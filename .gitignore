@@ -1,0 +1,33 @@
+# Local secrets (never commit)
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Optional: large extracted MedDRA flat files
+# data/meddra/MedAscii/
+# data/meddra/ascii-290/
+
+# Pipeline JSONL outputs (regenerate: scripts/run_pipeline.py, rerun_all.sh)
+results/**/*.jsonl
+experiments/**/results/*.jsonl
+
+# Unsloth JIT cache
+unsloth_compiled_cache/
+
+# Local / multi-GB checkpoints (see models/README.md)
+models/*
+!models/README.md
+
+# MedDRA release and optional training corpora (obtain under licence; see data/README.md)
+data/meddra/
+data/QUAERO_FrenchMed/
+
+# IDE / OS
+.cursor/
+.DS_Store
+
+# Planning cache (local)
+data/section48/planning_locks.json

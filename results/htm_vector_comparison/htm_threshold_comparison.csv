@@ -1,0 +1,18 @@
+ner_condition,label,display,htm_string,htm_vector_080,htm_vector_090
+ner_baseline,s1,S1 NLLB,0.303571,0.0,0.0
+ner_baseline,s2,S2 Mistral (doc),0.303571,0.089286,0.017857
+ner_baseline,s3,S3 GraphRAG,0.321429,0.107143,0.017857
+ner_baseline,s4,S4 rerank,0.339286,0.107143,0.0
+ner_baseline,s5,S5 NLLB + boost,0.303571,0.0,0.0
+ner_biollm,s1,S1 NLLB,0.303571,0.0,0.0
+ner_biollm,s2,S2 Mistral (doc),0.0,0.0,0.0
+ner_biollm,s3,S3 GraphRAG,0.375,0.125,0.035714
+ner_biollm,s4,S4 rerank,0.375,0.071429,0.017857
+ner_biollm,s5,S5 NLLB + boost,0.303571,0.0,0.0
+ner_biollm,s5_mistral,S5 Mistral + boost,0.375,0.142857,0.035714
+ner_biollm_finetuned,s1,S1 NLLB,0.303571,0.0,0.0
+ner_biollm_finetuned,s2,S2 Mistral (doc),0.303571,0.089286,0.017857
+ner_biollm_finetuned,s3,S3 GraphRAG,0.375,0.089286,0.017857
+ner_biollm_finetuned,s4,S4 rerank,0.375,0.089286,0.017857
+ner_biollm_finetuned,s5,S5 NLLB + boost,0.303571,0.0,0.0
+ner_biollm_finetuned,s5_mistral,S5 Mistral + boost,0.375,0.107143,0.035714

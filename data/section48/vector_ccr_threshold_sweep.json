@@ -1,0 +1,20 @@
+{
+  "0.70": {
+    "ccr": 1.0,
+    "grounded": 472,
+    "total": 472,
+    "fallbacks": 0
+  },
+  "0.75": {
+    "ccr": 0.987288,
+    "grounded": 466,
+    "total": 472,
+    "fallbacks": 6
+  },
+  "0.80": {
+    "ccr": 0.966102,
+    "grounded": 456,
+    "total": 472,
+    "fallbacks": 16
+  }
+}

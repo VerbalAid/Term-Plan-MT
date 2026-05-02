@@ -1,0 +1,5 @@
+figures_subdir=figures
+ccr_snapshot_fallback=ccr_snapshot.json (used when Neo4j/CSV give identical CCR)
+conditions_loaded:
+  ner_biollm
+  ner_biollm_finetuned

@@ -1,0 +1,19 @@
+[no-graph] Skipping Neo4j — HTM and dataset CCR omitted.
+
+System         BLEU     chrF    COMET      HTM      CCR
+(dataset)                                        --
+s1            22.89    37.14    0.639       --       --
+s2            18.81    39.73    0.629       --       --
+s3            10.78    35.48    0.587       --       --
+s4            10.43    35.07    0.591       --       --
+s5            21.14    35.49    0.637       --       --
+s5_mistral    10.81    35.46    0.586       --       --
+
+Inference wall time (s/segment, end-to-end per segment). Cross-system totals are not comparable when models sit on CPU vs GPU.
+System         mean_s      p95_s
+s1              2.130      6.397
+s2             17.478     47.456
+s3             23.484     77.139
+s4             51.200    169.469
+s5              0.718      2.013
+s5_mistral      4.618     14.270

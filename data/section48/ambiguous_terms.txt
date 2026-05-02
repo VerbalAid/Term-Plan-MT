@@ -1,0 +1,4 @@
+carcinome des voies biliaires	2
+fatigue	2
+pneumopathie inflammatoire	2
+toux	2
