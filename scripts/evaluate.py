@@ -2,7 +2,7 @@
 """BLEU/chrF/COMET and terminology metrics (see README).
 
 CCR: NER spans grounded in Neo4j (dataset coverage).
-HTM: optional ``--gold-terms`` JSON + graph hierarchy (requires Neo4j unless ``--no-graph``).
+HTM: optional ``--gold-terms`` audit list + graph checks on **English** ``hyp`` (Neo4j unless ``--no-graph``).
 """
 
 from __future__ import annotations

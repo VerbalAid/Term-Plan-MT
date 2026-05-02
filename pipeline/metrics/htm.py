@@ -1,8 +1,11 @@
 """Hierarchy-aware terminology match (HTM).
 
-Each score needs a **curated gold row** (French cue, expected English label/aliases, MedDRA level),
-the **hypothesis** English, and **Neo4j** for branch/level checks. It is not a standalone
-"how specific is English vs French source" metric without that gold list.
+Conceptually, HTM mirrors upstream NER+grounding on the **English hypothesis**: it checks
+whether realised English terminology sits correctly in **MedDRA / Neo4j** (branch and level).
+
+Implementation: each scored row comes from ``--gold-terms`` (French substring in ``fr`` selects
+which audit applies); the scorer then inspects **English in ``hyp``** for allowed renderings
+and graph consistency. This is not automatic English NER over the full hypothesis.
 """
 
 from __future__ import annotations

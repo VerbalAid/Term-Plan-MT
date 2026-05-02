@@ -39,7 +39,7 @@ It combines:
 | **NER** | Identify French medical spans worth constraining downstream (`terms[]` in JSONL) |
 | **Grounding** | Map each span to a MedDRA concept in Neo4j (identifier, English label, hierarchy) |
 | **Planning** | Choose a **canonical English rendering** per grounded surface and store it in a **global lock table** |
-| **MT + metrics** | Run translators that consume `fr`, locks, and optional graph context; score fluency, **HTM**, and **CCR** |
+| **MT + metrics** | Run translators that consume `fr`, locks, and optional graph context; score fluency, **HTM** (hierarchy check on **English** `hyp`), and **CCR** |
 
 ---
 
@@ -139,6 +139,8 @@ A **single global map** used by all segments and MT systems:
 3. Score English candidates (planning uses a **sentence-transformer** here; it is **not** the same mechanism as Neo4j vector grounding).  
 4. Write decisions into a shared **lock** structure consumed by MT stages.
 
+After translation, **HTM** ([§7](#7-htm-hierarchy-aware-terminology-metric)) applies the **same MedDRA hierarchy lens on the English hypothesis**—the reverse direction of grounding/planning, which attach concepts to **French** spans before decode.
+
 ### Artefact
 
 Generated **`planning_locks.json`** typically lives next to the segment JSONL (e.g. [`data/section48/planning_locks.json`](data/section48/planning_locks.json) alongside `segments_ner*.jsonl`); regenerate when NER or segments change.
@@ -160,7 +162,7 @@ They write per-system **JSONL hypotheses** (`s1.jsonl` … `s5_mistral.jsonl`) a
 | Concern | What we measure |
 | ------- | ----------------- |
 | Fluency vs reference | **BLEU**, **chrF++**, optional **COMET** (`scripts/evaluate.py`, `scripts/plot_results.py`) |
-| Terminology + hierarchy | **HTM** via optional `--gold-terms` JSON + Neo4j (`pipeline/metrics/htm.py`) |
+| Terminology + hierarchy | **HTM** — MedDRA-aware check on **English hypotheses** (`htm.py`; optional `--gold-terms` audit list + Neo4j) |
 | How much NER is even grounded | **Dataset CCR** — fraction of extracted spans with non-null grounding (`pipeline/metrics/ccr.py`) |
 
 ---
@@ -169,25 +171,29 @@ They write per-system **JSONL hypotheses** (`s1.jsonl` … `s5_mistral.jsonl`) a
 
 Implemented in [`pipeline/metrics/htm.py`](pipeline/metrics/htm.py).
 
-### Purpose
+### Conceptual role (mirror on English)
 
-Score whether English in the hypothesis respects **gold-listed** terminology **and** MedDRA **branch / level** consistency when a gold French cue appears in the source.
+Upstream, **NER → grounding → planning** walks **French** text: find risky spans, attach **MedDRA** concepts, fix **English** renderings before decode. **HTM is the same idea run backwards on the model output:** it inspects the **English hypothesis `hyp`** and asks whether the terminology that actually appears there sits at the **right place in the MedDRA hierarchy** (same branch / level logic you use during grounding), instead of only scoring surface overlap with `en_ref`.
 
-HTM is **not** a free-running measure of “specificity drift” from French to English without a reference list: it always uses **curated gold rows** (French substring in `fr`, expected English renderings, level) plus **Neo4j** to judge the hypothesis.
+So the **object of analysis is always the translated English string**; Neo4j supplies the ontology constraints, just as in the pipeline.
 
-### Scoring (per gold hit, simplified)
+### How it is implemented here
+
+The runtime stack does **not** run a second full **English NER** pass over `hyp` in `htm.py`. For a reproducible audit set, **`--gold-terms`** supplies rows with a French cue, expected English label(s), and level. A row **fires** when that French cue appears in the segment `fr`; then the scorer **searches `hyp`** for allowed English renderings and applies **1.0 / 0.5 / 0.0** from graph fit (`phrase_in_hyp`, `same_branch`, level match). The French field is therefore an **evaluation trigger** (which MedDRA-aligned checks apply), while the **score itself is driven by what English landed in the hypothesis**.
+
+### Scoring (per fired gold row, simplified)
 
 - **1.0** — Accepted English rendering **and** level consistent with the gold row  
 - **0.5** — Related via **`same_branch`** in the graph but level check fails  
 - **0.0** — Missing rendering, wrong branch, or no graph support  
 
-Run-level **HTM** is the mean over scored terms. Variants: **`compute_htm`** (lexical), **`compute_htm_vector`** (embedding-assisted).
+Run-level **HTM** is the mean over scored rows. Variants: **`compute_htm`** (lexical), **`compute_htm_vector`** (embedding-assisted).
 
 **Figure 2. HTM intuition**
 
 <p align="center">
   <img src="docs/figures/figure_htm_metric.png" alt="HTM: hierarchy-aware terminology scoring example" width="820"><br>
-  <sub><b>Figure 2.</b> Gold French cue → grounded English choices in Neo4j (see <code>htm.py</code>).</sub>
+  <sub><b>Figure 2.</b> After decode: English in <code>hyp</code> checked against MedDRA (same hierarchy discipline as upstream; audit points from <code>--gold-terms</code>).</sub>
 </p>
 
 ---

@@ -65,16 +65,16 @@ The **Neo4j graph** is the **interpretable layer**: each commitment ties to a co
 | Concern | Metric | Tooling in repo |
 | ------- | ------ | ---------------- |
 | Fluency vs reference | **BLEU**, **chrF++**, optional **COMET** | [`scripts/evaluate.py`](../scripts/evaluate.py), [`scripts/plot_results.py`](../scripts/plot_results.py) |
-| Hierarchy / gold-triggered terminology | **HTM** (1.0 / 0.5 / 0.0 per scored gold hit when the gold French cue appears in `fr`) | [`pipeline/metrics/htm.py`](../pipeline/metrics/htm.py); pass **`--gold-terms`** FR→EN JSON to [`evaluate.py`](../scripts/evaluate.py) / [`plot_results.py`](../scripts/plot_results.py) |
+| Hierarchy / MedDRA fit on **English** `hyp` | **HTM** (1.0 / 0.5 / 0.0 per audit row; graph checks on hypothesis wording) | [`pipeline/metrics/htm.py`](../pipeline/metrics/htm.py); optional **`--gold-terms`** JSON selects audit points; Neo4j supplies hierarchy |
 | Extracted span → graph reachability | **CCR** (dataset) | [`pipeline/metrics/ccr.py`](../pipeline/metrics/ccr.py) |
 
-**HTM** is the proposal’s **hierarchy-aware** score: for each **applicable** gold row (French cue present in the segment source), it asks whether English in the hypothesis **respects** the intended MedDRA **level/branch** relative to that row and Neo4j (`same_branch`, level match), not merely whether a synonym string appears somewhere in the hypothesis. It does **not** measure “specificity drift” from French to English without that gold list and graph.
+**HTM** is the **output-side mirror** of the French→MedDRA stack: it judges **English in the hypothesis** against **Neo4j** hierarchy (branch / level), not BLEU overlap alone. In code, a compact **`--gold-terms`** list **fires** audits when its French cue appears in `fr`; the score itself comes from **what English appears in `hyp`** relative to that row’s expected rendering and the graph. It is **not** an unconstrained “specificity gap” metric with no MedDRA anchor.
 
 ---
 
 ## 6. Gold annotation (evaluation contract)
 
-The proposal describes a **manual FR→EN term mapping** with **MedDRA levels** checked against the official browser. **HTM** in this codebase expects that same style of **reviewed** list as a JSON file you pass with **`--gold-terms`** (not shipped in-repo).
+The proposal describes a **manual FR→EN term mapping** with **MedDRA levels** checked against the official browser. For **HTM**, pass that style of list as **`--gold-terms`**: it **selects which hierarchy audits run** on each segment; the **measured surface is still English in `hyp`** (not shipped in-repo).
 
 ---
 
@@ -82,7 +82,7 @@ The proposal describes a **manual FR→EN term mapping** with **MedDRA levels** 
 
 - **Interpretable terminology layer:** French spans → **Neo4j** concepts → **locks** → MT — each step inspectable.  
 - **Causal ablation ladder:** S1→S5 isolates **context**, **graph-informed prompting**, **reranking**, and **decoding-time** pressure.  
-- **HTM:** explicitly scores **hierarchy drift** against gold + graph structure (see root README Figure 2).  
+- **HTM:** **output-side** MedDRA hierarchy check on **English hypotheses** (audit list via `--gold-terms`; see root README Figure 2).
 - **Reusable graph workflow:** same Neo4j store can accumulate **multiple** SmPCs under your licence and ingest pipeline.  
 - **NER flexibility:** prompted vs fine-tuned **BioMistral** extractors ([`experiments/french_medical_ner/`](../experiments/french_medical_ner/)), with **grounding-mode** studies ([`compare_neo4j_grounding_ccr.py`](../experiments/french_medical_ner/compare_neo4j_grounding_ccr.py)) supporting methodology appendices.
 
