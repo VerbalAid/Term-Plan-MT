@@ -122,7 +122,7 @@ From **`vector_ccr_all_models.json`** at **`11783a0^`**. **CCR** = fraction of e
 | Re-run two-condition driver | `./rerun_all.sh` (see root `README.md`) |
 | Re-evaluate one condition | `PYTHONPATH=. python scripts/evaluate.py --results-dir results/<condition> --segments data/section48/<segments>.jsonl` |
 | Rebuild figures / `scores_summary.csv` | `PYTHONPATH=. python scripts/plot_results.py --results-dir … --segments …` |
-| Ambiguous FR keys (two JSONLs + locks) | `PYTHONPATH=. python scripts/report_ambiguous_grounding.py` → `exports/ambiguous_grounding_report.csv` |
+| Ambiguous FR keys (two JSONLs + locks) | `PYTHONPATH=. python scripts/report_ambiguous_grounding.py` → `error_analysis/ambiguous_grounding_report.csv` |
 | Recover deleted `results/ner_*` CSV from git | e.g. `git show '11783a0^:results/ner_baseline/figures/scores_summary.csv'` |
 
 ---

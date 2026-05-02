@@ -87,8 +87,8 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 - **`data/section48/vector_ccr_all_models.json`**: trimmed to BioLLM + Unsloth-full stats (rerun `experiments/vector_grounding/build_vector_ccr_reports.py` to refresh).
 - **`results/htm_vector_comparison/`**: removed stale committed plots/CSVs; `.gitkeep` only until `rerun_all.sh` or `compare_htm_vector_thresholds.py` regenerates them.
 - **`experiments/french_medical_ner/quaero_brat_reader.py`**: QUAERO BRAT helpers (`ID2LABEL`, `load_quaero_brat`) used by `biomistral_ner_finetune_unsloth.py` (standalone module; legacy CamemBERT trainer removed).
-- **`exports/legacy/`**: sample error CSV tagged with removed conditions.
-- **`scripts/archive_results_snapshot.sh`**: optional tarball of `results/`, `exports/`, `planning_locks.json`.
+- **`error_analysis/legacy/`**: sample error CSV tagged with removed conditions.
+- **`scripts/archive_results_snapshot.sh`**: optional tarball of `results/`, `error_analysis/`, `planning_locks.json`.
 
 **Removed symlink**
 

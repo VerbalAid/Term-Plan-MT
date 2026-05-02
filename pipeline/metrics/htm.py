@@ -1,4 +1,9 @@
-"""Hierarchy-aware terminology match (HTM): string or embedding overlap + MedDRA level."""
+"""Hierarchy-aware terminology match (HTM).
+
+Each score needs a **curated gold row** (French cue, expected English label/aliases, MedDRA level),
+the **hypothesis** English, and **Neo4j** for branch/level checks. It is not a standalone
+"how specific is English vs French source" metric without that gold list.
+"""
 
 from __future__ import annotations
 

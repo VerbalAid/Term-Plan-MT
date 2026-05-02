@@ -68,7 +68,7 @@ The **Neo4j graph** is the **interpretable layer**: each commitment ties to a co
 | Hierarchy / gold-triggered terminology | **HTM** (1.0 / 0.5 / 0.0 per scored gold hit when the gold French cue appears in `fr`) | [`pipeline/metrics/htm.py`](../pipeline/metrics/htm.py); pass **`--gold-terms`** FR→EN JSON to [`evaluate.py`](../scripts/evaluate.py) / [`plot_results.py`](../scripts/plot_results.py) |
 | Extracted span → graph reachability | **CCR** (dataset) | [`pipeline/metrics/ccr.py`](../pipeline/metrics/ccr.py) |
 
-**HTM** is the proposal’s **hierarchy-aware** score: for each **applicable** gold row (French cue present in the segment source), it asks whether English in the hypothesis **respects** the intended MedDRA **level/branch** relative to that row and Neo4j (`same_branch`, level match), not merely whether a synonym string appears somewhere in the hypothesis.
+**HTM** is the proposal’s **hierarchy-aware** score: for each **applicable** gold row (French cue present in the segment source), it asks whether English in the hypothesis **respects** the intended MedDRA **level/branch** relative to that row and Neo4j (`same_branch`, level match), not merely whether a synonym string appears somewhere in the hypothesis. It does **not** measure “specificity drift” from French to English without that gold list and graph.
 
 ---
 

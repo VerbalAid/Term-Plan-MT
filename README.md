@@ -173,6 +173,8 @@ Implemented in [`pipeline/metrics/htm.py`](pipeline/metrics/htm.py).
 
 Score whether English in the hypothesis respects **gold-listed** terminology **and** MedDRA **branch / level** consistency when a gold French cue appears in the source.
 
+HTM is **not** a free-running measure of “specificity drift” from French to English without a reference list: it always uses **curated gold rows** (French substring in `fr`, expected English renderings, level) plus **Neo4j** to judge the hypothesis.
+
 ### Scoring (per gold hit, simplified)
 
 - **1.0** — Accepted English rendering **and** level consistent with the gold row  

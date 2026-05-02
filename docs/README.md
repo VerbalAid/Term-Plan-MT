@@ -10,6 +10,6 @@
 | [error_analysis/ambiguous_grounding.md](error_analysis/ambiguous_grounding.md) | Multi-concept FR keys, aggregates vs two NER JSONLs, planning locks |
 | [PROJECT_NOTES.md](PROJECT_NOTES.md) | Engineering log (grounding, thresholds, tooling) |
 | [paper_narrative_ner.md](paper_narrative_ner.md) | NER ablation notes for writing |
-| [exports/README.md](../exports/README.md) | Generated error-review CSVs (regenerate after pipeline runs; not source of truth) |
+| [error_analysis/README.md](../error_analysis/README.md) | Generated error-review CSVs (regenerate after pipeline runs; not source of truth) |
 
 Proposal PDF (if present): `docs/project-plan/TermPlanMT_Proposal.pdf`.

@@ -15,7 +15,7 @@ Requires Neo4j (same as ``evaluate.py``). Run from repo root::
       --segments-b data/section48/segments_ner_unsloth.jsonl \\
       --label-b ner_biollm_finetuned \\
       --locks data/section48/planning_locks.json \\
-      --out-csv exports/ambiguous_grounding_report.csv
+      --out-csv error_analysis/ambiguous_grounding_report.csv
 """
 
 from __future__ import annotations
@@ -91,7 +91,7 @@ def main() -> None:
         default=ROOT / "data" / "section48" / "planning_locks.json",
         help="Optional planning_locks.json (French surface -> English lock).",
     )
-    ap.add_argument("--out-csv", type=Path, default=ROOT / "exports" / "ambiguous_grounding_report.csv")
+    ap.add_argument("--out-csv", type=Path, default=ROOT / "error_analysis" / "ambiguous_grounding_report.csv")
     ap.add_argument("--grounding-mode", default="string", choices=("string", "vector", "vector_llm"))
     ap.add_argument("--exclude-segment-ids", default="", help="Comma-separated segment ids to skip.")
     args = ap.parse_args()

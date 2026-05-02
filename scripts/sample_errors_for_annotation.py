@@ -7,10 +7,10 @@ Optional Ollama/OpenAI fills CSV columns using built-in MedDRA-aligned flag defi
 Examples::
 
     PYTHONPATH=. python scripts/sample_errors_for_annotation.py \\
-      --out-csv exports/error_review_50.csv --n 50 --annotate-backend ollama
+      --out-csv error_analysis/error_review_50.csv --n 50 --annotate-backend ollama
 
     PYTHONPATH=. python scripts/sample_errors_for_annotation.py \\
-      --out-csv exports/errors.csv --annotate-backend none
+      --out-csv error_analysis/errors.csv --annotate-backend none
 """
 
 from __future__ import annotations

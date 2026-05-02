@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 stamp="$(date +%Y%m%d_%H%M%S)"
 out="artifacts_snapshot_${stamp}.tar.gz"
-paths=(results exports data/section48/planning_locks.json)
+paths=(results error_analysis data/section48/planning_locks.json)
 for extra in "$@"; do
   paths+=("$extra")
 done
