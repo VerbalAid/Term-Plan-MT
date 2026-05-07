@@ -16,25 +16,32 @@ def normalize_text(s: str) -> str:
     return s
 
 
-def phrase_in_hyp(hyp: str, phrase: str) -> bool:
+def phrase_in_text(text: str, phrase: str) -> bool:
+    """True if normalized ``phrase`` is a substring of normalized ``text``."""
     if not phrase:
         return False
-    return normalize_text(phrase) in normalize_text(hyp)
+    return normalize_text(phrase) in normalize_text(text)
 
 
-def all_renderings(gold: dict[str, Any]) -> list[str]:
+def phrase_in_hyp(hyp: str, phrase: str) -> bool:
+    """Backward-compatible name for :func:`phrase_in_text` (hypothesis string)."""
+    return phrase_in_text(hyp, phrase)
+
+
+def all_renderings(spec: dict[str, Any]) -> list[str]:
+    """English surface strings from a term spec dict (``en_label`` + ``en_aliases``)."""
     out: list[str] = []
-    if gold.get("en_label"):
-        out.append(str(gold["en_label"]))
-    for a in gold.get("en_aliases") or []:
+    if spec.get("en_label"):
+        out.append(str(spec["en_label"]))
+    for a in spec.get("en_aliases") or []:
         if a:
             out.append(str(a))
     return out
 
 
-def canonical_rendering_if_match(hyp: str, gold: dict[str, Any]) -> str | None:
-    """If ``hyp`` contains a gold rendering, return ``en_label``; else ``None``."""
-    for r in all_renderings(gold):
+def canonical_rendering_if_match(hyp: str, spec: dict[str, Any]) -> str | None:
+    """If ``hyp`` contains a rendering from ``spec``, return ``en_label``; else ``None``."""
+    for r in all_renderings(spec):
         if phrase_in_hyp(hyp, r):
-            return str(gold["en_label"])
+            return str(spec["en_label"])
     return None

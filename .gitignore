@@ -10,9 +10,14 @@ __pycache__/
 # data/meddra/MedAscii/
 # data/meddra/ascii-290/
 
-# Pipeline JSONL outputs (regenerate: scripts/run_pipeline.py, rerun_all.sh)
+# Pipeline JSONL outputs (regenerate: tools/pipeline/run_pipeline.py, rerun_all.sh)
 results/**/*.jsonl
-experiments/**/results/*.jsonl
+extras/experiments/**/results/*.jsonl
+
+# Local bulk / logs (regenerate or optional; shrink clones — see README §0)
+archive/
+# Prefer long-run logs under archive/logs/ (inside archive/, ignored with the rest).
+logs/
 
 # Unsloth JIT cache
 unsloth_compiled_cache/
@@ -25,9 +30,21 @@ models/*
 data/meddra/
 data/QUAERO_FrenchMed/
 
+# Large ontology NER SFT exports (regenerate; see tools/data/build_ontology_sft.py)
+data/ontology_ner_full*.jsonl
+data/sft/
+
 # IDE / OS
 .cursor/
 .DS_Store
 
 # Planning cache (local)
 data/section48/planning_locks.json
+
+# pdflatex intermediates (e.g. docs/termplan_acl_snapshot.tex)
+docs/*.aux
+docs/*.log
+docs/*.out
+
+# Ad-hoc error-analysis run logs
+error_analysis/*.log

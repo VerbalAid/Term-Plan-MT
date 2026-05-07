@@ -1,4 +1,4 @@
-"""Re-exports for scripts/notebooks that import ``pipeline.systems.utils``."""
+"""Re-exports for tools/notebooks that import ``pipeline.systems.utils``."""
 
 from pipeline.systems.data_io import iter_limited, iter_segments, load_all_segments, write_result_row
 from pipeline.systems.mistral_prompts import (

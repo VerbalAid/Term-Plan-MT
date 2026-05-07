@@ -1,0 +1,85 @@
+% TermPlan-MT — snapshot write-up (ACL-style: plain language, compact tables).
+% Compile: pdflatex termplan_acl_snapshot.tex  (twice if you add references later)
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+
+\title{TermPlan-MT: Graph-Grounded French--English Translation\\for SmPC Section~4.8 (Results Snapshot)}
+\author{Project repository snapshot}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We summarise \textbf{TermPlan-MT}, a French-to-English pipeline for regulatory SmPC \S4.8 text (Keytruda slice, 127 aligned sentence pairs). Named entities in French are grounded in a \textbf{MedDRA} graph (Neo4j), terminology is \textbf{planned} into global locks, and six MT conditions (S1--S5 plus a Mistral S5 branch) are scored with \textbf{sacreBLEU} BLEU/chrF++, hierarchy-aware \textbf{HTM}, a new \textbf{hypothesis--reference HTM agreement} score, dataset \textbf{rHTM}, and span \textbf{CCR}. We report two NER regimes: prompted BioMistral vs.\ fine-tuned BioMistral (Unsloth), and list ten French NER surfaces that trigger \textbf{ambiguous} string grounding for manual ontology review.
+\end{abstract}
+
+\section{Task and setup}
+The goal is terminology-consistent translation under a controlled vocabulary: French clinical phrases are linked to MedDRA concepts before and after decoding. Evaluation uses the same segment JSONL for NER spans as for CCR/HTM. Neo4j must be running for graph metrics.
+
+\section{Automatic metrics (short definitions)}
+\begin{itemize}
+  \item \textbf{BLEU / chrF++:} Corpus scores with \texttt{sacreBLEU} over all aligned segment hypotheses vs.\ a single English reference per segment (\texttt{pipeline/metrics/corpus\_scores.py}). Document variants \textbf{BLdoc} (macro mean per document) and \textbf{BLcn} (BLEU on space-joined segments per document) appear in \texttt{scores\_summary.csv}.
+  \item \textbf{HTM:} For each unique French \texttt{terms[].word} that grounds in Neo4j, we look for MedDRA-aligned English renderings in the system \textbf{hypothesis} and assign 1.0 / 0.5 / 0.0 using level and branch checks (\texttt{compute\_htm}).
+  \item \textbf{rHTM (htm\_en\_ref\_dataset):} Same HTM machinery on the human \textbf{en\_ref} string, averaged once per dataset (ceiling for MedDRA wording in the reference).
+  \item \textbf{htm\_hyp\_ref\_agreement:} Per system, over \textbf{grounded} French spans only: HTM-style score on \texttt{hyp} and the same score on \texttt{en\_ref}; we report the mean of $1 - |s_{\mathrm{hyp}} - s_{\mathrm{ref}}|$. High values mean the model's ontology-aligned rendering tier tracks the human sentence for the same French cue.
+  \item \textbf{CCR:} Fraction of extracted NER spans that receive a non-null MedDRA grounding (dataset level).
+\end{itemize}
+
+\section{Main numeric tables}
+Numbers are copied from \texttt{results/*/figures/scores\_summary.csv} at export time (two decimal places; COMET omitted when not computed).
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{System} & \textbf{BLEU} & \textbf{chrF} & \textbf{HTM} & \textbf{HypRefAg} & \textbf{CCR} \\
+\midrule
+\multicolumn{6}{l}{\textit{NER = prompted BioMistral (\texttt{segments\_ner\_biollm.jsonl})}} \\
+S1 NLLB & 18.89 & 31.90 & 0.11 & 0.68 & 0.35 \\
+S2 Mistral (doc) & 19.84 & 35.58 & 0.20 & 0.66 & 0.35 \\
+S3 GraphRAG & 10.79 & 32.65 & 0.25 & 0.59 & 0.35 \\
+S4 rerank & 10.87 & 32.85 & 0.24 & 0.60 & 0.35 \\
+S5 NLLB + boost & 17.34 & 30.55 & 0.13 & 0.66 & 0.35 \\
+S5 Mistral + boost & 10.82 & 32.64 & 0.27 & 0.58 & 0.35 \\
+\midrule
+\multicolumn{6}{l}{\textit{NER = fine-tuned BioMistral (\texttt{segments\_ner\_unsloth\_full.jsonl})}} \\
+S1 NLLB & 18.89 & 31.90 & 0.17 & 0.42 & 0.32 \\
+S2 Mistral (doc) & 20.37 & 35.85 & 0.25 & 0.49 & 0.32 \\
+S3 GraphRAG & 15.36 & 34.60 & 0.26 & 0.42 & 0.32 \\
+S4 rerank & 15.66 & 34.92 & 0.26 & 0.43 & 0.32 \\
+S5 NLLB + boost & 17.54 & 31.02 & 0.17 & 0.39 & 0.32 \\
+S5 Mistral + boost & 15.98 & 34.85 & 0.26 & 0.43 & 0.32 \\
+\bottomrule
+\end{tabular}
+\caption{Fluency (BLEU/chrF), HTM on hypotheses, hypothesis--reference agreement (HypRefAg), and dataset CCR. rHTM (not shown) is $\approx$0.13 (prompt) / $\approx$0.16 (FT) on this export.}
+\label{tab:main}
+\end{table}
+
+\paragraph{Takeaway.} Fine-tuned NER raises \textbf{HTM} on several systems (more audited spans align with MedDRA renderings in \texttt{hyp}) but lowers \textbf{HypRefAg}: the model's hierarchy scores diverge slightly more from the human reference tier than under prompted NER, at similar BLEU for S1. Graph-heavy lines (S3--S5) remain fluency-expensive vs.\ S1/S2.
+
+\section{Ambiguous French surfaces (manual follow-up)}
+String grounding warns when one normalised French key matches \textbf{multiple} MedDRA concepts. We export ten \textbf{(segment\_id, term)} examples for prompted NER in \texttt{error\_analysis/ambiguous\_spans\_top10.md} (and \texttt{.csv}), generated by \texttt{tools/error\_analysis/list\_ambiguous\_spans.py}. Use the official MedDRA browser to inspect competing PT/LLT branches for each surface.
+
+\section{Reproducibility commands}
+\begin{verbatim}
+docker compose up -d   # Neo4j
+export PYTHONPATH=.
+python tools/eval/evaluate.py --no-comet \
+  --results-dir results/ner_biollm \
+  --segments data/section48/segments_ner_biollm.jsonl
+python tools/eval/plot_figures.py --results-dir results/ner_biollm \
+  --segments data/section48/segments_ner_biollm.jsonl
+python tools/error_analysis/list_ambiguous_spans.py --n 10
+\end{verbatim}
+\noindent Omit \texttt{--no-comet} to compute COMET when the Unbabel model is installed (slower).
+
+\section{What was added in code (this milestone)}
+\texttt{compute\_htm\_hyp\_vs\_ref} in \texttt{pipeline/metrics/htm.py}; column \texttt{htm\_hyp\_ref\_agreement} in \texttt{collect\_system\_metric\_rows} / \texttt{scores\_summary.csv}; console column \texttt{HypRefAg} plus stderr legend in \texttt{tools/eval/evaluate.py}; optional \texttt{--no-comet} for faster re-scoring; \texttt{tools/error\_analysis/list\_ambiguous\_spans.py} for manual ambiguity review; README and \texttt{docs/CONCLUSIONS.md} updated accordingly.
+
+\end{document}

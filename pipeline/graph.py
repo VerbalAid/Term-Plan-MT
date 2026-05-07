@@ -84,6 +84,10 @@ class TermGraph:
 
         self._ambiguous_lines: list[str] = []
         self._vector_rejected_spans: list[dict[str, Any]] = []
+        self._hierarchy_cache: dict[str, dict[str, Any]] = {}
+        self._hierarchy_index_loaded: bool = False
+        self._hierarchy_payloads: dict[str, dict[str, Any]] | None = None
+        self._hierarchy_parent_by_child: dict[str, str] | None = None
         self.reset_grounding_stats()
 
     def set_vector_threshold(self, value: float) -> None:
@@ -542,7 +546,175 @@ class TermGraph:
             rec = session.run(q, na=name_a.strip(), nb=name_b.strip()).single()
         return bool(rec and rec["ok"])
 
+    @staticmethod
+    def _neo_concept_payload(node: Any) -> dict[str, Any]:
+        return {
+            "id": node.get("id"),
+            "name": node.get("name"),
+            "level": node.get("level"),
+            "tier": node.get("tier"),
+        }
+
+    def preload_hierarchy_index(self) -> None:
+        """Load every ``:Concept`` payload plus ``BROADER_THAN`` child→parent edges once.
+
+        After this, ``fetch_hierarchy_for_concept`` resolves chains in memory (two Neo4j scans total),
+        which is required for full-ontology exports with tens of thousands of concepts.
+        """
+        if self._hierarchy_index_loaded:
+            return
+        payloads: dict[str, dict[str, Any]] = {}
+        parent_by_child: dict[str, str] = {}
+        q_nodes = """
+        MATCH (c:Concept)
+        WHERE c.id IS NOT NULL AND trim(toString(c.id)) <> ''
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier
+        """
+        q_edges = """
+        MATCH (p:Concept)-[:BROADER_THAN]->(c:Concept)
+        WHERE c.id IS NOT NULL AND p.id IS NOT NULL
+        RETURN toString(c.id) AS child, toString(p.id) AS parent
+        """
+        with self._driver.session() as session:
+            for rec in session.run(q_nodes):
+                cid = str(rec["id"]).strip()
+                if cid:
+                    payloads[cid] = {
+                        "id": cid,
+                        "name": rec["name"],
+                        "level": rec["level"],
+                        "tier": rec["tier"],
+                    }
+            for rec in session.run(q_edges):
+                ch = str(rec["child"]).strip()
+                pa = str(rec["parent"]).strip()
+                if ch and pa:
+                    parent_by_child[ch] = pa
+        self._hierarchy_payloads = payloads
+        self._hierarchy_parent_by_child = parent_by_child
+        self._hierarchy_index_loaded = True
+
+    def _hierarchy_from_index(self, cid: str) -> dict[str, Any]:
+        """Build chain via parent pointers (requires ``preload_hierarchy_index``)."""
+        payloads = self._hierarchy_payloads or {}
+        parent_of = self._hierarchy_parent_by_child or {}
+        if cid not in payloads:
+            return {"chain": [], "by_tier": {}}
+        up_ids: list[str] = []
+        cur: str | None = cid
+        seen: set[str] = set()
+        while cur and cur not in seen:
+            seen.add(cur)
+            up_ids.append(cur)
+            cur = parent_of.get(cur)
+        chain_ids = list(reversed(up_ids))
+        chain: list[dict[str, Any]] = []
+        for i in chain_ids:
+            pl = payloads.get(i)
+            if pl:
+                chain.append(dict(pl))
+        by_tier: dict[str, dict[str, Any]] = {}
+        for pl in chain:
+            t = str(pl.get("tier") or "").strip().upper()
+            if t:
+                by_tier[t] = pl
+        return {"chain": chain, "by_tier": by_tier}
+
+    def fetch_hierarchy_for_concept(self, concept_id: str, *, use_cache: bool = True) -> dict[str, Any]:
+        """Primary MedDRA branch SOC→…→concept for ``concept_id`` (``:Concept.id``).
+
+        Returns ``{"chain": list[payload], "by_tier": dict[tier_code, payload]}`` where each payload
+        has keys ``id``, ``name``, ``level``, ``tier``. ``chain`` is ordered broad→narrow.
+
+        Uses the longest SOC-rooted ``BROADER_THAN`` path when multiple matches exist (MedDRA tree
+        should yield a single branch). Results are cached per id for export scripts.
+        """
+        cid = str(concept_id or "").strip()
+        if not cid:
+            return {"chain": [], "by_tier": {}}
+        if use_cache and cid in self._hierarchy_cache:
+            return dict(self._hierarchy_cache[cid])
+        if self._hierarchy_index_loaded:
+            out = self._hierarchy_from_index(cid)
+            self._hierarchy_cache[cid] = out
+            return dict(out)
+
+        q = """
+        MATCH (anchor:Concept {id: $cid})
+        OPTIONAL MATCH path = (soc:Concept)-[:BROADER_THAN*0..14]->(anchor)
+        WHERE soc.tier = 'SOC'
+        WITH anchor, path
+        ORDER BY coalesce(length(path), -1) DESC
+        LIMIT 1
+        RETURN anchor, path
+        """
+        chain: list[dict[str, Any]] = []
+        with self._driver.session() as session:
+            rec = session.run(q, cid=cid).single()
+        if not rec:
+            out = {"chain": [], "by_tier": {}}
+            self._hierarchy_cache[cid] = out
+            return out
+
+        anchor = rec["anchor"]
+        path = rec["path"]
+        if path is None:
+            chain = [self._neo_concept_payload(anchor)]
+        else:
+            try:
+                nodes = list(path.nodes)
+            except Exception:
+                nodes = []
+            chain = [self._neo_concept_payload(n) for n in nodes]
+
+        by_tier: dict[str, dict[str, Any]] = {}
+        for pl in chain:
+            t = str(pl.get("tier") or "").strip().upper()
+            if t:
+                by_tier[t] = pl
+
+        out = {"chain": chain, "by_tier": by_tier}
+        self._hierarchy_cache[cid] = out
+        return out
+
+    def fetch_concepts_with_fr_labels(self, *, tiers: list[str] | None = None) -> list[dict[str, Any]]:
+        """Return ``:Concept`` rows with French labels (for full-ontology SFT export).
+
+        Each dict has keys ``id``, ``name``, ``level``, ``tier``, ``fr_label`` (Neo4j field names).
+        """
+        params: dict[str, Any] = {}
+        tier_clause = ""
+        if tiers:
+            tier_clause = " AND c.tier IN $tiers"
+            params["tiers"] = list(tiers)
+        q = (
+            "MATCH (c:Concept)\n"
+            "WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''\n"
+            "  AND c.name IS NOT NULL AND trim(c.name) <> ''\n"
+            "  AND c.level IS NOT NULL\n"
+            f"{tier_clause}\n"
+            "RETURN coalesce(c.id, c.name) AS id, c.name AS name, c.level AS level, "
+            "c.tier AS tier, c.fr_label AS fr_label"
+        )
+        rows: list[dict[str, Any]] = []
+        with self._driver.session() as session:
+            for rec in session.run(q, **params):
+                rows.append(
+                    {
+                        "id": rec["id"],
+                        "name": rec["name"],
+                        "level": rec["level"],
+                        "tier": rec["tier"],
+                        "fr_label": rec["fr_label"],
+                    }
+                )
+        return rows
+
     def close(self) -> None:
+        self._hierarchy_cache.clear()
+        self._hierarchy_index_loaded = False
+        self._hierarchy_payloads = None
+        self._hierarchy_parent_by_child = None
         self._driver.close()
         emb = self._embedder
         self._embedder = None

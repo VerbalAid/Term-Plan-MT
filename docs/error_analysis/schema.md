@@ -6,7 +6,7 @@ Use this for qualitative review of FR→EN hypotheses against references and gra
 
 One row per **(segment_id, system_id, issue)** triple. If a segment has multiple independent issues, use multiple rows with the same `segment_id` and `system_id`.
 
-When exporting via `scripts/sample_errors_for_annotation.py`, default sampling is **one CSV row per `segment_id`** (worst chrF triple among all systems/conditions); add `--repeat-segments` for other layouts.
+When exporting via `tools/error_analysis/sample_errors_for_annotation.py`, default sampling is **one CSV row per `segment_id`** (worst chrF triple among all systems/conditions); add `--repeat-segments` for other layouts.
 
 ## Fields
 
@@ -37,7 +37,7 @@ When exporting via `scripts/sample_errors_for_annotation.py`, default sampling i
 - `ner_propagation` — error plausibly tied to missing/wrong NER span feeding S3–S5.
 - `other` — use sparingly; extend list if patterns repeat.
 
-Definitions (1–4) live in `scripts/sample_errors_for_annotation.py` as `ERROR_REVIEW_ONTOLOGY_GUIDE` and are prepended to Ollama/OpenAI annotation prompts.
+Definitions (1–4) live in `tools/error_analysis/sample_errors_for_annotation.py` as `ERROR_REVIEW_ONTOLOGY_GUIDE` and are prepended to Ollama/OpenAI annotation prompts.
 
 ## Pairwise workflow
 

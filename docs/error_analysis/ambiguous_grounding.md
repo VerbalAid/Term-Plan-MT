@@ -14,6 +14,6 @@ This is a **graph / lexicon** phenomenon (synonymous or colliding FR labels), no
 
 ## Script
 
-[`scripts/report_ambiguous_grounding.py`](../../scripts/report_ambiguous_grounding.py) writes `error_analysis/ambiguous_grounding_report.csv` and prints aggregate counts for two JSONLs (defaults: `segments_ner_biollm.jsonl` vs `segments_ner_unsloth.jsonl`).
+[`tools/error_analysis/report_ambiguous_grounding.py`](../../tools/error_analysis/report_ambiguous_grounding.py) writes `error_analysis/ambiguous_grounding_report.csv` and prints aggregate counts for two JSONLs (defaults: `segments_ner_biollm.jsonl` vs `segments_ner_unsloth.jsonl`).
 
 **Stale locks:** After changing segments without regenerating `planning_locks.json`, I deleted the locks file or re-ran the pipeline with recompute so lock columns matched the current NER file.

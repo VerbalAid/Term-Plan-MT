@@ -21,7 +21,23 @@ It combines:
 - **MedDRA grounding** via Neo4j (`TermGraph`)  
 - **Global terminology planning** (per-surface locks shared across segments)  
 - **Multiple MT systems** — plain and graph-aware — in `pipeline/systems/`  
-- **Evaluation** that separates **fluency** (BLEU, chrF++, optional COMET) from **hierarchy-aware terminology** (**HTM**) and **dataset grounding coverage** (**CCR**)
+- **Evaluation** that separates **fluency** (BLEU, chrF++, optional COMET) from **hierarchy-aware terminology** (**HTM**, **hyp–ref HTM agreement**, **rHTM**) and **dataset grounding coverage** (**CCR**), plus **document-level BLEU** variants (macro over sentences per document, and **concatenated** document BLEU in `scores_summary.csv`)
+
+---
+
+## 0. Thesis rerun in N steps
+
+1. **Enter the repository** — From the parent folder, use a quoted path if your directory name ends with a **space** (some checkouts are literally `MT_Project_Terminology `):  
+   `cd "/home/you/Desktop/Masters/MT/MT_Project_Terminology "`
+2. **Create the venv and install dependencies** — `python -m venv .venv` then `.venv/bin/pip install -r requirements.txt` (see `requirements.txt` for optional Unsloth blocks used only from [`extras/`](extras/README.md)).
+3. **Start Neo4j** — From the repo root: `docker compose up -d` (MedDRA graph build expectations are in [`data/README.md`](data/README.md)).
+4. **Prepare or refresh segment JSONL** — Default segmentation: [`tools/data/prepare_data.py`](tools/data/prepare_data.py) → `data/section48/segments_ner.jsonl`. For BioMistral / Unsloth NER variants, run the scripts under [`extras/experiments/french_medical_ner/`](extras/experiments/french_medical_ner/) (see [`extras/README.md`](extras/README.md)).
+5. **Run translation** — Full matrix: [`rerun_all.sh`](rerun_all.sh) from the repo root (`SKIP_*` toggles are documented in the script header). Single profile + lighter defaults: [`thesis_rerun.sh`](thesis_rerun.sh). Ad hoc: [`tools/pipeline/run_pipeline.py`](tools/pipeline/run_pipeline.py) with `--segments`, `--results-dir`, and optional `--system` / `--resume`.
+6. **Evaluate and plot** — [`tools/eval/evaluate.py`](tools/eval/evaluate.py) and [`tools/eval/plot_figures.py`](tools/eval/plot_figures.py), or rely on Phase 2 inside `rerun_all.sh` / [`tools/eval/run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py).
+
+**S1 / S2 reuse (save GPU time):** In `rerun_all.sh`, `REUSE_S1_S2_FROM_BIOLLM=1` (default) copies `results/ner_biollm/s1.jsonl` and `s2.jsonl` into other result directories and runs **only S3–S5** for those conditions. Set `REUSE_S1_S2_FROM_BIOLLM=0` for a full S1–S5 rerun per directory. For one tree only, [`tools/pipeline/run_pipeline.py`](tools/pipeline/run_pipeline.py) supports `--resume` or `--system s3 s4 s5` when `s1.jsonl` / `s2.jsonl` are already complete.
+
+**Shrinking the working tree:** Regenerated `results/` figures, `archive/`, and caches can be deleted locally when you only need **`tools/`** (see [`tools/README.md`](tools/README.md) for script locations); see [`.gitignore`](.gitignore) and [`docs/REPO_LAYOUT.md`](docs/REPO_LAYOUT.md).
 
 ---
 
@@ -45,9 +61,9 @@ It combines:
 
 ## 2. Section 4.8 segmentation (test corpus)
 
-The corpus is the **~10-page SmPC §4.8** slice (Keytruda PDFs under [`test_data/`](test_data/)), turned into **127 aligned sentence pairs** (default PDFs and alignment rule).
+The corpus is the **~10-page SmPC §4.8** slice (Keytruda PDFs under [`data/test_data/`](data/test_data/)), turned into **127 aligned sentence pairs** (default PDFs and alignment rule).
 
-### Pipeline — [`scripts/prepare_data.py`](scripts/prepare_data.py)
+### Pipeline — [`tools/data/prepare_data.py`](tools/data/prepare_data.py)
 
 1. **Extract §4.8** — Regex from the §4.8 heading through just before §4.9.  
 2. **Sentence splitting** — French and English split independently with **NLTK Punkt**.  
@@ -82,16 +98,16 @@ NER runs **before** grounding, planning, and translation.
 
 Each segment carries a **`terms`** array (at minimum a French surface **`word`** per item; offsets and metadata depend on the extractor).
 
-### Extractors and NER ablations (`experiments/french_medical_ner/`)
+### Extractors and NER ablations (`extras/experiments/french_medical_ner/`)
 
-This folder holds **French medical span extraction** for SmPC §4.8, **fine-tuning** utilities, and **ablation / diagnostic** scripts (for example CCR under different Neo4j grounding modes). The **primary evaluation** in `rerun_all.sh` contrasts **prompted** BioMistral NER vs **fine-tuned** BioMistral NER (`results/ner_biollm/` vs `results/ner_biollm_finetuned/`); the table below lists the main entry points.
+GPU-heavy extractors and trainers live under **[`extras/`](extras/README.md)** (core `experiments/` is only a pointer — see [`experiments/README.md`](experiments/README.md)). The **primary evaluation** in `rerun_all.sh` contrasts **prompted** BioMistral NER vs **fine-tuned** BioMistral NER (`results/ner_biollm/` vs `results/ner_biollm_finetuned/`). Main scripts:
 
 | Script | Purpose |
 | ------ | ------- |
-| [`biomistral_prompt_ner.py`](experiments/french_medical_ner/biomistral_prompt_ner.py) | **Prompted** JSON-list extraction with **BioMistral-7B** (build or refresh `segments_ner_biollm.jsonl` from the aligned Section 4.8 JSONL) |
-| [`biomistral_ner_finetune_unsloth.py`](experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py) | **LoRA fine-tuning** with **Unsloth + TRL**; merged adapters load in **`biomistral_prompt_ner --backend unsloth`** |
-| [`quaero_brat_reader.py`](experiments/french_medical_ner/quaero_brat_reader.py) | **QUAERO** BRAT helpers (`ID2LABEL`, `load_quaero_brat`) for supervised NER training data |
-| [`compare_neo4j_grounding_ccr.py`](experiments/french_medical_ner/compare_neo4j_grounding_ccr.py) | **Grounding ablation:** string vs vector **CCR** over segment JSONLs; refuses vector modes if the Neo4j vector index is missing |
+| [`biomistral_prompt_ner.py`](extras/experiments/french_medical_ner/biomistral_prompt_ner.py) | **Prompted** JSON-list extraction with **BioMistral-7B** (build or refresh `segments_ner_biollm.jsonl` from the aligned Section 4.8 JSONL) |
+| [`biomistral_ner_finetune_unsloth.py`](extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py) | **LoRA fine-tuning** with **Unsloth + TRL**; merged adapters load in **`biomistral_prompt_ner --backend unsloth`** |
+| [`quaero_brat_reader.py`](extras/experiments/french_medical_ner/quaero_brat_reader.py) | **QUAERO** BRAT helpers (`ID2LABEL`, `load_quaero_brat`) for supervised NER training data |
+| [`compare_neo4j_grounding_ccr.py`](extras/experiments/french_medical_ner/compare_neo4j_grounding_ccr.py) | **Grounding ablation:** string vs vector **CCR** over segment JSONLs; refuses vector modes if the Neo4j vector index is missing |
 
 ### Design rule
 
@@ -161,8 +177,12 @@ They write per-system **JSONL hypotheses** (`s1.jsonl` … `s5_mistral.jsonl`) a
 
 | Concern | What we measure |
 | ------- | ----------------- |
-| Fluency vs reference | **BLEU**, **chrF++**, optional **COMET** (`scripts/evaluate.py`, `scripts/plot_results.py`) |
-| Terminology + hierarchy | **HTM** — MedDRA-aware check on **English hypotheses** (`htm.py`; optional `--gold-terms` audit list + Neo4j) |
+| **Corpus BLEU** | **sacreBLEU** corpus BLEU over all aligned segment pairs: `BLEU().corpus_score(hypotheses, [references])` in [`pipeline/metrics/corpus_scores.py`](pipeline/metrics/corpus_scores.py) — one reference string per hypothesis, library defaults (effective order, tokenization). Shown as **`BLEU`** in `tools/eval/evaluate.py` and column **`bleu`** in `scores_summary.csv`. |
+| **chrF++ / COMET** | Same alignment as BLEU: **chrF++** via sacreBLEU `CHRF().corpus_score`; **COMET** optional when dependencies and model weights are available (`tools/eval/evaluate.py`). |
+| Document-level BLEU | **doc-BLEU** — unweighted macro average of corpus BLEU computed **per document** on segment lists (`bleu_doc_macro`; console **`BLdoc`**). **BLEU†** — same grouping, but each document is scored as **one** string by **joining** segment hypotheses and references with a space (`bleu_doc_concat` in `scores_summary.csv`; console **`BLcn`** in `evaluate.py`) |
+| Terminology + hierarchy | **HTM** — MedDRA-aware check on **English hypotheses** (`htm.py`; NER `terms[]` + Neo4j grounding on the same `--segments` JSONL as CCR) |
+| Hyp vs ref **ontology alignment** | **`htm_hyp_ref_agreement`** (per system): for each **grounded** French `terms[].word`, same HTM-style **1.0 / 0.5 / 0.0** score on `hyp` and on segment **`en_ref`**; mean of **1 − \|hyp_score − ref_score\|** (`compute_htm_hyp_vs_ref` in `htm.py`). Console column **`HypRefAg`** in `evaluate.py` (see stderr legend). **`--`** on the `(dataset)` row — not a dataset-level scalar. |
+| Same HTM machinery vs **gold** `en_ref` | **rHTM** (dataset-level): how often grounded English renderings appear in the reference string (`compute_htm_en_ref` in `htm.py`; printed by `evaluate.py`, column **`htm_en_ref_dataset`** in `scores_summary.csv` from `plot_figures.py`) |
 | How much NER is even grounded | **Dataset CCR** — fraction of extracted spans with non-null grounding (`pipeline/metrics/ccr.py`) |
 
 ---
@@ -179,21 +199,25 @@ So the **object of analysis is always the translated English string**; Neo4j sup
 
 ### How it is implemented here
 
-The runtime stack does **not** run a second full **English NER** pass over `hyp` in `htm.py`. For a reproducible audit set, **`--gold-terms`** supplies rows with a French cue, expected English label(s), and level. A row **fires** when that French cue appears in the segment `fr`; then the scorer **searches `hyp`** for allowed English renderings and applies **1.0 / 0.5 / 0.0** from graph fit (`phrase_in_hyp`, `same_branch`, level match). The French field is therefore an **evaluation trigger** (which MedDRA-aligned checks apply), while the **score itself is driven by what English landed in the hypothesis**.
+The runtime stack does **not** run a second full **English NER** pass over `hyp` in `htm.py`. **HTM** walks each segment’s French **`terms[].word`** (unique per segment), grounds the span in Neo4j with the segment French as context, builds allowed English renderings from the grounded concept, then scores **1.0 / 0.5 / 0.0** from what appears in **`hyp`** (`phrase_in_hyp`, `same_branch`, level match). The **same** segment JSONL you pass to **`--segments`** for CCR therefore defines which French spans are audited; the **score surface is always English in `hyp`**.
 
-### Scoring (per fired gold row, simplified)
+**rHTM** runs the **same** span-wise scoring but checks renderings against **`en_ref`** instead of `hyp`, aggregated once per dataset (useful as a lexical “MedDRA vs human reference” ceiling, not a per-system metric).
 
-- **1.0** — Accepted English rendering **and** level consistent with the gold row  
+**Hypothesis–reference HTM agreement** (`compute_htm_hyp_vs_ref`): **per MT system**, for each French NER span that **grounds** in Neo4j, compute the usual HTM-style score on **`hyp`** and the same score on segment **`en_ref`**, then **1 − \|hyp_score − ref_score\|**; the reported value is the **mean** over those grounded spans (**`nan`** if none). **1.0** means the system’s ontology alignment matches the human reference segment for every audited span; **0.0** means maximum mismatch on that scale. It does **not** replace **HTM** or **rHTM**; it answers whether the model “lands” the same MedDRA rendering tier as the gold sentence for the same French cue.
+
+### Scoring (per grounded NER span, simplified)
+
+- **1.0** — Accepted English rendering **and** level consistent with the grounded concept  
 - **0.5** — Related via **`same_branch`** in the graph but level check fails  
 - **0.0** — Missing rendering, wrong branch, or no graph support  
 
-Run-level **HTM** is the mean over scored rows. Variants: **`compute_htm`** (lexical), **`compute_htm_vector`** (embedding-assisted).
+Run-level **HTM** is the mean over scored spans. Variants: **`compute_htm`** (lexical), **`compute_htm_vector`** (embedding-assisted).
 
 **Figure 2. HTM intuition**
 
 <p align="center">
   <img src="docs/figures/figure_htm_metric.png" alt="HTM: hierarchy-aware terminology scoring example" width="820"><br>
-  <sub><b>Figure 2.</b> After decode: English in <code>hyp</code> checked against MedDRA (same hierarchy discipline as upstream; audit points from <code>--gold-terms</code>).</sub>
+  <sub><b>Figure 2.</b> After decode: English in <code>hyp</code> checked against MedDRA (same hierarchy discipline as upstream; audit points = French NER <code>terms[]</code> on the segment JSONL).</sub>
 </p>
 
 ---
@@ -202,21 +226,22 @@ Run-level **HTM** is the mean over scored rows. Variants: **`compute_htm`** (lex
 
 | Location | Purpose |
 | -------- | ------- |
-| [`docs/CONCLUSIONS.md`](docs/CONCLUSIONS.md) | **Proposal-aligned conclusions:** SmPC scope, four stages, research questions, HTM/CCR/fluency, contributions, limitations |
+| [`docs/CONCLUSIONS.md`](docs/CONCLUSIONS.md) | **Proposal-aligned conclusions:** SmPC scope, four stages, research questions, HTM/rHTM/CCR/fluency, contributions, limitations |
 | [`docs/interpretation_of_results_snapshots.md`](docs/interpretation_of_results_snapshots.md) | **Main results narrative:** BioMistral prompt vs fine-tuned NER, CCR, cross-condition figures |
 | [`docs/README.md`](docs/README.md) | Index of all documentation |
-| [`scripts/prepare_data.py`](scripts/prepare_data.py) | Build §4.8 aligned JSONL (**127** segments for default Keytruda PDFs) |
+| [`tools/data/prepare_data.py`](tools/data/prepare_data.py) | Build §4.8 aligned JSONL (**127** segments for default Keytruda PDFs) |
 | [`pipeline/`](pipeline/) | Graph, planning, MT systems, metrics |
-| [`experiments/french_medical_ner/`](experiments/french_medical_ner/) | French medical NER, fine-tuning, QUAERO I/O, grounding / CCR ablations |
+| [`extras/README.md`](extras/README.md) | **Supplementary NER / training / vector grounding** (GPU-heavy scripts under `extras/experiments/`) |
+| [`experiments/README.md`](experiments/README.md) | Pointer to `extras/` (legacy path kept for short citations) |
 | [`docs/appendix_historical_ner_and_pipeline_results.md`](docs/appendix_historical_ner_and_pipeline_results.md) | Historical NER conditions and metric tables |
-| [`data/README.md`](data/README.md) | Data layout, gold lists, MedDRA folder expectations |
+| [`data/README.md`](data/README.md) | Data layout, optional graph seed JSON, MedDRA folder expectations |
 | [`docs/REPO_LAYOUT.md`](docs/REPO_LAYOUT.md) | Full tree-oriented map of the repo |
 
 ---
 
 ## 9. MedDRA licensing
 
-MedDRA is **not** redistributed in this repository. Obtain a licence and data from [meddra.org/software-packages](https://www.meddra.org/software-packages), then load into Neo4j per your internal graph build (`scripts/extract_meddra.py`, `build_graph.py` — see `data/README.md`).
+MedDRA is **not** redistributed in this repository. Obtain a licence and data from [meddra.org/software-packages](https://www.meddra.org/software-packages), then load into Neo4j per your internal graph build (`tools/data/extract_meddra.py`, `tools/data/build_graph.py` — see `data/README.md`).
 
 ---
 

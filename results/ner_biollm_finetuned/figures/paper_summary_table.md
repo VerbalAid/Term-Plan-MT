@@ -1,10 +1,14 @@
 # Summary metrics
 
-| System | chrF++ | HTM | BLEU | Mean s/seg | p95 s |
-|--------|--------|-----|------|------------|-------|
-| S1 NLLB | 37.14 | 0.370 | 22.89 | 0.67 | 1.49 |
-| S2 Mistral (doc) | 39.56 | 0.348 | 22.91 | 6.96 | 9.96 |
-| S3 GraphRAG | 37.90 | 0.435 | 14.29 | 3.45 | 13.08 |
-| S4 rerank | 37.45 | 0.435 | 13.72 | 11.08 | 36.51 |
-| S5 NLLB + boost | 36.55 | 0.370 | 22.03 | 0.75 | 2.00 |
-| S5 Mistral + boost | 38.19 | 0.435 | 14.81 | 3.41 | 14.15 |
+| System | chrF++ | HTM (lex) | BLEU | doc-BLEU | doc-chrF | BLEU† | Mean s/seg | p95 s |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| S1 NLLB | 31.90 | 0.165 | 18.89 | 18.89 | 31.90 | 43.82 | 0.77 | 3.81 |
+| S2 Mistral (doc) | 35.85 | 0.250 | 20.37 | 20.37 | 35.85 | 46.26 | 8.04 | 17.91 |
+| S3 GraphRAG | 34.60 | 0.257 | 15.36 | 15.36 | 34.60 | 36.40 | 3.55 | 16.01 |
+| S4 rerank | 34.92 | 0.257 | 15.66 | 15.66 | 34.92 | 37.19 | 11.21 | 42.32 |
+| S5 NLLB + boost | 31.02 | 0.174 | 17.54 | 17.54 | 31.02 | 41.35 | 0.89 | 3.93 |
+| S5 Mistral + boost | 34.85 | 0.261 | 15.98 | 15.98 | 34.85 | 37.82 | 3.54 | 16.05 |
+
+*BLEU† — macro mean over documents of corpus BLEU on a single synthetic line per document (segment `hyp` / `en_ref` joined with spaces; column `bleu_doc_concat` in CSV).*
+
+*rHTM (dataset, gold `en_ref` vs grounded MedDRA English): 0.158*

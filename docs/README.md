@@ -2,10 +2,12 @@
 
 | Document | Contents |
 |----------|----------|
-| [CONCLUSIONS.md](CONCLUSIONS.md) | **Proposal-aligned conclusions:** problem, scope, RQs, stages, metrics (HTM/CCR/fluency), contributions, limits |
+| [CONCLUSIONS.md](CONCLUSIONS.md) | **Proposal-aligned conclusions:** problem, scope, RQs, stages, metrics (HTM/rHTM/CCR/fluency), contributions, limits |
 | [interpretation_of_results_snapshots.md](interpretation_of_results_snapshots.md) | **BioMistral (prompt) vs FT BioMistral:** tables, CCR, figures, links to appendix and frozen snapshots |
 | [RESULTS_INTERPRETATION.md](RESULTS_INTERPRETATION.md) | Cross-NER narrative with embedded figures (BLEU/chrF/HTM, CCR, trade-offs) |
 | [REPO_LAYOUT.md](REPO_LAYOUT.md) | Directory map and script entrypoints |
+| [termplan_acl_snapshot.tex](termplan_acl_snapshot.tex) | **ACL-style snapshot:** metric definitions, two-condition results table, ambiguous-span pointers, reproduce commands (`pdflatex`) |
+| [../extras/README.md](../extras/README.md) | Supplementary NER / Unsloth / vector-grounding scripts (`extras/experiments/`) |
 | [appendix_historical_ner_and_pipeline_results.md](appendix_historical_ner_and_pipeline_results.md) | Appendix: all NER/term extractors + six MT systems + archived metrics |
 | [error_analysis/ambiguous_grounding.md](error_analysis/ambiguous_grounding.md) | Multi-concept FR keys, aggregates vs two NER JSONLs, planning locks |
 | [PROJECT_NOTES.md](PROJECT_NOTES.md) | Engineering log (grounding, thresholds, tooling) |

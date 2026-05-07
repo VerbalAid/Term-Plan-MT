@@ -8,7 +8,7 @@ Single consolidated note for engineering decisions, completed work, and measured
 
 **Done**
 
-- `experiments/french_medical_ner/compare_neo4j_grounding_ccr.py`: added `--vector-threshold` (float, default **0.6**), passed into `TermGraph(..., vector_score_threshold=...)`.
+- `extras/experiments/french_medical_ner/compare_neo4j_grounding_ccr.py`: added `--vector-threshold` (float, default **0.6**), passed into `TermGraph(..., vector_score_threshold=...)`.
 - `pipeline/graph.py`:
   - Default `vector_score_threshold` set to **0.6**.
   - **Vector mode:** if the vector index returns no rows, or the **top score &lt; threshold**, increment `vector_fallbacks` and return **`None`** (no silent string fallback).
@@ -39,7 +39,7 @@ Stricter `--vector-threshold` (e.g. **0.85**) is useful when reporting “confid
 **Done**
 
 - `requirements.txt`: added **`unsloth_zoo`** and documented install order (`unsloth_zoo` → `trl` / `datasets` → `unsloth[cu124]` with `--break-system-packages` where needed).
-- `experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py`: `ImportError` text mentions `unsloth_zoo`.
+- `extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py`: `ImportError` text mentions `unsloth_zoo`.
 
 **Caveat:** `unsloth_zoo` can pull a different **torch** stack than the rest of the project; keep one coherent CUDA line (see §5).
 
@@ -64,9 +64,9 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 
 **Done**
 
-- **Single PDF folder:** `test_data/` now holds real **`keytruda_fr.pdf`** and **`keytruda_en.pdf`** (copies of the former EPAR PDFs). **`Test_data/` removed** to avoid two trees; `scripts/prepare_data.py` defaults were already `test_data/…`.
+- **Single PDF folder:** `data/test_data/` holds **`keytruda_fr.pdf`** and **`keytruda_en.pdf`** (copies of the former EPAR PDFs; not committed). **`Test_data/` removed** to avoid two trees; `tools/data/prepare_data.py` defaults point at `data/test_data/…` (see `data/test_data/README.md`).
 - **Duplicate segment JSONL:** `segments_ner.jsonl` and `segments_ner_finetuned.jsonl` were **byte-identical**; **`segments_ner_finetuned.jsonl`** was a **symlink** to **`segments_ner.jsonl`** until the **5b** cleanup archived that symlink name under **`archive/data/section48/`** (generic **`segments_ner.jsonl`** remains).
-- **Legacy evaluation figures:** older `results/figures/` snapshots were removed; use **`results/<condition>/figures/`** from `plot_results.py`.
+- **Legacy evaluation figures:** older `results/figures/` snapshots were removed; use **`results/<condition>/figures/`** from `plot_figures.py`.
 - **`rerun_all.sh`:** GPU pre-kill block shortened (single `TERM` pass + short sleep; optional `SKIP_GPU_KILL=1` unchanged).
 - **Planning PDFs:** **`Project Plan/`** moved to **`docs/project-plan/`** (no space in path).
 - **`CLEANUP_PLAN.md` removed**; this file is the living summary.
@@ -75,7 +75,7 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 **Not removed**
 
 - **`results/ad_hoc/*.jsonl`**: retained outputs from pipeline runs that used the default `--results-dir results` (not byte-identical to `results/ner_biollm/` in checks).
-- **`scripts/*.py`** and **`experiments/**/*.py`**: entrypoints remain intentional pipeline or supplementary stages.
+- **`tools/**/*.py`** and **`extras/experiments/**/*.py`**: entrypoints remain intentional pipeline or supplementary stages.
 
 ---
 
@@ -84,15 +84,15 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 **Done**
 
 - **`archive/data/section48/`**: moved baseline CamemBERT, Llama3-, Mistral-instruct-tagged segment JSONLs, and the legacy `segments_ner_finetuned.jsonl` symlink name; added README.
-- **`data/section48/vector_ccr_all_models.json`**: trimmed to BioLLM + Unsloth-full stats (rerun `experiments/vector_grounding/build_vector_ccr_reports.py` to refresh).
-- **`results/htm_vector_comparison/`**: removed stale committed plots/CSVs; `.gitkeep` only until `rerun_all.sh` or `compare_htm_vector_thresholds.py` regenerates them.
-- **`experiments/french_medical_ner/quaero_brat_reader.py`**: QUAERO BRAT helpers (`ID2LABEL`, `load_quaero_brat`) used by `biomistral_ner_finetune_unsloth.py` (standalone module; legacy CamemBERT trainer removed).
+- **`data/section48/vector_ccr_all_models.json`**: trimmed to BioLLM + Unsloth-full stats (rerun `extras/experiments/vector_grounding/build_vector_ccr_reports.py` to refresh).
+- **`results/htm_vector_comparison/`**: removed stale committed plots/CSVs; `.gitkeep` only until `rerun_all.sh` or `tools/eval/compare_htm_vector_thresholds.py` regenerates them.
+- **`extras/experiments/french_medical_ner/quaero_brat_reader.py`**: QUAERO BRAT helpers (`ID2LABEL`, `load_quaero_brat`) used by `biomistral_ner_finetune_unsloth.py` (standalone module; legacy CamemBERT trainer removed).
 - **`error_analysis/legacy/`**: sample error CSV tagged with removed conditions.
-- **`scripts/archive_results_snapshot.sh`**: optional tarball of `results/`, `error_analysis/`, `planning_locks.json`.
+- **`tools/admin/archive_results_snapshot.sh`**: optional tarball of `results/`, `error_analysis/`, `planning_locks.json`.
 
 **Removed symlink**
 
-- **`segments_ner_finetuned.jsonl`** had pointed at **`segments_ner.jsonl`**; the symlink path was archived; generic **`segments_ner.jsonl`** remains for `prepare_data.py` workflows.
+- **`segments_ner_finetuned.jsonl`** had pointed at **`segments_ner.jsonl`**; the symlink path was archived; generic **`segments_ner.jsonl`** remains for `tools/data/prepare_data.py` workflows.
 
 ---
 
@@ -100,8 +100,8 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 
 **Done**
 
-- **`scripts/plot_cross_ner_dashboard.py`:** HTM panel y-limits use **min/max of the plotted values** plus padding (capped at 1.05), with the axis-break cue when the floor is above zero — avoids a full 0–1 scale when all HTM bars sit in a narrow band (~0.35–0.45).
-- **`scripts/plot_results.py`:** `scan_global_scatter_limits` now reads only **`ner_biollm`** and **`ner_biollm_finetuned`** `scores_summary.csv` files so legacy `ner_*` trees do not skew shared trade-off / bubble axis locks.
+- **`tools/eval/plot_cross_ner_dashboard.py`:** HTM panel y-limits use **min/max of the plotted values** plus padding (capped at 1.05), with the axis-break cue when the floor is above zero — avoids a full 0–1 scale when all HTM bars sit in a narrow band (~0.35–0.45).
+- **`tools/eval/plot_figures.py`:** `scan_global_scatter_limits` now reads only **`ner_biollm`** and **`ner_biollm_finetuned`** `scores_summary.csv` files so legacy `ner_*` trees do not skew shared trade-off / bubble axis locks.
 - **`plot_tradeoff` / `plot_bubble_chrF_htm_time`:** after merged limits are applied, **chrF** and **HTM** axes are tightened when the axis span is much wider than the point spread (keeps the “prefer top-right” shading but matches the visible cloud).
 
 ---
@@ -129,5 +129,5 @@ Then `import torch` and `compare_neo4j_grounding_ccr.py` succeeded (`torch 2.11.
 
 ## 9. Open items (not automated here)
 
-- **`run_pipeline.py` / `evaluate.py`:** they construct `TermGraph` without CLI `--vector-threshold`; default in code is **0.6**. Override via future CLI/env for parity with `compare_neo4j_grounding_ccr` sweeps.
+- **`run_pipeline.py` / `evaluate.py`:** they construct `TermGraph` without CLI `--vector-threshold`; default in code is **0.6**. Override via future CLI/env for parity with `compare_neo4j_grounding_ccr` sweeps. *(Paths: `tools/pipeline/run_pipeline.py`, `tools/eval/evaluate.py`.)*
 - **Unsloth fine-tune:** requires a GPU venv where `from unsloth import FastLanguageModel` succeeds; consider a **dedicated** env if `unsloth_zoo` and torch versions keep fighting.

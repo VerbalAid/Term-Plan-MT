@@ -1,6 +1,8 @@
 # Interpretation of results
 
-**HTM (hierarchy-aware term match).** **`scripts/evaluate.py`** scores **HTM** when you pass **`--gold-terms`** with a FR→EN JSON list (French substring in source, English phrases checked in the hypothesis) together with **Neo4j** hierarchy consistency.
+**HTM (hierarchy-aware term match).** With Neo4j (and without `--no-graph`), **`tools/eval/evaluate.py`** scores **HTM** from the segment JSONL: each French **`terms[].word`** is grounded in the graph, then English renderings are checked in the hypothesis with **Neo4j** hierarchy consistency.
+
+**rHTM** uses the **same** grounded renderings but checks **`en_ref`** instead of `hyp`, once per dataset (printed as **`rHTM`** on the `(dataset)` row; duplicated on each system row for easy comparison to **HTM**). It is **not** a second fluency metric: it measures how often MedDRA-style English strings literally appear in the human reference for the audited spans.
 
 CSV summaries and PNG exports live under `results/`. Open this file from the **project root** if image links break in the preview. **Snapshot write-ups** (NER BioLLM, frozen figures): [interpretation_of_results_snapshots.md](interpretation_of_results_snapshots.md).
 
@@ -23,7 +25,7 @@ The grounding coverage numbers explain most of the behaviour. Baseline NER is to
 | BioMistral prompt (`ner_biollm`) | ~35.4% |
 | FT BioMistral (`ner_biollm_finetuned`) | ~32.4% |
 
-CamemBERT baseline / FT CamemBERT are no longer in the primary reproduce script; regenerate those segment files from `experiments/french_medical_ner/` if you need historical comparison.
+CamemBERT baseline / FT CamemBERT are no longer in the primary reproduce script; regenerate those segment files from `extras/experiments/french_medical_ner/` if you need historical comparison.
 
 Reranking improves control only marginally relative to its cost. S4 is the clearest example of this: it is slower, but it does not consistently recover enough fluency or terminology to justify the added complexity. The same point applies to decoding-level constraints. Harder enforcement is only useful once the graph input is good enough. Otherwise, it simply constrains the model around a weak or incomplete term set.
 
@@ -31,9 +33,9 @@ Reranking improves control only marginally relative to its cost. S4 is the clear
 
 The vector-based HTM results reinforce the same interpretation. Vector matching is stricter than string matching, so the scores are lower. That does not mean translation quality is worse; it means the evaluation is demanding a more precise semantic landing in the MedDRA hierarchy. In practice, it is a better test of whether the translated term is really placed in the right ontology region rather than merely sharing surface form with a known label.
 
-HTM threshold overview and per-metric panels are stored under **`results/htm_vector_comparison/`** (PNG/PDF/CSV). Regenerate with `./rerun_all.sh` (set **`GOLD_TERMS_JSON`**, unless `SKIP_HTM_THRESHOLD_COMPARE=1`) or `PYTHONPATH=. python scripts/compare_htm_vector_thresholds.py --gold-terms …` (requires Neo4j + sentence-transformers).
+HTM threshold overview and per-metric panels are stored under **`results/htm_vector_comparison/`** (PNG/PDF/CSV). Regenerate with `./rerun_all.sh` (unless `SKIP_HTM_THRESHOLD_COMPARE=1`) or `PYTHONPATH=. python tools/eval/compare_htm_vector_thresholds.py --results-root results --exclude-segment-ids 48_028` (requires Neo4j + sentence-transformers).
 
-**Segment exclusion.** Segment **`48_028`** is the Section 4.8 **Tableau 2** block (dense tabular adverse-reaction text). It is **excluded by default** in `rerun_all.sh` and in matching `evaluate.py` / `plot_results.py` calls (`--exclude-segment-ids 48_028`), so corpus metrics are **not** driven by that single atypical segment. Set `EXCLUDE_SEGMENT_IDS=` to empty if you need the full segment list.
+**Segment exclusion.** Segment **`48_028`** is the Section 4.8 **Tableau 2** block (dense tabular adverse-reaction text). It is **excluded by default** in `rerun_all.sh` and in matching `evaluate.py` / `plot_figures.py` calls (`--exclude-segment-ids 48_028`), so corpus metrics are **not** driven by that single atypical segment. Set `EXCLUDE_SEGMENT_IDS=` to empty if you need the full segment list.
 
 **Overall.** Long-context MT is useful for fluent document-level translation, but it does not solve terminology consistency on its own. Ontology grounding improves hierarchy-aware translation, but only when NER recall and grounding coverage are high enough for the graph to be informative. The decisive factor is therefore not just whether graph structure is present, but whether the pipeline can reliably activate it on the source terms that matter.
 

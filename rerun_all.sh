@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 # Reproduce: BioMistral-prompt NER + fine-tuned BioMistral NER only.
+# NER training/inference scripts live under extras/experiments/ (see extras/README.md).
 # Excludes segment 48_028 (Section 4.8 Tableau 2 / dense table block) from translation and metrics by default.
 #
 # Override exclusions: EXCLUDE_SEGMENT_IDS=""  (include all segments)
 # Skip phases: SKIP_GPU_KILL=1 SKIP_NER_BIOLLM=1 SKIP_NER_BIOMISTRAL_FT=1 SKIP_EVAL_PHASE=1
+#               SKIP_EVAL_MATRIX=1 (skip tools/eval/run_eval_plot_matrix.py entirely)
+#               SKIP_EVAL_NER_BIOLLM=1 / SKIP_EVAL_NER_BIOLLM_FT=1 (skip that profile only; other EVAL_RERUN_PROFILES still run)
 #               SKIP_CROSS_NER_DASHBOARD=1 SKIP_HTM_THRESHOLD_COMPARE=1 REUSE_S1_S2_FROM_BIOLLM=0 EXTRA_RUN_PIPELINE_FLAGS="--resume"
-# HTM in evaluate/plot: EXTRA_EVAL_FLAGS='--gold-terms /abs/path/to/gold.json' (JSON: fr, en_label, en_aliases, level, tier)
-# HTM threshold script: GOLD_TERMS_JSON=/abs/path/to/gold.json (or skip compare when unset)
+# HTM in evaluate.py + plot_figures.py: uses NER ``terms[]`` from the same ``--segments`` JSONL as CCR.
+# Optional vector HTM columns (separate from lexical ``htm``): HTM_VECTOR_THRESHOLDS=0.8,0.9
+# HTM threshold script: runs when SKIP_HTM_THRESHOLD_COMPARE is unset; optional EXTRA_HTM_COMPARE_FLAGS.
 #
 set -euo pipefail
 
@@ -45,37 +49,28 @@ if [[ ! -x "${PYTHON}" ]]; then
 fi
 
 FLAGS="${EXTRA_RUN_PIPELINE_FLAGS:-${EXTRA_RUN_SYSTEMS_FLAGS:-}}"
-read -r -a GROUNDING_MODES <<< "${EVAL_GROUNDING_MODES:-string}"
 
-eval_and_plot() {
-  local results_sub="$1"
-  local segments_rel="$2"
-  local rd="${ROOT}/${results_sub}"
-  local seg="${ROOT}/${segments_rel}"
-  local gm
-  for gm in "${GROUNDING_MODES[@]}"; do
-    local out_sub="figures"
-    if [[ "${gm}" != "string" ]]; then
-      out_sub="figures_${gm}"
-    fi
-    local od="${rd}/${out_sub}"
-    # shellcheck disable=SC2086
-    "${PYTHON}" scripts/evaluate.py \
-      --grounding-mode "${gm}" \
-      --results-dir "${rd}" \
-      --segments "${seg}" \
-      --exclude-segment-ids "${EXCLUDE_IDS}" \
-      ${EXTRA_EVAL_FLAGS:-}
-    # shellcheck disable=SC2086
-    "${PYTHON}" scripts/plot_results.py \
-      --grounding-mode "${gm}" \
-      --results-dir "${rd}" \
-      --segments "${seg}" \
-      --out-dir "${od}" \
-      --exclude-segment-ids "${EXCLUDE_IDS}" \
-      ${EXTRA_EVAL_FLAGS:-} \
-      $( [[ "${PLOT_COMET:-0}" == "1" ]] && echo --comet )
-  done
+run_eval_plot_matrix() {
+  echo "========================================================================"
+  echo "EVAL + FIGURES — pipeline/metrics/eval_manifest.EVAL_RERUN_PROFILES"
+  echo "  (skip dirs with no pipeline JSONLs or missing segment files)"
+  echo "========================================================================"
+  export EVAL_GROUNDING_MODES="${EVAL_GROUNDING_MODES:-string}"
+  export HTM_VECTOR_THRESHOLDS="${HTM_VECTOR_THRESHOLDS:-}"
+  export EXTRA_EVAL_FLAGS="${EXTRA_EVAL_FLAGS:-}"
+  export PLOT_COMET="${PLOT_COMET:-0}"
+  local _skip_prof="${SKIP_EVAL_PROFILES:-}"
+  if [[ "${SKIP_EVAL_NER_BIOLLM:-0}" == "1" ]]; then
+    _skip_prof="${_skip_prof},ner_biollm"
+  fi
+  if [[ "${SKIP_EVAL_NER_BIOLLM_FT:-0}" == "1" ]]; then
+    _skip_prof="${_skip_prof},ner_biollm_finetuned"
+  fi
+  _skip_prof="${_skip_prof#,}"
+  _skip_prof="${_skip_prof%,}"
+  export SKIP_EVAL_PROFILES="${_skip_prof}"
+  # shellcheck disable=SC2086
+  "${PYTHON}" tools/eval/run_eval_plot_matrix.py --exclude-segment-ids "${EXCLUDE_IDS}"
 }
 
 run_pipeline_only() {
@@ -122,38 +117,11 @@ run_pipeline_only() {
   fi
 
   # shellcheck disable=SC2086
-  "${PYTHON}" scripts/run_pipeline.py "${pipe_sys[@]}" --s5-backend both \
+  "${PYTHON}" tools/pipeline/run_pipeline.py "${pipe_sys[@]}" --s5-backend both \
     --results-dir "${results_sub}" \
     --segments "${segments_rel}" \
     --exclude-segment-ids "${EXCLUDE_IDS}" \
     ${FLAGS}
-}
-
-evaluate_one_condition() {
-  local title="$1"
-  local segments_rel="$2"
-  local results_sub="$3"
-  local skip_eval_env="${4:-}"
-
-  local seg="${ROOT}/${segments_rel}"
-
-  if [[ ! -f "${seg}" ]]; then
-    return 0
-  fi
-
-  if [[ -n "${skip_eval_env}" ]]; then
-    local _ev="${skip_eval_env}"
-    if [[ "${!_ev:-0}" == "1" ]]; then
-      echo "SKIP eval/plots (${skip_eval_env}=1): ${title}"
-      return 0
-    fi
-  fi
-
-  echo "========================================================================"
-  echo "EVAL + FIGURES — ${title}"
-  echo "  results: ${results_sub}/"
-  echo "========================================================================"
-  eval_and_plot "${results_sub}" "${segments_rel}"
 }
 
 echo ""
@@ -187,29 +155,24 @@ fi
 
 echo ""
 echo "################################################################################"
-echo "# PHASE 2 — EVALUATION + FIGURES"
+echo "# PHASE 2 — EVALUATION + FIGURES (eval_manifest.EVAL_RERUN_PROFILES)"
 echo "################################################################################"
 echo ""
 
-evaluate_one_condition \
-  "BioMistral prompt" \
-  "data/section48/segments_ner_biollm.jsonl" \
-  "results/ner_biollm" \
-  "SKIP_EVAL_NER_BIOLLM"
-
-if [[ "${SKIP_NER_BIOMISTRAL_FT:-0}" != "1" ]]; then
-  evaluate_one_condition \
-    "FT BioMistral NER" \
-    "${UNSLOTH_SEG}" \
-    "results/ner_biollm_finetuned" \
-    "SKIP_EVAL_NER_BIOLLM_FT"
+if [[ "${SKIP_EVAL_MATRIX:-0}" == "1" ]]; then
+  echo "SKIP_EVAL_MATRIX=1 — skipping tools/eval/run_eval_plot_matrix.py"
+elif [[ "${SKIP_EVAL_NER_BIOLLM:-0}" == "1" ]] && [[ "${SKIP_EVAL_NER_BIOLLM_FT:-0}" == "1" ]]; then
+  echo "SKIP_EVAL_NER_BIOLLM=1 and SKIP_EVAL_NER_BIOLLM_FT=1 — skipping run_eval_plot_matrix (matches legacy: no eval for the two BioLLM dirs)."
+  echo "  (Cross-NER dashboard + HTM threshold compare still run below; use SKIP_EVAL_MATRIX=1 only if you meant skip matrix explicitly.)"
+else
+  run_eval_plot_matrix
 fi
 
 if [[ "${SKIP_CROSS_NER_DASHBOARD:-0}" != "1" ]]; then
   echo "========================================================================"
-  echo "Cross-NER dashboard (ner_biollm vs ner_biollm_finetuned)"
+  echo "Cross-NER dashboard (conditions from eval_manifest.EVAL_RERUN_PROFILES with scores_summary)"
   echo "========================================================================"
-  "${PYTHON}" scripts/plot_cross_ner_dashboard.py \
+  "${PYTHON}" tools/eval/plot_cross_ner_dashboard.py \
     --results-root "${ROOT}/results" \
     --figures-subdir "${CROSS_FIGURES_SUBDIR:-figures}" \
     --out-dir "${ROOT}/results/cross_ner_comparison" \
@@ -220,28 +183,16 @@ if [[ "${SKIP_HTM_THRESHOLD_COMPARE:-0}" != "1" ]]; then
   echo "========================================================================"
   echo "HTM string vs vector thresholds (Neo4j + sentence-transformers)"
   echo "========================================================================"
-  _htm_gold=()
-  if [[ -n "${GOLD_TERMS_JSON:-}" ]]; then
-    if [[ -f "${GOLD_TERMS_JSON}" ]]; then
-      _htm_gold=(--gold-terms "${GOLD_TERMS_JSON}")
-    elif [[ -f "${ROOT}/${GOLD_TERMS_JSON}" ]]; then
-      _htm_gold=(--gold-terms "${ROOT}/${GOLD_TERMS_JSON}")
-    fi
-  fi
-  if [[ ${#_htm_gold[@]} -eq 0 ]]; then
-    echo "Skipping compare_htm_vector_thresholds (set GOLD_TERMS_JSON to your gold JSON path)."
-  else
-    # shellcheck disable=SC2086
-    "${PYTHON}" scripts/compare_htm_vector_thresholds.py \
-      "${_htm_gold[@]}" \
-      --results-root "${ROOT}/results" \
-      ${EXTRA_HTM_COMPARE_FLAGS:-}
-  fi
+  # shellcheck disable=SC2086
+  "${PYTHON}" tools/eval/compare_htm_vector_thresholds.py \
+    --results-root "${ROOT}/results" \
+    --exclude-segment-ids "${EXCLUDE_IDS}" \
+    ${EXTRA_HTM_COMPARE_FLAGS:-}
 fi
 
 echo "Done."
 echo "  BioMistral prompt:     ${ROOT}/results/ner_biollm/figures/"
 echo "  FT BioMistral NER:     ${ROOT}/results/ner_biollm_finetuned/figures/ (segments: ${UNSLOTH_SEG})"
 echo "  Cross-NER figures:     ${ROOT}/results/cross_ner_comparison/"
-echo "  HTM threshold plots:   ${ROOT}/results/htm_vector_comparison/ (skip: SKIP_HTM_THRESHOLD_COMPARE=1; needs GOLD_TERMS_JSON)"
+echo "  HTM threshold plots:   ${ROOT}/results/htm_vector_comparison/ (skip: SKIP_HTM_THRESHOLD_COMPARE=1)"
 echo "  Default excluded ids:  ${EXCLUDE_IDS} (segment 48_028 = Tableau 2 block); set EXCLUDE_SEGMENT_IDS= to include all segments."

@@ -7,7 +7,7 @@ This note is for **thesis appendix / supplementary material**: it records **whic
 **Protocol caveats.**
 
 - Each NER condition uses its **own** segment JSONL: **number of NER spans** (`total` in the CCR table) differs by extractor, so **`ccr_dataset` in `scores_summary.csv` is not comparable across rows** as a standalone “quality” score—it is grounded-span coverage **for that extractor’s span set**.
-- Metrics in the CSVs follow whatever **`scripts/evaluate.py`** / **`scripts/plot_results.py`** settings were used when the CSV was written (typically **string** grounding for HTM unless you re-ran with `--grounding-mode vector`).
+- Metrics in the CSVs follow whatever **`tools/eval/evaluate.py`** / **`tools/eval/plot_figures.py`** settings were used when the CSV was written (typically **string** grounding for HTM unless you re-ran with `--grounding-mode vector`).
 - The main reproduce path **excludes segment `48_028` by default** (same id as in `rerun_all.sh`). Older CSVs in git history may pre-date that convention—re-run evaluation for strict parity.
 
 ---
@@ -33,9 +33,9 @@ So each “full pipeline” row in the tables below is **one of these six system
 
 | Condition (results folder) | Segment JSONL (typical) | What it is | Where it lives now |
 |-----------------------------|-------------------------|------------|---------------------|
-| **ner_baseline** | `segments_ner_baseline.jsonl` | Hugging Face **CamemBERT** token NER on Section 4.8 FR text (`Jean-Baptiste/camembert-ner` style workflow; see `scripts/prepare_data.py`). | **[`archive/data/section48/segments_ner_baseline.jsonl`](../archive/data/section48/segments_ner_baseline.jsonl)** |
+| **ner_baseline** | `segments_ner_baseline.jsonl` | Hugging Face **CamemBERT** token NER on Section 4.8 FR text (`Jean-Baptiste/camembert-ner` style workflow; see `tools/data/prepare_data.py`). | **[`archive/data/section48/segments_ner_baseline.jsonl`](../archive/data/section48/segments_ner_baseline.jsonl)** |
 | **ner_finetuned** | `segments_ner_finetuned.jsonl` (historically symlinked to generic `segments_ner.jsonl`) | **Fine-tuned CamemBERT** on QUAERO-style labels (same sentence alignment as generic NER export in older runs). | Symlink name archived as **[`archive/data/section48/segments_ner_finetuned.jsonl`](../archive/data/section48/segments_ner_finetuned.jsonl)**; generic **[`data/section48/segments_ner.jsonl`](../data/section48/segments_ner.jsonl)** still used by `prepare_data.py` |
-| **ner_biollm** | `segments_ner_biollm.jsonl` | **BioMistral-7B** JSON-list prompting (`experiments/french_medical_ner/biomistral_prompt_ner.py`). | **`data/section48/segments_ner_biollm.jsonl`** |
+| **ner_biollm** | `segments_ner_biollm.jsonl` | **BioMistral-7B** JSON-list prompting (`extras/experiments/french_medical_ner/biomistral_prompt_ner.py`). | **`data/section48/segments_ner_biollm.jsonl`** |
 | **ner_biollm_finetuned** | `segments_ner_unsloth.jsonl` or `segments_ner_unsloth_full.jsonl` | **Fine-tuned BioMistral** NER (Unsloth LoRA merge). | **`data/section48/`** (see `rerun_all.sh`) |
 | **Mistral Instruct tagging** | `segments_ner_mistral_instruct.jsonl` | Experimental FR term list using **Mistral Instruct** (not on main `rerun_all.sh`). | **[`archive/data/section48/segments_ner_mistral_instruct.jsonl`](../archive/data/section48/segments_ner_mistral_instruct.jsonl)** |
 | **Llama 3 tagging** | `segments_ner_llama3.jsonl` | Experimental FR term list using **Llama 3** (not on main `rerun_all.sh`). | **[`archive/data/section48/segments_ner_llama3.jsonl`](../archive/data/section48/segments_ner_llama3.jsonl)** |
@@ -111,7 +111,7 @@ From **`vector_ccr_all_models.json`** at **`11783a0^`**. **CCR** = fraction of e
 | `segments_ner_llama3.jsonl` | 0.326 | 0.992 | 485 | 158 | 481 |
 | `segments_ner_unsloth_full.jsonl` | 0.324 | 0.998 | 580 | 188 | 579 |
 
-**Note.** In this repository snapshot, **Mistral-Instruct** and **Llama-3** segment lists were used for **grounding / CCR analysis**; a full **`scores_summary.csv`** bundle for **`results/ner_mistral_*`** / **`ner_llama*`** was **not** kept under `results/` in the archived tree checked here. If you regenerate full pipelines for those JSONLs, drop outputs under a new `results/<name>/` and re-run `scripts/evaluate.py` + `scripts/plot_results.py` to extend this appendix.
+**Note.** In this repository snapshot, **Mistral-Instruct** and **Llama-3** segment lists were used for **grounding / CCR analysis**; a full **`scores_summary.csv`** bundle for **`results/ner_mistral_*`** / **`ner_llama*`** was **not** kept under `results/` in the archived tree checked here. If you regenerate full pipelines for those JSONLs, drop outputs under a new `results/<name>/` and re-run `tools/eval/evaluate.py` + `tools/eval/plot_figures.py` to extend this appendix.
 
 ---
 
@@ -120,9 +120,9 @@ From **`vector_ccr_all_models.json`** at **`11783a0^`**. **CCR** = fraction of e
 | Goal | Command / path |
 |------|----------------|
 | Re-run two-condition driver | `./rerun_all.sh` (see root `README.md`) |
-| Re-evaluate one condition | `PYTHONPATH=. python scripts/evaluate.py --results-dir results/<condition> --segments data/section48/<segments>.jsonl` |
-| Rebuild figures / `scores_summary.csv` | `PYTHONPATH=. python scripts/plot_results.py --results-dir … --segments …` |
-| Ambiguous FR keys (two JSONLs + locks) | `PYTHONPATH=. python scripts/report_ambiguous_grounding.py` → `error_analysis/ambiguous_grounding_report.csv` |
+| Re-evaluate one condition | `PYTHONPATH=. python tools/eval/evaluate.py --results-dir results/<condition> --segments data/section48/<segments>.jsonl` |
+| Rebuild figures / `scores_summary.csv` | `PYTHONPATH=. python tools/eval/plot_figures.py --results-dir … --segments …` |
+| Ambiguous FR keys (two JSONLs + locks) | `PYTHONPATH=. python tools/error_analysis/report_ambiguous_grounding.py` → `error_analysis/ambiguous_grounding_report.csv` |
 | Recover deleted `results/ner_*` CSV from git | e.g. `git show '11783a0^:results/ner_baseline/figures/scores_summary.csv'` |
 
 ---
