@@ -785,7 +785,7 @@ def main() -> None:
     p.add_argument("--partial", action="store_true", help="Skip malformed JSONL lines.")
     p.add_argument("--comet", action="store_true", help="Compute COMET (slow; needs unbabel-comet).")
     p.add_argument("--dpi", type=int, default=180)
-    p.add_argument("--format", default="png,pdf", help="Comma-separated: png, pdf, svg")
+    p.add_argument("--format", default="png", help="Comma-separated: png, pdf, svg (default: png only)")
     p.add_argument(
         "--no-inference-figure",
         action="store_true",

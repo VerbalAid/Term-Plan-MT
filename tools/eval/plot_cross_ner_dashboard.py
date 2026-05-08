@@ -541,7 +541,7 @@ def main() -> None:
         help="Output directory (default: {results-root}/cross_ner_comparison).",
     )
     ap.add_argument("--dpi", type=int, default=180)
-    ap.add_argument("--format", default="png,pdf", help="Comma-separated figure formats.")
+    ap.add_argument("--format", default="png", help="Comma-separated figure formats (default: png only).")
     ap.add_argument(
         "--grounding-mode",
         choices=["string", "vector", "vector_llm"],

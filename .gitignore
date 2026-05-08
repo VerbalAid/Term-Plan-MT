@@ -32,6 +32,7 @@ data/QUAERO_FrenchMed/
 
 # Large ontology NER SFT exports (regenerate; see tools/data/build_ontology_sft.py)
 data/ontology_ner_full*.jsonl
+data/ontology_ner_full*.jsonl.bak
 data/sft/
 
 # IDE / OS

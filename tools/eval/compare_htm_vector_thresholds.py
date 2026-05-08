@@ -7,7 +7,7 @@ segment JSONL as that pipeline (NER ``terms[]`` → graph grounding → English 
 
   - ``htm_threshold_comparison.csv`` — one row per (NER condition, system)
   - ``htm_threshold_comparison.json`` — nested summary
-  - ``htm_threshold_comparison.png`` (and ``.pdf``) — **overview**: one panel per MT system; **colour = NER pipeline**, **hatch = HTM variant** (string vs vector thresholds); no numeric bar labels
+  - ``htm_threshold_comparison.png`` (optional ``.pdf`` via ``--format``) — **overview**: one panel per MT system; **colour = NER pipeline**, **hatch = HTM variant** (string vs vector thresholds); no numeric bar labels
   - ``htm_threshold_comparison__<metric>.png`` — **per-metric** figures (larger bars, solid fill only) for slides or the appendix
   - ``htm_threshold_comparison__string_vs_vector_panels.png`` — **grid**: one subplot per NER pipeline; at each MT system, **substring and vector thresholds as adjacent bars** (easier to read than hatch-only overview)
 
@@ -653,7 +653,7 @@ def main() -> None:
     )
     ap.add_argument("--partial", action="store_true", help="Skip malformed JSONL lines.")
     ap.add_argument("--dpi", type=int, default=180)
-    ap.add_argument("--format", default="png,pdf", help="Comma-separated figure formats.")
+    ap.add_argument("--format", default="png", help="Comma-separated figure formats (default: png only).")
     ap.add_argument(
         "--embed-model",
         default=None,

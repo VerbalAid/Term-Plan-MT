@@ -1,12 +1,23 @@
 # Data directory
 
-| Path | Purpose |
-|------|--------|
-| `section48/` | Section 4.8 segment JSONLs (`segments_ner*.jsonl`), `planning_locks.json` (generated), small JSON reports. **Committed** (small). Retired extractors: [archive/data/section48/](../archive/data/section48/README.md). |
-| `meddra/` | MedDRA release files for graph build (`tools/data/extract_meddra.py` / `tools/data/build_graph.py`). **Not committed** (large; requires a MedDRA **licence**) — see root `README.md`. |
-| `QUAERO_FrenchMed/` | Optional corpus for NER fine-tuning. **Not committed** by default. |
-| `error_analysis/` | Optional error-analysis inputs. |
+| Path | Role |
+|------|------|
+| `meddra/` | MedDRA MedAscii (English hierarchy; not committed by default — see root `.gitignore`) |
+| `ontology_ner_full_hierarchical_mistral_{train,val,test}.jsonl` | Mistral-instruct ontology SFT (one `{"text":...}` per line) |
+| `ontology_ner_full_hierarchical_alpaca_{train,val,test}.jsonl` | Same examples in Alpaca blocks (default for `biomistral_ner_finetune_unsloth.py --ontology-only`) |
+| `ontology_ner_full_hierarchical_mistral_train.jsonl.bak` | Optional pre-patch backup |
+| `section48/` | Segment JSONLs for S1–S5 / NER (`segments_ner*.jsonl`) |
 
-Regenerate `data/section48/segments_ner.jsonl` with `tools/data/prepare_data.py` (default FR/EN PDF paths under `data/test_data/` when present; see [`test_data/README.md`](test_data/README.md)).
+Regenerate ontology JSONL from Neo4j:
 
-**HTM:** uses French **`terms[].word`** on the same segment JSONL you pass to **`--segments`** in `tools/eval/evaluate.py` / `tools/eval/plot_figures.py` (with Neo4j). Optional **`data/gold_terms.json`** is only for **Neo4j graph seeding** via `tools/data/build_graph.py`, not for HTM. To draft such rows from parallel NER, see `tools/data/build_gold_terms_from_parallel_ner.py --out …`.
+```bash
+PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --prompt-style mistral --out data/full_mistral.jsonl
+PYTHONPATH=. python tools/data/split_ontology_sft_jsonl.py --input data/full_mistral.jsonl --out-dir data
+# rename outputs to match expected stems, or adjust trainer paths
+```
+
+Fix `soc`…`llt` on existing hierarchical JSONL without Neo4j:
+
+```bash
+PYTHONPATH=. python tools/data/patch_ontology_sft_hierarchy_jsonl.py --input data/ontology_ner_full_hierarchical_mistral_train.jsonl --in-place --backup .bak
+```

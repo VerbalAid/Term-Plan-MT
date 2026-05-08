@@ -16,7 +16,18 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 load_dotenv(ROOT / ".env")
+
+from pipeline.meddra_io import (
+    enrich_mdhier_row_pt,
+    load_llt_to_parent_pt,
+    load_pt_names,
+    parse_mdhier_row,
+    read_meddra_asc,
+    split_meddra_asc_line,
+)
 
 
 def ensure_concept_indexes(session) -> None:
@@ -25,37 +36,12 @@ def ensure_concept_indexes(session) -> None:
     session.run("CREATE RANGE INDEX concept_fr_label IF NOT EXISTS FOR (c:Concept) ON (c.fr_label)")
 
 
-def _split_row(line: str) -> list[str]:
-    line = line.rstrip("\n\r")
-    if "|" in line:
-        return [p.strip() for p in line.split("|")]
-    return [p.strip() for p in line.split("$")]
-
-
-def parse_mdhier_row(parts: list[str]) -> dict | None:
-    """MedDRA mdhier: llt_cd, llt_name, pt_cd, pt_name, hlt_cd, hlt_name, hlgt_cd, hlgt_name, soc_cd, soc_name."""
-    if len(parts) < 10:
-        return None
-    return {
-        "llt_code": parts[0],
-        "llt_name": parts[1],
-        "pt_code": parts[2],
-        "pt_name": parts[3],
-        "hlt_code": parts[4],
-        "hlt_name": parts[5],
-        "hlgt_code": parts[6],
-        "hlgt_name": parts[7],
-        "soc_code": parts[8],
-        "soc_name": parts[9],
-    }
-
-
 def load_level_file(path: Path) -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+    for line in read_meddra_asc(path).splitlines():
         if not line.strip():
             continue
-        parts = _split_row(line)
+        parts = split_meddra_asc_line(line)
         if len(parts) < 2:
             continue
         rows.append((parts[0], parts[1]))
@@ -115,10 +101,10 @@ def apply_french_labels(session, fr_dir: Path, batch_size: int = 4000) -> None:
         if not path.is_file():
             continue
         batch: list[dict] = []
-        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        for line in read_meddra_asc(path).splitlines():
             if not line.strip():
                 continue
-            parts = _split_row(line)
+            parts = split_meddra_asc_line(line)
             if len(parts) < 2:
                 continue
             batch.append({"id": parts[0], "fr": parts[1]})
@@ -150,12 +136,24 @@ def load_meddra_english(session, en_dir: Path) -> None:
     concepts: dict[str, tuple[str, int, str]] = {}
     edges: set[tuple[str, str]] = set()
 
-    for line in mdhier_path.read_text(encoding="utf-8", errors="replace").splitlines():
+    llt_path = en_dir / "llt.asc"
+    pt_path = en_dir / "pt.asc"
+    llt_pt = load_llt_to_parent_pt(llt_path) if llt_path.is_file() else {}
+    pt_names = load_pt_names(pt_path) if pt_path.is_file() else {}
+
+    for line in read_meddra_asc(mdhier_path).splitlines():
         if not line.strip():
             continue
-        row = parse_mdhier_row(_split_row(line))
+        row = parse_mdhier_row(split_meddra_asc_line(line))
         if not row:
             continue
+        if (row.get("primary_soc_fg") or "Y").upper() != "Y":
+            continue
+        row = enrich_mdhier_row_pt(row, llt_pt, pt_names)
+        if not (row.get("pt_code") or "").strip():
+            row = dict(row)
+            row["pt_code"] = row["llt_code"]
+            row["pt_name"] = (row.get("pt_name") or row.get("llt_name") or "").strip()
         concepts[row["soc_code"]] = (row["soc_name"], 1, "SOC")
         concepts[row["hlgt_code"]] = (row["hlgt_name"], 2, "HLGT")
         concepts[row["hlt_code"]] = (row["hlt_name"], 3, "HLT")

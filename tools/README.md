@@ -6,12 +6,11 @@ Entrypoints are grouped **by workflow** (not a flat `tools/*.py` list). Run from
 
 | Script | Role |
 |--------|------|
-| `prepare_data.py` | PDF → aligned segment JSONL. |
 | `extract_meddra.py`, `build_graph.py` | MedDRA ASCII → Neo4j `:Concept` graph. |
-| `build_gold_terms_from_parallel_ner.py` | Optional `gold_terms` JSON for graph seeding. |
-| `export_full_ontology_ner_sft_jsonl.py` | Full ontology → Alpaca JSONL (NER / hierarchy formats). |
-| `split_ontology_sft_jsonl.py` | Train/val split for ontology JSONL. |
-| `build_ontology_sft.py` | MedDRA-only instruction pairs (no sentences) → `data/sft/ontology_{train,val}.jsonl`. |
+| `export_full_ontology_ner_sft_jsonl.py` | Full ontology → Alpaca / Mistral JSONL (hierarchical or legacy). |
+| `split_ontology_sft_jsonl.py` | Train/val/test split for ontology JSONL. |
+| `patch_ontology_sft_hierarchy_jsonl.py` | Fix `soc`…`llt` in hierarchical JSONL from English `mdhier.asc`. |
+| `mistral_hierarchical_jsonl_to_alpaca.py` | Reframe Mistral `[INST]` ontology lines as Alpaca `text`. |
 
 ## `tools/pipeline/` — run translation ladder (S1–S5)
 

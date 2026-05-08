@@ -21,6 +21,7 @@ import sys
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 from pipeline.cuda_ld_path import ensure_cuda_pip_libs_visible
+from pipeline.meddra_io import MEDDRA_TIERS, canonical_meddra_tier
 
 ensure_cuda_pip_libs_visible()
 
@@ -615,8 +616,8 @@ class TermGraph:
                 chain.append(dict(pl))
         by_tier: dict[str, dict[str, Any]] = {}
         for pl in chain:
-            t = str(pl.get("tier") or "").strip().upper()
-            if t:
+            t = canonical_meddra_tier(pl)
+            if t in MEDDRA_TIERS:
                 by_tier[t] = pl
         return {"chain": chain, "by_tier": by_tier}
 
@@ -669,8 +670,8 @@ class TermGraph:
 
         by_tier: dict[str, dict[str, Any]] = {}
         for pl in chain:
-            t = str(pl.get("tier") or "").strip().upper()
-            if t:
+            t = canonical_meddra_tier(pl)
+            if t in MEDDRA_TIERS:
                 by_tier[t] = pl
 
         out = {"chain": chain, "by_tier": by_tier}

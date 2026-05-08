@@ -922,6 +922,12 @@ def main() -> None:
     _patch_datasets_fingerprint_if_py314()
 
     brat_dir = args.brat_dir if args.brat_dir.is_absolute() else ROOT / args.brat_dir
+    if not args.ontology_only and not brat_dir.is_dir():
+        raise SystemExit(
+            f"QUAERO BRAT not found: {brat_dir}\n"
+            "Use --ontology-only with hierarchical ontology JSONL (see docs/mistral_instruct_Ontology-Fine-tuning.md), "
+            "or install the QUAERO EMEA corpus and pass --brat-dir."
+        )
     lora_dir = args.lora_dir if args.lora_dir.is_absolute() else ROOT / args.lora_dir
     merged_dir = args.merged_dir if args.merged_dir.is_absolute() else ROOT / args.merged_dir
     lora_dir.mkdir(parents=True, exist_ok=True)
@@ -976,9 +982,9 @@ def main() -> None:
     if args.ontology_only and not ontology_paths and not (otr and oval):
         raise SystemExit(
             "--ontology-only needs ontology data: pass --ontology-sft-jsonl and/or "
-            "--ontology-train-jsonl + --ontology-val-jsonl, or create the default splits, e.g.\n"
-            "  PYTHONPATH=. python tools/data/split_ontology_sft_jsonl.py \\\n"
-            "    --input data/ontology_ner_full_hierarchical_alpaca.jsonl --out-dir data\n"
+            "--ontology-train-jsonl + --ontology-val-jsonl, or create the default splits with\n"
+            "  PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --out data/full.jsonl\n"
+            "  PYTHONPATH=. python tools/data/split_ontology_sft_jsonl.py --input data/full.jsonl --out-dir data\n"
             f"Expected then: {_DEFAULT_OT_TRAIN}\n  {_DEFAULT_OT_VAL}\n  {_DEFAULT_OT_TEST} (optional)"
         )
 

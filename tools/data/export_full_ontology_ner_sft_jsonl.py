@@ -6,6 +6,9 @@ One training line per retained concept: ``### Input`` is that French label (shor
 ``{fr, en, level, tier, id}``. **hierarchical** (default) adds SOC→LLT path fields, ``en_resolved``,
 and PT-canonical ``en`` (schema documented in ``pipeline/ontology_sft_alpaca.py``).
 
+Use ``--prompt-style mistral`` for Mistral-7B-Instruct ``[INST]…[/INST]`` framing (recommended
+for that base model). Default ``alpaca`` keeps ``### Instruction`` / ``### Response`` blocks.
+
 ``biomistral_ner_finetune_unsloth.py --ontology-sft-jsonl`` accepts all of these; training only
 uses ``fr`` from the gold JSON for the built-in multiset F1, so extra keys are learnable structure.
 
@@ -44,6 +47,8 @@ from pipeline.ontology_sft_alpaca import (
     row_payload_json_hierarchical,
     to_alpaca,
     to_alpaca_hierarchical,
+    to_mistral_instruct,
+    to_mistral_instruct_hierarchical,
 )
 
 
@@ -131,6 +136,12 @@ def main() -> None:
         "``representative`` (default) = one row per FR key; ``none`` = one row per concept (can duplicate inputs); "
         "``skip`` = drop every concept in a colliding FR key.",
     )
+    ap.add_argument(
+        "--prompt-style",
+        choices=("alpaca", "mistral"),
+        default="alpaca",
+        help="alpaca = ### Instruction/Input/Response (default). mistral = <s>[INST]…[/INST]…</s>.",
+    )
     args = ap.parse_args()
 
     if args.out is None:
@@ -178,10 +189,14 @@ def main() -> None:
                         fr_surface=fr_raw,
                         supervision_en=args.supervision_en,
                     )
-                    wrap = to_alpaca_hierarchical
+                    wrap = (
+                        to_mistral_instruct_hierarchical
+                        if args.prompt_style == "mistral"
+                        else to_alpaca_hierarchical
+                    )
                 else:
                     payload = row_payload_json(concept, fr_surface=fr_raw)
-                    wrap = to_alpaca
+                    wrap = to_mistral_instruct if args.prompt_style == "mistral" else to_alpaca
                 body = f"Texte (libellé médical en français) :\n{fr_raw}"
                 text = wrap(body, payload)
                 fout.write(json.dumps({"text": text}, ensure_ascii=False) + "\n")
@@ -193,11 +208,12 @@ def main() -> None:
     print(f"Normalized-FR keys with >1 concept: {n_colliding}", file=sys.stderr)
     print(f"Rows dropped by FR policy: {n_dropped}", file=sys.stderr)
     print(
-        f"Wrote {n_out} Alpaca rows → {out_path} (format={args.format})",
+        f"Wrote {n_out} JSONL rows → {out_path} (format={args.format})",
         file=sys.stderr,
     )
     if args.format == "hierarchical":
         print(f"supervision_en={args.supervision_en}", file=sys.stderr)
+    print(f"prompt_style={args.prompt_style}", file=sys.stderr)
 
 
 if __name__ == "__main__":

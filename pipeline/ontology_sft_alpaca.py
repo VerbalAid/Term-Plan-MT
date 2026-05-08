@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from pipeline.meddra_io import canonical_meddra_tier
+
 ONTOLOGY_SFT_ALPACA_INSTRUCTION = (
     "Extract medical terms from the French medical text below. "
     "Return only a JSON list of objects. Each object must have keys: "
@@ -57,12 +59,25 @@ def to_alpaca_hierarchical(fr_body: str, response_json: str) -> str:
     )
 
 
+def to_mistral_instruct(fr_body: str, response_json: str) -> str:
+    """Mistral-7B-Instruct style: user turn + assistant JSON (no bare Alpaca section headers)."""
+    user = ONTOLOGY_SFT_ALPACA_INSTRUCTION + "\n\n### Input:\n" + fr_body.strip()
+    assistant = response_json.strip()
+    return f"<s>[INST] {user} [/INST] {assistant}</s>"
+
+
+def to_mistral_instruct_hierarchical(fr_body: str, response_json: str) -> str:
+    user = ONTOLOGY_SFT_ALPACA_INSTRUCTION_HIERARCHICAL + "\n\n### Input:\n" + fr_body.strip()
+    assistant = response_json.strip()
+    return f"<s>[INST] {user} [/INST] {assistant}</s>"
+
+
 def concept_to_row(word_fr: str, concept: dict[str, Any]) -> dict[str, Any]:
     return {
         "fr": word_fr.strip(),
         "en": str(concept.get("name") or "").strip(),
         "level": concept.get("level"),
-        "tier": str(concept.get("tier") or "").strip(),
+        "tier": canonical_meddra_tier(concept),
         "id": str(concept.get("id") or "").strip(),
     }
 
@@ -114,7 +129,7 @@ def concept_to_row_hierarchical(
 ) -> dict[str, Any]:
     """Rich row: PT-canonical `en`, path columns, grounded tier/id/level, `en_resolved`."""
     by_tier = hierarchy.get("by_tier") or {}
-    gtier = str(grounded.get("tier") or "").strip().upper()
+    gtier = canonical_meddra_tier(grounded)
     flat = hierarchy_flat_fields(gtier, by_tier if isinstance(by_tier, dict) else {})
     en_primary = canonical_en(supervision_en=supervision_en, grounded=grounded, by_tier=by_tier)
     row: dict[str, Any] = {
@@ -122,7 +137,7 @@ def concept_to_row_hierarchical(
         "en": en_primary,
         "en_resolved": str(grounded.get("name") or "").strip(),
         "level": grounded.get("level"),
-        "tier": str(grounded.get("tier") or "").strip(),
+        "tier": gtier,
         "id": str(grounded.get("id") or "").strip(),
     }
     row.update(flat)
