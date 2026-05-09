@@ -20,17 +20,17 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+# Repo root (this script lives under training_scripts/ner/).
+ROOT = Path(__file__).resolve().parents[2]
 _TOOLS = ROOT / "tools"
 _NER_AB = Path(__file__).resolve().parent
 for _p in (ROOT, _TOOLS, _NER_AB):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-# Default ontology splits (``tools/data/split_ontology_sft_jsonl.py`` on hierarchical export).
-_DEFAULT_OT_TRAIN = ROOT / "data" / "ontology_ner_full_hierarchical_alpaca_train.jsonl"
-_DEFAULT_OT_VAL = ROOT / "data" / "ontology_ner_full_hierarchical_alpaca_val.jsonl"
-_DEFAULT_OT_TEST = ROOT / "data" / "ontology_ner_full_hierarchical_alpaca_test.jsonl"
+# Default hierarchical Alpaca ontology JSONL (export with tools/data/export_full_ontology_ner_sft_jsonl.py).
+# With --ontology-only and no explicit paths, this file is loaded and split 90/10 train/val in memory.
+_DEFAULT_ONTOLOGY_ALPACA_JSONL = ROOT / "data" / "ontology_ner_full_hierarchical_alpaca.jsonl"
 # CLI default for --max-seq-length (used with --fit-8gb + --ontology-only to apply fit-8gb-max-seq).
 _DEFAULT_MAX_SEQ_LENGTH_CLI = 256
 
@@ -677,24 +677,24 @@ def main() -> None:
         type=Path,
         default=None,
         metavar="PATH",
-        help="Ontology train split (requires --ontology-val-jsonl). Under --ontology-only, if omitted "
-        "and this file exists, defaults to data/ontology_ner_full_hierarchical_alpaca_train.jsonl.",
+        help="Ontology train split (requires --ontology-val-jsonl). Omit both train and val to use "
+        "data/ontology_ner_full_hierarchical_alpaca.jsonl with an in-memory 90/10 split when that file exists.",
     )
     p.add_argument(
         "--ontology-val-jsonl",
         type=Path,
         default=None,
         metavar="PATH",
-        help="Ontology validation / dev split (requires --ontology-train-jsonl). Under --ontology-only, "
-        "if omitted and defaults exist, uses data/ontology_ner_full_hierarchical_alpaca_val.jsonl.",
+        help="Ontology validation / dev split (requires --ontology-train-jsonl). "
+        "Omit both train and val to use the default single-file flow (see --ontology-train-jsonl).",
     )
     p.add_argument(
         "--ontology-test-jsonl",
         type=Path,
         default=None,
         metavar="PATH",
-        help="Ontology test split — evaluated once after training. Optional; if omitted under --ontology-only "
-        "and data/ontology_ner_full_hierarchical_alpaca_test.jsonl exists, it is used.",
+        help="Ontology test split — evaluated once after training. Optional; pass explicitly when you "
+        "have a held-out JSONL (there is no default test file when using the single canonical Alpaca export).",
     )
     p.add_argument(
         "--ontology-test-eval-cap",
@@ -706,7 +706,8 @@ def main() -> None:
     p.add_argument(
         "--ontology-only",
         action="store_true",
-        help="Skip QUAERO BRAT; train and validate only on --ontology-sft-jsonl data.",
+        help="Skip QUAERO BRAT; train and validate on ontology JSONL (--ontology-sft-jsonl and/or default "
+        "data/ontology_ner_full_hierarchical_alpaca.jsonl with 90/10 split, or explicit train/val paths).",
     )
     p.add_argument(
         "--full-ontology-finetune",
@@ -967,25 +968,24 @@ def main() -> None:
         and not ontology_paths
         and args.ontology_train_jsonl is None
         and args.ontology_val_jsonl is None
-        and _DEFAULT_OT_TRAIN.is_file()
-        and _DEFAULT_OT_VAL.is_file()
+        and _DEFAULT_ONTOLOGY_ALPACA_JSONL.is_file()
     ):
-        otr, oval = _DEFAULT_OT_TRAIN, _DEFAULT_OT_VAL
-        if args.ontology_test_jsonl is None and _DEFAULT_OT_TEST.is_file():
-            ote = _DEFAULT_OT_TEST
-        _ts = f", test={ote.name}" if ote else ""
+        ontology_paths = [_DEFAULT_ONTOLOGY_ALPACA_JSONL]
         print(
-            f"[train] --ontology-only: default splits (train={otr.name}, val={oval.name}{_ts})",
+            f"[train] --ontology-only: using {_DEFAULT_ONTOLOGY_ALPACA_JSONL.name} "
+            "(90/10 train/val split in memory).",
             file=sys.stderr,
         )
 
     if args.ontology_only and not ontology_paths and not (otr and oval):
         raise SystemExit(
             "--ontology-only needs ontology data: pass --ontology-sft-jsonl and/or "
-            "--ontology-train-jsonl + --ontology-val-jsonl, or create the default splits with\n"
-            "  PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --out data/full.jsonl\n"
-            "  PYTHONPATH=. python tools/data/split_ontology_sft_jsonl.py --input data/full.jsonl --out-dir data\n"
-            f"Expected then: {_DEFAULT_OT_TRAIN}\n  {_DEFAULT_OT_VAL}\n  {_DEFAULT_OT_TEST} (optional)"
+            "--ontology-train-jsonl + --ontology-val-jsonl, or place\n"
+            f"  {_DEFAULT_ONTOLOGY_ALPACA_JSONL}\n"
+            "Create it with:\n"
+            "  PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --prompt-style alpaca --out data/ontology_ner_full_hierarchical_alpaca.jsonl\n"
+            "Optionally split with tools/data/split_ontology_sft_jsonl.py if you prefer separate train/val files "
+            "and pass them via --ontology-train-jsonl / --ontology-val-jsonl."
         )
 
     if (otr or oval) and not (otr and oval):
@@ -1005,7 +1005,7 @@ def main() -> None:
         if "PATH/TO/" in s.upper() or "/PATH/" in s.upper():
             return (
                 "\nHint: use real JSONL paths, or omit --ontology-train-jsonl and "
-                "--ontology-val-jsonl to auto-use data/ontology_ner_full_hierarchical_alpaca_{train,val}.jsonl."
+                "--ontology-val-jsonl to use data/ontology_ner_full_hierarchical_alpaca.jsonl when present."
             )
         return ""
 
@@ -1119,7 +1119,7 @@ def main() -> None:
                 f"loading the base model). Another process is using the GPU — run  nvidia-smi  and "
                 f"stop other python / ML jobs (or reboot). Then in a **new** shell:\n"
                 f"  export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True\n"
-                f"  PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py ...\n"
+                f"  PYTHONPATH=. python training_scripts/ner/biomistral_ner_finetune_unsloth.py ...\n"
                 f"(Total GPU: ~{total_mib} MiB.)"
             )
 

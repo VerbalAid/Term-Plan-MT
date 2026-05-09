@@ -1,6 +1,3 @@
-# TermPlan-MT  
-**Terminology-aware machine translation** — French → English for SmPC **§4.8**, with **MedDRA-grounded** terminology kept consistent across several MT setups.
-
 <p align="center">
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.14+"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch 2.x"></a>
@@ -15,6 +12,9 @@
   <a href="https://github.com/mjpost/sacrebleu"><img src="https://img.shields.io/badge/sacreBLEU-metric-222222?style=for-the-badge" alt="sacreBLEU"></a>
   <a href="https://pytest.org/"><img src="https://img.shields.io/badge/pytest-tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="pytest"></a>
 </p>
+
+# TermPlan-MT  
+**Terminology-aware machine translation** — French → English for SmPC **§4.8**, with **MedDRA-grounded** terminology kept consistent across several MT setups.
 
 ---
 
@@ -51,7 +51,7 @@ High-level path: **NER → grounding → planning → translation (S1–S5) → 
 | 1 | `cd` into the repo. If the folder name ends with a **space**, quote the path, e.g. `cd "/…/MT_Project_Terminology "`. |
 | 2 | `python -m venv .venv` → `.venv/bin/pip install -r requirements.txt` |
 | 3 | `docker compose up -d` — Neo4j for grounding / metrics. |
-| 4 | Segment JSONL under **`data/section48/`** (`segments_ner*.jsonl`). Refresh NER with **`extras/experiments/french_medical_ner/biomistral_prompt_ner.py`** (see **`extras/README.md`**). |
+| 4 | Segment JSONL under **`data/section48/`** (`segments_ner*.jsonl`). To (re)generate NER, use `training_scripts/ner/biomistral_prompt_ner.py` (see `training_scripts/README.md`). |
 | 5 | **Full matrix:** `./rerun_all.sh` (see script header for `SKIP_*`). **Ad hoc:** `PYTHONPATH=. python tools/pipeline/run_pipeline.py --segments … --results-dir …` |
 | 6 | **Scores / figures:** `tools/eval/evaluate.py`, `tools/eval/plot_figures.py`, or the eval phase inside `rerun_all.sh` / `tools/eval/run_eval_plot_matrix.py`. |
 
@@ -67,7 +67,13 @@ High-level path: **NER → grounding → planning → translation (S1–S5) → 
 |------|--------|
 | `tools/README.md` | CLI layout (`run_pipeline`, `eval`, `data` tools) |
 | `data/README.md` | Data tree, MedDRA, ontology JSONL |
-| `extras/README.md` | NER prompt / Unsloth / ontology SFT |
+| `training_scripts/README.md` | NER inference + Unsloth fine-tuning (QUAERO / ontology SFT) |
 | `docs/mistral_instruct_Ontology-Fine-tuning.md` | Mistral-7B-Instruct ontology fine-tuning |
 
 **MedDRA** is not redistributed; obtain a licence, extract with `tools/data/extract_meddra.py`, load with `tools/data/build_graph.py` (details in `data/README.md`).
+
+---
+
+## Error analysis
+
+Run audits and build annotation sheets from `results/` under `tools/error_analysis/`. The expected columns for manual review live in `docs/error_analysis/schema.md`.

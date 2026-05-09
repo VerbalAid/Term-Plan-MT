@@ -18,8 +18,8 @@ Legacy 5-key rows (no path fields) are left unchanged.
 Examples::
 
     PYTHONPATH=. python tools/data/patch_ontology_sft_hierarchy_jsonl.py \\
-      --input data/ontology_ner_full_hierarchical_alpaca_train.jsonl \\
-      --output data/ontology_ner_full_hierarchical_alpaca_train.patched.jsonl
+      --input data/ontology_ner_full_hierarchical_alpaca.jsonl \\
+      --output data/ontology_ner_full_hierarchical_alpaca.patched.jsonl
 
     PYTHONPATH=. python tools/data/patch_ontology_sft_hierarchy_jsonl.py \\
       --input data/ontology_ner_full_hierarchical_mistral_train.jsonl \\

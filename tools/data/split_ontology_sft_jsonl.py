@@ -7,17 +7,14 @@ Example::
       --input data/ontology_ner_full_hierarchical_alpaca.jsonl \\
       --out-dir data
 
-Writes ``ontology_ner_full_hierarchical_{train,val,test}.jsonl`` under ``--out-dir`` when
-the input basename matches ``ontology_ner_full_hierarchical_alpaca.jsonl``; otherwise uses
-``{stem}_train.jsonl`` etc.
+Writes ``{stem}_train.jsonl``, ``{stem}_val.jsonl``, and ``{stem}_test.jsonl`` under
+``--out-dir`` (e.g. ``ontology_ner_full_hierarchical_alpaca_train.jsonl`` when the input
+stem is ``ontology_ner_full_hierarchical_alpaca``).
 
-Then train with explicit splits::
+Then train with explicit splits (optional)::
 
-    PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \\
-      --ontology-only \\
-      --ontology-train-jsonl data/ontology_ner_full_hierarchical_alpaca_train.jsonl \\
-      --ontology-val-jsonl data/ontology_ner_full_hierarchical_alpaca_val.jsonl \\
-      --ontology-test-jsonl data/ontology_ner_full_hierarchical_alpaca_test.jsonl
+    # Pass the resulting *_train.jsonl / *_val.jsonl / *_test.jsonl paths to your
+    # preferred training script (this repo does not require a specific runner).
 """
 
 from __future__ import annotations

@@ -24,8 +24,7 @@ Example::
     PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py \\
       --out data/ontology_ner_full_hierarchical_alpaca.jsonl
 
-    PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \\
-      --ontology-sft-jsonl data/ontology_ner_full_hierarchical_alpaca.jsonl --ontology-only
+    # Then train with your preferred SFT runner on that JSONL (single-file dataset).
 """
 
 from __future__ import annotations

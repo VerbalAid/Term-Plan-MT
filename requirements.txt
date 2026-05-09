@@ -22,7 +22,7 @@ pytest>=8.0
 
 # Optional COMET (evaluate.py): pip install unbabel-comet — see README.md (Py 3.12 easiest).
 
-# Optional: NER fine-tuning (Unsloth LoRA), extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py — install order:
+# Optional: NER fine-tuning (Unsloth LoRA) — install order:
 #   pip install unsloth_zoo --break-system-packages
 #   pip install trl datasets --break-system-packages
 #   pip install "unsloth[cu124] @ git+https://github.com/unslothai/unsloth.git" --break-system-packages

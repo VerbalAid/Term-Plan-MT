@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run NER with a saved HF Trainer LoRA checkpoint, then print dataset CCR (Neo4j grounding of NER spans).
 # Usage (from repo root) — all paths required (no baked-in checkpoint):
-#   bash extras/experiments/french_medical_ner/run_ner_ccr_from_lora_checkpoint.sh \\
+#   bash training_scripts/ner/run_ner_ccr_from_lora_checkpoint.sh \\
 #     data/section48/segments_ner_my_run.jsonl models/my-lora/checkpoint-5000 unsloth/qwen2.5-3b-instruct-unsloth-bnb-4bit
 #
 # Arg 3 (HF base) must match ``base_model_name_or_path`` in the checkpoint's adapter_config.json.
@@ -31,7 +31,7 @@ echo "  base:  ${BASE}"
 echo "  lora:  ${LORA_CKPT}"
 echo "  out:   ${SEG_OUT}"
 # shellcheck disable=SC2086
-PYTHONPATH=. "${PY}" extras/experiments/french_medical_ner/biomistral_prompt_ner.py \
+PYTHONPATH=. "${PY}" training_scripts/ner/biomistral_prompt_ner.py \
   --backend unsloth \
   --unsloth-base-model "${BASE}" \
   --unsloth-lora-path "${LORA_CKPT}" \

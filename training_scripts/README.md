@@ -1,17 +1,14 @@
-# Extras (GPU-heavy and supplementary research)
+# Training scripts (GPU-heavy)
 
-This directory holds **French medical NER**, **Unsloth fine-tuning**, **vector grounding helpers**, and related scripts that used to live under `experiments/`. The **core thesis pipeline** (`tools/pipeline/run_pipeline.py`, `tools/eval/evaluate.py`, Neo4j, `pipeline/`) does not import these modules; it only needs segment JSONLs under `data/section48/`.
+This directory holds **French medical NER inference** and **Unsloth fine-tuning** helpers. The **core pipeline** (`tools/pipeline/run_pipeline.py`, `tools/eval/evaluate.py`, Neo4j, `pipeline/`) does not import these modules; it only needs segment JSONLs under `data/section48/`.
 
 ## Layout
 
 | Path | Role |
 | ---- | ---- |
-| [`experiments/french_medical_ner/`](experiments/french_medical_ner/) | Prompted / fine-tuned NER, QUAERO BRAT I/O, Neo4j grounding / CCR ablations |
-| [`experiments/vector_grounding/`](experiments/vector_grounding/) | Graph embeddings and vector CCR reports |
-| [`experiments/figures/`](experiments/figures/) | Training curve overlays |
-| [`experiments/legacy/`](experiments/legacy/) | Legacy / archived experiment stubs |
-
-Outputs from supplementary runs may appear under `extras/experiments/*/results/` (ignored by git when configured in the root `.gitignore`).
+| [`ner/`](ner/) | Prompted NER, NER fine-tuning, QUAERO BRAT loader. |
+| `slurm_ontology_sft.sh` | Cluster run: ontology-only SFT. |
+| `slurm_quaero_ner_sft.sh` | Cluster run: QUAERO-only NER fine-tune. |
 
 ## Environment
 
@@ -26,21 +23,21 @@ Set `PYTHONPATH=.` so `pipeline.*` imports resolve.
 
 ```bash
 cd "/path/to/MT_Project_Terminology "
-PYTHONPATH=. ./.venv/bin/python extras/experiments/french_medical_ner/biomistral_prompt_ner.py --help
+PYTHONPATH=. ./.venv/bin/python training_scripts/ner/biomistral_prompt_ner.py --help
 ```
 
 **Unsloth NER fine-tune / ontology SFT:**
 
 ```bash
-PYTHONPATH=. ./.venv/bin/python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py --help
+PYTHONPATH=. ./.venv/bin/python training_scripts/ner/biomistral_ner_finetune_unsloth.py --help
 ```
 
-Ontology SFT data comes from **`tools/data/export_full_ontology_ner_sft_jsonl.py`** and **`tools/data/split_ontology_sft_jsonl.py`**. When `data/ontology_ner_full_hierarchical_alpaca_{train,val}.jsonl` exist, **`--ontology-only`** can omit `--ontology-train-jsonl` / `--ontology-val-jsonl` (optional test file is picked up the same way).
+Ontology SFT data comes from **`tools/data/export_full_ontology_ner_sft_jsonl.py`**. When **`data/ontology_ner_full_hierarchical_alpaca.jsonl`** exists, **`--ontology-only`** can omit `--ontology-sft-jsonl` / `--ontology-train-jsonl` / `--ontology-val-jsonl` (trainer loads that file and splits 90/10). Use **`tools/data/split_ontology_sft_jsonl.py`** only if you want separate train/val/test files on disk.
 
 **Minimal Qwen ontology run + resume from latest checkpoint:**
 
 ```bash
-PYTHONPATH=. ./.venv/bin/python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \
+PYTHONPATH=. ./.venv/bin/python training_scripts/ner/biomistral_ner_finetune_unsloth.py \
   --fit-8gb --ontology-only --resume-from-checkpoint auto --fast
 ```
 
@@ -49,16 +46,16 @@ PYTHONPATH=. ./.venv/bin/python extras/experiments/french_medical_ner/biomistral
 **Full ontology LoRA run** (no `--max-steps` cap; trains for **`--num-train-epochs`**, default **2**):
 
 ```bash
-PYTHONPATH=. ./.venv/bin/python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \
+PYTHONPATH=. ./.venv/bin/python training_scripts/ner/biomistral_ner_finetune_unsloth.py \
   --fit-8gb --ontology-only --full-ontology-finetune --resume-from-checkpoint auto
 ```
 
-Or run the same via `extras/experiments/french_medical_ner/run_full_ontology_qwen_finetune.sh` from the repo root. **`--full-ontology-finetune` ignores `--fast` and clears `--max-steps`** if you passed either by habit.
+**`--full-ontology-finetune` ignores `--fast` and clears `--max-steps`** if you passed either by habit.
 
 **Try a saved LoRA checkpoint + dataset CCR** (requires GPU + Neo4j; pass output JSONL, LoRA `checkpoint-*` dir, and HF base id matching `adapter_config.json`):
 
 ```bash
-bash extras/experiments/french_medical_ner/run_ner_ccr_from_lora_checkpoint.sh \
+bash training_scripts/ner/run_ner_ccr_from_lora_checkpoint.sh \
   data/section48/segments_ner_my_run.jsonl models/<your-lora>/checkpoint-5000 \
   unsloth/qwen2.5-3b-instruct-unsloth-bnb-4bit
 ```

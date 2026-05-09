@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================
 #  SLURM job: Mistral-7B-Instruct QLoRA on hierarchical ontology JSONL (Unsloth).
-#  Submit: sbatch Training_server_scripts/slurm_ontology_sft.sh
+#  Submit: sbatch training_scripts/slurm_ontology_sft.sh
 # ============================================================
 
 #SBATCH --job-name=ontology-sft-mistral
@@ -36,21 +36,18 @@ python -c "import unsloth" 2>/dev/null || {
     pip install "unsloth[cu124]" --break-system-packages --quiet
 }
 
-TRAIN="${ROOT}/data/ontology_ner_full_hierarchical_alpaca_train.jsonl"
-VAL="${ROOT}/data/ontology_ner_full_hierarchical_alpaca_val.jsonl"
-if [[ ! -f "$TRAIN" || ! -f "$VAL" ]]; then
-    echo "Missing ontology splits. Export from Neo4j then split, e.g." >&2
-    echo "  PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --prompt-style alpaca --out data/full.jsonl" >&2
-    echo "  PYTHONPATH=. python tools/data/split_ontology_sft_jsonl.py --input data/full.jsonl --out-dir data" >&2
+ONTO="${ROOT}/data/ontology_ner_full_hierarchical_alpaca.jsonl"
+if [[ ! -f "$ONTO" ]]; then
+    echo "Missing ${ONTO}" >&2
+    echo "Create it from Neo4j, e.g.:" >&2
+    echo "  PYTHONPATH=. python tools/data/export_full_ontology_ner_sft_jsonl.py --prompt-style alpaca --out data/ontology_ner_full_hierarchical_alpaca.jsonl" >&2
     exit 1
 fi
 
 echo "[slurm] training Mistral-7B-Instruct on ontology (Alpaca hierarchical text field) …"
-PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \
+PYTHONPATH=. python training_scripts/ner/biomistral_ner_finetune_unsloth.py \
     --base-model mistralai/Mistral-7B-Instruct-v0.2 \
     --ontology-only \
-    --ontology-train-jsonl "$TRAIN" \
-    --ontology-val-jsonl "$VAL" \
     --full-ontology-finetune \
     --lora-dir models/mistral-ontology-lora \
     --merged-dir models/mistral-ontology-merged

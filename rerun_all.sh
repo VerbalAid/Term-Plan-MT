@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # Reproduce: BioMistral-prompt NER + fine-tuned BioMistral NER only.
-# NER training/inference scripts live under extras/experiments/ (see extras/README.md).
 # Excludes segment 48_028 (Section 4.8 Tableau 2 / dense table block) from translation and metrics by default.
 #
 # Override exclusions: EXCLUDE_SEGMENT_IDS=""  (include all segments)

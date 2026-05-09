@@ -12,7 +12,6 @@ __pycache__/
 
 # Pipeline JSONL outputs (regenerate: tools/pipeline/run_pipeline.py, rerun_all.sh)
 results/**/*.jsonl
-extras/experiments/**/results/*.jsonl
 
 # Local bulk / logs (regenerate or optional; shrink clones — see README §0)
 archive/

@@ -8,7 +8,7 @@ Example::
 
     PYTHONPATH=. python tools/data/mistral_hierarchical_jsonl_to_alpaca.py \\
       --input data/ontology_ner_full_hierarchical_mistral_train.jsonl \\
-      --output data/ontology_ner_full_hierarchical_alpaca_train.jsonl
+      --output data/ontology_ner_full_hierarchical_alpaca.jsonl
 """
 
 from __future__ import annotations

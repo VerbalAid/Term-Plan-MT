@@ -8,7 +8,7 @@ A version of Mistral-7B-Instruct that, given a French MedDRA label, outputs stru
 
 ### Alternative: ontology-only SFT (no segment sentences)
 
-Build examples **only from Neo4j** (`:Concept` with `fr_label`, English `name`, hierarchy). Use `tools/data/export_full_ontology_ner_sft_jsonl.py` (see Step 1 below), then `tools/data/split_ontology_sft_jsonl.py`. Train with `extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py --ontology-only`.
+Build examples **only from Neo4j** (`:Concept` with `fr_label`, English `name`, hierarchy). Use `tools/data/export_full_ontology_ner_sft_jsonl.py` (see Step 1 below), then optionally `tools/data/split_ontology_sft_jsonl.py`. Train with `training_scripts/ner/biomistral_ner_finetune_unsloth.py`.
 
 ## Data quality before you export ontology JSONL
 
@@ -39,12 +39,12 @@ Use the split `ontology_ner_full_hierarchical_*` JSONL files from the previous b
 ## Train (Unsloth, in-repo)
 
 ```bash
-PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_ner_finetune_unsloth.py \
+PYTHONPATH=. python training_scripts/ner/biomistral_ner_finetune_unsloth.py \
   --base-model mistralai/Mistral-7B-Instruct-v0.2 \
   --ontology-only --full-ontology-finetune
 ```
 
-Defaults pick up `data/ontology_ner_full_hierarchical_alpaca_{train,val,test}.jsonl` when present. For SLURM, see `Training_server_scripts/slurm_ontology_sft.sh`.
+Defaults pick up `data/ontology_ner_full_hierarchical_alpaca.jsonl` when present (90/10 train/val split in memory). For SLURM, see `training_scripts/slurm_ontology_sft.sh`.
 
 To mix **QUAERO NER** data, install the BRAT corpus and pass `--brat-dir` (omit `--ontology-only`).
 
@@ -58,7 +58,7 @@ scp -r models/mistral-7b-instruct-v0-2-ner-lora your_laptop:~/path/to/repo/model
 
 # On laptop — smoke inference
 export PYTHONPATH=.
-PYTHONPATH=. python extras/experiments/french_medical_ner/biomistral_prompt_ner.py \
+PYTHONPATH=. python training_scripts/ner/biomistral_prompt_ner.py \
   --backend unsloth --unsloth-lora-path models/mistral-ontology-lora \
   --output data/section48/segments_smoke.jsonl
 ```
