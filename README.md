@@ -64,6 +64,9 @@
 | [`data/README.md`](data/README.md) | Data tree, MedDRA, ontology JSONL |
 | [`training_scripts/README.md`](training_scripts/README.md) | NER inference + Unsloth fine-tuning (QUAERO / ontology SFT) |
 | [`docs/mistral_instruct_Ontology-Fine-tuning.md`](docs/mistral_instruct_Ontology-Fine-tuning.md) | Mistral-7B-Instruct ontology fine-tuning |
+| [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot vs `scores_summary.csv`, discrepancy notes, paper checklist (EN) |
+| [`docs/pt/RESULTS_INTERPRETATION.md`](docs/pt/RESULTS_INTERPRETATION.md) | Mesmo conteúdo em português |
+| [`docs/de/RESULTS_INTERPRETATION.md`](docs/de/RESULTS_INTERPRETATION.md) | Gleicher Inhalt auf Deutsch |
 
 **MedDRA** is not redistributed; obtain a licence, extract with [`tools/data/extract_meddra.py`](tools/data/extract_meddra.py), load with [`tools/data/build_graph.py`](tools/data/build_graph.py) (details in [`data/README.md`](data/README.md)).
 
