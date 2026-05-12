@@ -1,0 +1,630 @@
+[
+  {
+    "fr": "acute GVHD",
+    "en": "acute graft-versus-host disease"
+  },
+  {
+    "fr": "adrenal insufficiency",
+    "en": "adrenal insufficiency"
+  },
+  {
+    "fr": "ALAT",
+    "en": "alanine aminotransferase"
+  },
+  {
+    "fr": "ALAT",
+    "en": "increased ALT"
+  },
+  {
+    "fr": "amylase",
+    "en": "increased amylase"
+  },
+  {
+    "fr": "anticorps anti-berahyaluronidase alfa recombinante",
+    "en": "anticorps anti-berahyaluronidase alfa recombinant"
+  },
+  {
+    "fr": "anémie",
+    "en": "anaemia"
+  },
+  {
+    "fr": "arrêt de pembrolizumab",
+    "en": "withdrawal of pembrolizumab"
+  },
+  {
+    "fr": "arrêt de pembrolizumab",
+    "en": "discontinuation of pembrolizumab"
+  },
+  {
+    "fr": "arthralgie",
+    "en": "arthralgia"
+  },
+  {
+    "fr": "ASAT",
+    "en": "increased ASAT"
+  },
+  {
+    "fr": "axitinib",
+    "en": "axitinib"
+  },
+  {
+    "fr": "berahyaluronidase alfa recombinante",
+    "en": "recombinant berahyaluronidase alfa"
+  },
+  {
+    "fr": "bilirubine",
+    "en": "increased bilirubin"
+  },
+  {
+    "fr": "bw",
+    "en": "bw"
+  },
+  {
+    "fr": "calcium",
+    "en": "decreased calcium"
+  },
+  {
+    "fr": "carcinome des voies biliaires",
+    "en": "biliary tract carcinoma"
+  },
+  {
+    "fr": "carcinome urothélial non résécable ou métastatique",
+    "en": "unresectable or metastatic urothelial carcinoma"
+  },
+  {
+    "fr": "CBNPC",
+    "en": "NSCLC"
+  },
+  {
+    "fr": "CCR avancé",
+    "en": "advanced RCC"
+  },
+  {
+    "fr": "CE",
+    "en": "EC"
+  },
+  {
+    "fr": "CE avancé",
+    "en": "advanced EC"
+  },
+  {
+    "fr": "CETEC",
+    "en": "HNSCC"
+  },
+  {
+    "fr": "CETEC",
+    "en": "melanoma, NSCLC, RCC"
+  },
+  {
+    "fr": "chimiothérapie",
+    "en": "chemotherapy"
+  },
+  {
+    "fr": "cholestérol",
+    "en": "increased cholesterol"
+  },
+  {
+    "fr": "chronic GVHD",
+    "en": "chronic graft-versus-host disease"
+  },
+  {
+    "fr": "colite",
+    "en": "Immune-mediated colitis"
+  },
+  {
+    "fr": "colite",
+    "en": "colitis"
+  },
+  {
+    "fr": "colite à médiation immunitaire",
+    "en": "immune-mediated colitis"
+  },
+  {
+    "fr": "colitis",
+    "en": "colitis"
+  },
+  {
+    "fr": "constipation",
+    "en": "constipation"
+  },
+  {
+    "fr": "créatinine",
+    "en": "increased creatinine"
+  },
+  {
+    "fr": "CSTN",
+    "en": "TNBC"
+  },
+  {
+    "fr": "céphalées",
+    "en": "headache"
+  },
+  {
+    "fr": "Description d’une sélection d’effets indésirables",
+    "en": "Description of selected adverse reactions"
+  },
+  {
+    "fr": "diarrhée",
+    "en": "diarrhoea"
+  },
+  {
+    "fr": "diarrhée",
+    "en": "diarrhea"
+  },
+  {
+    "fr": "diarrhées",
+    "en": "diarrhoea"
+  },
+  {
+    "fr": "diminution de l'appétit",
+    "en": "decreased appetite"
+  },
+  {
+    "fr": "diminution de l’appétit",
+    "en": "decreased appetite"
+  },
+  {
+    "fr": "doses",
+    "en": "doses"
+  },
+  {
+    "fr": "douleurs abdominales",
+    "en": "abdominal pain"
+  },
+  {
+    "fr": "douleurs musculosquelettiques",
+    "en": "musculoskeletal pain"
+  },
+  {
+    "fr": "durée médiane",
+    "en": "median duration"
+  },
+  {
+    "fr": "dysphonie",
+    "en": "dysphonia"
+  },
+  {
+    "fr": "Déclaration des effets indésirables suspectés",
+    "en": "Declaration of suspected adverse effects"
+  },
+  {
+    "fr": "délai d’apparition médian",
+    "en": "median time to onset"
+  },
+  {
+    "fr": "Effets indésirables",
+    "en": "undesirable effects"
+  },
+  {
+    "fr": "effets indésirables",
+    "en": "adverse reactions"
+  },
+  {
+    "fr": "effets indésirables",
+    "en": "adverse events"
+  },
+  {
+    "fr": "effets indésirables ayant entraîné le décès",
+    "en": "adverse events leading to death"
+  },
+  {
+    "fr": "Effets indésirables cutanés à médiation immunitaire",
+    "en": "cutaneous adverse reactions (immune-mediated)"
+  },
+  {
+    "fr": "Effets indésirables cutanés à médiation immunitaire",
+    "en": "immune-mediated cutaneous adverse reactions"
+  },
+  {
+    "fr": "effets indésirables de Grade 3-5",
+    "en": "Grades 3-5 adverse reactions"
+  },
+  {
+    "fr": "effets indésirables de Grades 3 à 5",
+    "en": "Grades 3 to 5 adverse events"
+  },
+  {
+    "fr": "effets indésirables à médiation immunitaire",
+    "en": "immune-mediated adverse reactions"
+  },
+  {
+    "fr": "elevation des enzymes hépatiques",
+    "en": "elevated liver enzymes"
+  },
+  {
+    "fr": "enfortumab vedotin",
+    "en": "enfortumab vedotin"
+  },
+  {
+    "fr": "engraftment syndrome",
+    "en": "engraftment syndrome"
+  },
+  {
+    "fr": "engraftment syndrome post-transplant",
+    "en": "engraftment syndrome"
+  },
+  {
+    "fr": "fatigue",
+    "en": "fatigue"
+  },
+  {
+    "fr": "Formulation sous-cutanée",
+    "en": "subcutaneous formulation"
+  },
+  {
+    "fr": "frequences mentionnées",
+    "en": "frequencies included"
+  },
+  {
+    "fr": "fréquence indéterminée",
+    "en": "not known"
+  },
+  {
+    "fr": "fréquent",
+    "en": "common"
+  },
+  {
+    "fr": "glucose",
+    "en": "increased glucose"
+  },
+  {
+    "fr": "Grade 1 ou 2",
+    "en": "Grade 1 or 2"
+  },
+  {
+    "fr": "Grade 2 ou 3",
+    "en": "Grade 2 or 3"
+  },
+  {
+    "fr": "Grade 3 or 4 anomalies de paramètres biologiques",
+    "en": "Grade 3 or 4 abnormalities of biological parameters"
+  },
+  {
+    "fr": "Grade 3 ou 4 laboratory abnormality",
+    "en": "Grade 3 or 4 laboratory abnormality"
+  },
+  {
+    "fr": "Grade 3-5",
+    "en": "Grades 3-5"
+  },
+  {
+    "fr": "Grades",
+    "en": "Grades"
+  },
+  {
+    "fr": "Grades 1 ou 2",
+    "en": "Grades 1 or 2"
+  },
+  {
+    "fr": "Grades 3-5",
+    "en": "Grades 3-5"
+  },
+  {
+    "fr": "GVH aiguë",
+    "en": "acute GVH"
+  },
+  {
+    "fr": "GVH aiguë",
+    "en": "acute GVHD"
+  },
+  {
+    "fr": "GVH chronique",
+    "en": "chronic GVH"
+  },
+  {
+    "fr": "GVH chronique",
+    "en": "chronic GVHD"
+  },
+  {
+    "fr": "hepatic VOD",
+    "en": "hepatic veno-occlusive disease"
+  },
+  {
+    "fr": "HSCT",
+    "en": "hematopoietic stem cell transplantation"
+  },
+  {
+    "fr": "hypertension",
+    "en": "hypertension"
+  },
+  {
+    "fr": "hypophysite",
+    "en": "hypophysitis"
+  },
+  {
+    "fr": "hypophysitis",
+    "en": "hypophysitis"
+  },
+  {
+    "fr": "hypothyroidism",
+    "en": "hypothyroidism"
+  },
+  {
+    "fr": "hypothyroïdie",
+    "en": "hypothyroidism"
+  },
+  {
+    "fr": "hypothyroïdie",
+    "en": "hyperthyroidism"
+  },
+  {
+    "fr": "hémoglobine",
+    "en": "decreased hemoglobin"
+  },
+  {
+    "fr": "hépatite",
+    "en": "hepatitis"
+  },
+  {
+    "fr": "immunogénicité",
+    "en": "immunogenicity"
+  },
+  {
+    "fr": "INR (prothrombine)",
+    "en": "increased INR (prothrombine)"
+  },
+  {
+    "fr": "insuffisance surrénalienne",
+    "en": "adrenal insufficiency"
+  },
+  {
+    "fr": "ITK",
+    "en": "tyrosine kinase inhibitor"
+  },
+  {
+    "fr": "L'hyperthyroïdie",
+    "en": "hyperthyroidism"
+  },
+  {
+    "fr": "lenvatinib",
+    "en": "lenvatinib"
+  },
+  {
+    "fr": "leucocytes",
+    "en": "decreased leukocytes"
+  },
+  {
+    "fr": "lipase",
+    "en": "increased lipase"
+  },
+  {
+    "fr": "lymphocytes",
+    "en": "decreased lymphocytes"
+  },
+  {
+    "fr": "magnésium",
+    "en": "increased magnesium"
+  },
+  {
+    "fr": "mg/kg",
+    "en": "mg/kg"
+  },
+  {
+    "fr": "monothérapie",
+    "en": "monotherapy"
+  },
+  {
+    "fr": "MVO hépatique",
+    "en": "hepatic MVO"
+  },
+  {
+    "fr": "mélanome de stade IIB, IIC et III",
+    "en": "stage IIB, IIC, and III melanoma"
+  },
+  {
+    "fr": "mésothéliome pleural malin",
+    "en": "malignant pleural mesothelioma"
+  },
+  {
+    "fr": "nausée",
+    "en": "nausea"
+  },
+  {
+    "fr": "nausées",
+    "en": "nausea"
+  },
+  {
+    "fr": "neutrophil count decreased",
+    "en": "neutrophil count decreased"
+  },
+  {
+    "fr": "neutrophiles",
+    "en": "decreased neutrophils"
+  },
+  {
+    "fr": "néphrite",
+    "en": "nephritis"
+  },
+  {
+    "fr": "néphrite à médiation immunitaire",
+    "en": "immune-mediated nephritis"
+  },
+  {
+    "fr": "patients",
+    "en": "patients"
+  },
+  {
+    "fr": "pembrolizumab",
+    "en": "pembrolizumab"
+  },
+  {
+    "fr": "pembrolizumab solution for injection",
+    "en": "pembrolizumab solution for injection"
+  },
+  {
+    "fr": "pembrolizumab solution injectable",
+    "en": "pembrolizumab injectable solution"
+  },
+  {
+    "fr": "perte de poids",
+    "en": "weight decreased"
+  },
+  {
+    "fr": "peu fréquent",
+    "en": "uncommon"
+  },
+  {
+    "fr": "phosphatases alcalines",
+    "en": "increased alkaline phosphatases"
+  },
+  {
+    "fr": "phosphate",
+    "en": "decreased phosphate"
+  },
+  {
+    "fr": "plaquettes",
+    "en": "decreased platelets"
+  },
+  {
+    "fr": "pneumopathie inflammatoire",
+    "en": "pneumonitis"
+  },
+  {
+    "fr": "pneumopathie inflammatoire à médiation immunitaire",
+    "en": "immune-mediated pneumonitis"
+  },
+  {
+    "fr": "potassium",
+    "en": "increased potassium"
+  },
+  {
+    "fr": "proteinurie",
+    "en": "proteinuria"
+  },
+  {
+    "fr": "radiochimiothérapie (RCT)",
+    "en": "chemoradiotherapy (CRT)"
+  },
+  {
+    "fr": "radiothérapie (RT)",
+    "en": "radiation therapy (RT)"
+  },
+  {
+    "fr": "rare",
+    "en": "rare"
+  },
+  {
+    "fr": "RCP",
+    "en": "SmPC"
+  },
+  {
+    "fr": "RCT",
+    "en": "CRT"
+  },
+  {
+    "fr": "RT",
+    "en": "RT"
+  },
+  {
+    "fr": "réactions au site d’injection",
+    "en": "injection-site reactions"
+  },
+  {
+    "fr": "réactions cutanées",
+    "en": "cutaneous reactions"
+  },
+  {
+    "fr": "réactions cutanées sévères",
+    "en": "severe cutaneous reactions"
+  },
+  {
+    "fr": "réactions sévères liées à la perfusion",
+    "en": "severe infusion-related reactions"
+  },
+  {
+    "fr": "safety of pembrolizumab solution for injection",
+    "en": "safety of pembrolizumab solution for injection"
+  },
+  {
+    "fr": "sodium",
+    "en": "decreased sodium"
+  },
+  {
+    "fr": "stomatite",
+    "en": "stomatitis"
+  },
+  {
+    "fr": "syndrome de prise de greffe",
+    "en": "immune-mediated skin adverse reactions"
+  },
+  {
+    "fr": "syndrome de prise de greffe après transplantation",
+    "en": "severe skin reactions"
+  },
+  {
+    "fr": "syndrome main-pied",
+    "en": "palmar-plantar erythrodysaesthesia syndrome"
+  },
+  {
+    "fr": "sécurité",
+    "en": "safety"
+  },
+  {
+    "fr": "sécurité à long terme",
+    "en": "long-term safety"
+  },
+  {
+    "fr": "toux",
+    "en": "cough"
+  },
+  {
+    "fr": "traitement médical",
+    "en": "medical therapy"
+  },
+  {
+    "fr": "traités au stade adjuvant",
+    "en": "treated at adjuvant stage"
+  },
+  {
+    "fr": "triglycérides",
+    "en": "increased triglycerides"
+  },
+  {
+    "fr": "très rare",
+    "en": "very rare"
+  },
+  {
+    "fr": "tumeurs",
+    "en": "tumours"
+  },
+  {
+    "fr": "VOD",
+    "en": "veno-occlusive disease"
+  },
+  {
+    "fr": "vomissements",
+    "en": "vomiting"
+  },
+  {
+    "fr": "éruption cutanée",
+    "en": "rash"
+  },
+  {
+    "fr": "éruption cutanée maculo-papuleuse",
+    "en": "rash maculo-papular"
+  },
+  {
+    "fr": "études cliniques",
+    "en": "clinical studies"
+  },
+  {
+    "fr": "évaluation de la causalité",
+    "en": "investigator assessment of causality"
+  },
+  {
+    "fr": "évaluation de la causalité",
+    "en": "causality evaluation"
+  },
+  {
+    "fr": "événements de Grade ≥ 3",
+    "en": "≥ Grade 3 events"
+  },
+  {
+    "fr": "événements indésirables",
+    "en": "adverse events"
+  },
+  {
+    "fr": "événements indésirables graves",
+    "en": "serious adverse events"
+  }
+]

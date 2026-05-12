@@ -101,7 +101,7 @@ def build_prompt(pairs: list[tuple[str, str]]) -> str:
 
 # Common field name variants seen in NER-annotated segment files.
 SRC_CANDIDATES = ["src", "source", "fr", "french", "source_text", "fr_text"]
-REF_CANDIDATES = ["ref", "reference", "en", "english", "target", "target_text", "en_text"]
+REF_CANDIDATES = ["ref", "reference", "en_ref", "en", "english", "target", "target_text", "en_text"]
 
 
 def detect_field(record: dict, candidates: list[str]) -> Optional[str]:
@@ -197,9 +197,18 @@ def extract_terms_from_batch(
             return []
         valid = []
         for t in terms:
-            if isinstance(t, dict) and "fr" in t and "en" in t:
-                fr = str(t["fr"]).strip()
-                en = str(t["en"]).strip()
+            if not isinstance(t, dict) or "fr" not in t or "en" not in t:
+                continue
+            fr = str(t["fr"]).strip()
+            en_val = t["en"]
+            # Model sometimes returns a list of English renderings — expand them.
+            if isinstance(en_val, list):
+                for en in en_val:
+                    en = str(en).strip()
+                    if fr and en:
+                        valid.append({"fr": fr, "en": en})
+            else:
+                en = str(en_val).strip()
                 if fr and en:
                     valid.append({"fr": fr, "en": en})
         return valid
