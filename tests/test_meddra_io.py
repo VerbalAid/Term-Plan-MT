@@ -40,21 +40,6 @@ def test_canonical_meddra_tier_prefers_valid_string() -> None:
     assert canonical_meddra_tier({"tier": "HLT", "level": 99}) == "HLT"
 
 
-def test_hierarchy_flat_llt_fills_soc_and_pt() -> None:
-    from ontology_sft import hierarchy_flat_fields
-
-    by_tier = {
-        "SOC": {"name": "Respiratory disorders"},
-        "HLGT": {"name": "HLGT x"},
-        "HLT": {"name": "HLT y"},
-        "PT": {"name": "Asthma"},
-        "LLT": {"name": "Childhood asthma"},
-    }
-    flat = hierarchy_flat_fields("LLT", by_tier)
-    assert flat["soc"] == "Respiratory disorders"
-    assert flat["pt"] == "Asthma"
-    assert flat["llt"] == "Childhood asthma"
-
 
 def test_parse_mdhier_dollar_primary_y_and_enrich_pt(tmp_path: Path) -> None:
     # Synthetic dollar row: LLT, HLT, HLGT, SOC + four names + abbrev + empty + dup + Y + trailing empty

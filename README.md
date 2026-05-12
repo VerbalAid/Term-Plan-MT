@@ -15,7 +15,7 @@
 
 # TermPlan-MT
 
-**Terminology-aware machine translation** — French → English for SmPC Section 4.8, with MedDRA-grounded terminology across several MT setups.
+**Terminology-aware machine translation** — French → English for SmPC Section 4.8, with MedDRA-grounded terminology across six MT systems (S1–S6).
 
 ---
 
@@ -23,36 +23,36 @@
 
 | Location | Purpose |
 |----------|---------|
-| [`pipeline/`](pipeline/) | Core code: graph grounding, planning, translation systems (S1–S5), metrics helpers. |
-| [`tools/pipeline/`](tools/pipeline/) | CLI to run the ladder — mainly [`run_pipeline.py`](tools/pipeline/run_pipeline.py). |
-| [`tools/eval/`](tools/eval/) | Scores, plots, batch eval — e.g. [`evaluate.py`](tools/eval/evaluate.py), [`plot_figures.py`](tools/eval/plot_figures.py), [`run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py). |
-| [`tools/data/`](tools/data/) | MedDRA extract/load, ontology JSONL export/split/patch. |
-| [`tools/error_analysis/`](tools/error_analysis/) | Scripts that produce qualitative CSVs / reports (outputs usually under [`error_analysis/`](error_analysis/)). |
-| [`data/`](data/) | Corpora, segment JSONLs — see [`data/README.md`](data/README.md). Segment files live under [`data/section48/`](data/section48/). |
-| [`training_scripts/`](training_scripts/) | NER inference + Unsloth fine-tuning — see [`training_scripts/README.md`](training_scripts/README.md). |
-| [`results/`](results/) | Run outputs (large `*.jsonl` gitignored; figures / summaries may be committed per profile). |
-| [`error_analysis/`](error_analysis/) | Stored qualitative analysis artifacts (CSVs, notes). |
-| [`docs/`](docs/) | Extra docs and figures — e.g. ontology tuning [`mistral_instruct_Ontology-Fine-tuning.md`](docs/mistral_instruct_Ontology-Fine-tuning.md), error-review schema [`docs/error_analysis/schema.md`](docs/error_analysis/schema.md). |
-| [`tests/`](tests/) | [`pytest`](https://pytest.org/) tests. |
-| [`rerun_all.sh`](rerun_all.sh) | Full reproducibility driver (NER conditions + eval matrix); see header for `SKIP_*`. |
-| [`docker-compose.yml`](docker-compose.yml) | Neo4j for grounding / metrics. |
+| [`pipeline.py`](pipeline.py) | MedDRA graph grounding, terminology planning, MedDRA flat-file I/O. |
+| [`systems.py`](systems.py) | Translation systems S1–S6, segment loading, model management. |
+| [`metrics.py`](metrics.py) | HTM, CCR, BLEU, chrF, COMET, eval helpers, figures infrastructure. |
+| [`tools/pipeline/`](tools/pipeline/) | CLI runner — [`run_pipeline.py`](tools/pipeline/run_pipeline.py). |
+| [`tools/eval/`](tools/eval/) | Scoring and plots — [`evaluate.py`](tools/eval/evaluate.py), [`plot_figures.py`](tools/eval/plot_figures.py), [`run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py), [`bootstrap_bleu_delta.py`](tools/eval/bootstrap_bleu_delta.py). |
+| [`tools/data/`](tools/data/) | MedDRA extract/load scripts (`extract_meddra.py`, `build_graph.py`). |
+| [`tools/error_analysis/`](tools/error_analysis/) | Qualitative analysis scripts (outputs under [`error_analysis/`](error_analysis/)). |
+| [`data/section48/`](data/section48/) | Segment JSONLs (`segments_ner_biollm.jsonl`, `segments_ner_unsloth.jsonl`). |
+| [`results/`](results/) | Run outputs — `s*.jsonl` are gitignored; figures and CSV summaries are committed. |
+| [`docs/`](docs/) | [`RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md), [`CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md), error-review schema. |
+| [`tests/`](tests/) | [`pytest`](https://pytest.org/) unit tests. |
+| [`rerun_all.sh`](rerun_all.sh) | Full reproducibility driver (NER conditions + eval matrix). |
+| [`docker-compose.yml`](docker-compose.yml) | Neo4j for graph grounding and HTM/CCR metrics. |
 
 ---
 
-## Quick start
+## Reproducing the paper results
 
 | Step | What to do |
 |------|------------|
-| 1 | `cd` into the repo. If the folder name ends with a space, quote the path, e.g. `cd "/…/MT_Project_Terminology "`. |
-| 2 | `python -m venv .venv` → `.venv/bin/pip install -r` [`requirements.txt`](requirements.txt) |
-| 3 | `docker compose up -d` — Neo4j for grounding / metrics ([`docker-compose.yml`](docker-compose.yml)). |
-| 4 | Segment JSONL under [`data/section48/`](data/section48/) (`segments_ner*.jsonl`). To (re)generate NER, use [`training_scripts/ner/biomistral_prompt_ner.py`](training_scripts/ner/biomistral_prompt_ner.py) (see [`training_scripts/README.md`](training_scripts/README.md)). |
-| 5 | **Full matrix:** [`./rerun_all.sh`](rerun_all.sh) (see script header for `SKIP_*`). **Ad hoc:** `PYTHONPATH=. python` [`tools/pipeline/run_pipeline.py`](tools/pipeline/run_pipeline.py) `--segments … --results-dir …` |
-| 6 | **Scores / figures:** [`tools/eval/evaluate.py`](tools/eval/evaluate.py), [`tools/eval/plot_figures.py`](tools/eval/plot_figures.py), [`tools/eval/bootstrap_bleu_delta.py`](tools/eval/bootstrap_bleu_delta.py) (bootstrap CIs for BLEU deltas), or the eval phase inside [`rerun_all.sh`](rerun_all.sh) / [`tools/eval/run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py). |
+| 1 | `cd` into the repo root. |
+| 2 | `python -m venv .venv` → `.venv/bin/pip install -r requirements.txt` |
+| 3 | `docker compose up -d` — starts Neo4j ([`docker-compose.yml`](docker-compose.yml)). |
+| 4 | Load MedDRA: obtain a licence, extract with [`tools/data/extract_meddra.py`](tools/data/extract_meddra.py), then load with `PYTHONPATH=. python tools/data/build_graph.py` (see [`data/README.md`](data/README.md)). |
+| 5 | Segment JSONLs are already in [`data/section48/`](data/section48/) — no NER re-run needed. |
+| 6 | **Run the pipeline:** `PYTHONPATH=. python tools/pipeline/run_pipeline.py --segments data/section48/segments_ner_biollm.jsonl --results-dir results/ner_biollm` |
+| 7 | **Score and plot:** `PYTHONPATH=. python tools/eval/evaluate.py --results-dir results/ner_biollm --segments data/section48/segments_ner_biollm.jsonl` then `PYTHONPATH=. python tools/eval/plot_figures.py …` |
+| 8 | **Full matrix:** `./rerun_all.sh` runs both NER conditions and all eval/plot steps. |
 
-**S1 / S2 reuse:** In [`rerun_all.sh`](rerun_all.sh), `REUSE_S1_S2_FROM_BIOLLM=1` (default) copies [`results/ner_biollm/s1.jsonl`](results/ner_biollm/) and `s2.jsonl` into other result trees and runs **S3–S5** only. Set to `0` for a full S1–S5 rerun per condition.
-
-**Results folders:** [`results/ner_biollm/`](results/ner_biollm/) — prompted BioMistral NER on `segments_ner_biollm.jsonl`. [`results/ner_biollm_finetuned/`](results/ner_biollm_finetuned/) — Unsloth NER segments (see [`rerun_all.sh`](rerun_all.sh)). Git keeps figures (PNG, CSV, markdown); `s*.jsonl` are local / gitignored — regenerate with the pipeline + eval.
+**S1 / S2 reuse:** `REUSE_S1_S2_FROM_BIOLLM=1` (default in `rerun_all.sh`) copies `results/ner_biollm/s1.jsonl` and `s2.jsonl` into the finetuned-NER tree and only reruns S3–S6. Set to `0` for a full S1–S6 run per condition.
 
 ---
 
@@ -60,18 +60,13 @@
 
 | File | Topic |
 |------|--------|
-| [`tools/README.md`](tools/README.md) | CLI layout (`run_pipeline`, `eval`, `data` tools) |
-| [`data/README.md`](data/README.md) | Data tree, MedDRA, ontology JSONL |
-| [`training_scripts/README.md`](training_scripts/README.md) | NER inference + Unsloth fine-tuning (QUAERO / ontology SFT) |
-| [`docs/mistral_instruct_Ontology-Fine-tuning.md`](docs/mistral_instruct_Ontology-Fine-tuning.md) | Mistral-7B-Instruct ontology fine-tuning |
-| [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot vs `scores_summary.csv`, discrepancy notes, paper checklist (EN) |
-| [`docs/pt/RESULTS_INTERPRETATION.md`](docs/pt/RESULTS_INTERPRETATION.md) | Mesmo conteúdo em português |
-| [`docs/de/RESULTS_INTERPRETATION.md`](docs/de/RESULTS_INTERPRETATION.md) | Gleicher Inhalt auf Deutsch |
-
-**MedDRA** is not redistributed; obtain a licence, extract with [`tools/data/extract_meddra.py`](tools/data/extract_meddra.py), load with [`tools/data/build_graph.py`](tools/data/build_graph.py) (details in [`data/README.md`](data/README.md)).
+| [`tools/README.md`](tools/README.md) | CLI reference for pipeline, eval, and data tools. |
+| [`data/README.md`](data/README.md) | Data tree and MedDRA setup. |
+| [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot, discrepancy notes, paper checklist. |
+| [`docs/CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md) | Definition of each metric and how contamination is handled. |
 
 ---
 
 ## Error analysis
 
-Run audits and build annotation sheets from [`results/`](results/) using the scripts under [`tools/error_analysis/`](tools/error_analysis/). The expected columns for manual review live in [`docs/error_analysis/schema.md`](docs/error_analysis/schema.md). Outputs for qualitative review are typically saved under [`error_analysis/`](error_analysis/).
+Scripts under [`tools/error_analysis/`](tools/error_analysis/) produce CSVs from the pipeline JSONLs. The annotation schema is in [`docs/error_analysis/schema.md`](docs/error_analysis/schema.md). Outputs are stored under [`error_analysis/`](error_analysis/).
