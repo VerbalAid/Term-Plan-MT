@@ -26,7 +26,24 @@ PYTHONPATH=. python data/build_graph.py
 
 ## S6 glossary
 
-`section48/gold_glossary.json` is a draft FR→EN glossary for the S6 oracle ablation. To regenerate from the segment corpus:
+`section48/gold_glossary.json` is the FR→EN glossary for the S6 oracle ablation.
+
+**Preferred — LLM extraction via Ollama** (better quality):
+
+```bash
+# Requires: ollama serve && ollama pull mistral
+python data/build_glossary.py \
+  --input data/section48/segments_ner_biollm.jsonl \
+  --output data/section48/gold_glossary.json \
+  --model mistral --verbose
+
+# Dry-run to inspect the prompt first:
+python data/build_glossary.py --input data/section48/segments_ner_biollm.jsonl --dry-run
+```
+
+Batch size of 4 is the sweet spot — small enough the model stays focused, large enough to finish 126 pairs in ~32 calls. Multiple English renderings of the same French term are kept deliberately (both are valid for logit boosting).
+
+**Fallback — n-gram heuristic** (no Ollama needed):
 
 ```bash
 PYTHONPATH=. python data/build_gold_terms_from_parallel_ner.py \
