@@ -42,9 +42,14 @@ data/sft/
 data/section48/planning_locks.json
 
 # pdflatex intermediates (e.g. docs/termplan_acl_snapshot.tex)
-docs/*.aux
-docs/*.log
-docs/*.out
+*.aux
+docs/**/*.log
+docs/**/*.out
 
 # Ad-hoc error-analysis run logs
 error_analysis/*.log
+
+# LaTeX build artefacts
+*.aux
+*.out
+docs/paper/*.log
