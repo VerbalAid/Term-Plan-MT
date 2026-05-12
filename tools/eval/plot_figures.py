@@ -34,24 +34,21 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.metrics.comet_score import corpus_comet_da as _try_comet
-from pipeline.metrics.corpus_scores import corpus_bleu, corpus_chrf
-from pipeline.metrics.eval_io import align_src_hyp_ref, load_results_jsonl
-from pipeline.metrics.eval_manifest import EVAL_FILES
-from pipeline.metrics.eval_table import (
+from metrics import corpus_comet_da as _try_comet
+from metrics import corpus_bleu, corpus_chrf
+from metrics import align_src_hyp_ref, load_results_jsonl
+from metrics import EVAL_FILES
+from metrics import (
     NEO4J_CONN_ERRORS,
     collect_system_metric_rows,
     display_label_for_system as _label,
     neo4j_connection_help,
     write_scores_summary_csv,
 )
-from pipeline.metrics.htm import (
-    htm_vector_column_key,
-    parse_cosine_thresholds_csv,
-)
-from pipeline.graph import TermGraph
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
-from pipeline.systems.inference_timing import inference_mean_p95
+from metrics import htm_vector_column_key, parse_cosine_thresholds_csv
+from pipeline import TermGraph
+from systems import load_all_segments, parse_exclude_segment_ids
+from metrics import inference_mean_p95
 
 
 def _htm_unavailable(rows: list[dict[str, Any]]) -> bool:
@@ -688,7 +685,7 @@ def write_paper_summary_table(rows: list[dict[str, Any]], path: Path) -> None:
     """Markdown table: fluency, terminology, latency — suitable for paper text."""
     vec_keys = sorted(k for k in rows[0] if str(k).startswith("htm_vector_")) if rows else []
     header_cells = ["System", "chrF++", "HTM (lex)"] + [_htm_vec_col_title(k) for k in vec_keys]
-    header_cells += ["BLEU", "doc-BLEU", "doc-chrF", "BLEU†", "Mean s/seg", "p95 s"]
+    header_cells += ["BLEU", "doc-BLEU", "doc-chrF", "BLEU†", "COMET", "Mean s/seg", "p95 s"]
     sep = "| " + " | ".join(["---"] * len(header_cells)) + " |"
     lines = [
         "# Summary metrics",
@@ -724,6 +721,11 @@ def write_paper_summary_table(rows: list[dict[str, Any]], path: Path) -> None:
             _fmt_doc_m(r.get("bleu_doc_macro")),
             _fmt_doc_m(r.get("chrf_doc_macro")),
             _fmt_doc_m(r.get("bleu_doc_concat")),
+            (
+                f"{float(r['comet']):.2f}"
+                if r.get("comet") is not None and not (isinstance(r.get("comet"), float) and math.isnan(float(r["comet"])))
+                else "—"
+            ),
             ms_s,
             p95_s,
         ]
@@ -774,7 +776,7 @@ def main() -> None:
         "--results-dir",
         type=Path,
         default=None,
-        help="Directory with s1.jsonl … (default: results/ad_hoc/). Figures default to {results-dir}/figures/.",
+        help="Directory with s1.jsonl … s6_mistral.jsonl (default: results/ad_hoc/). Figures default to {results-dir}/figures/.",
     )
     p.add_argument(
         "--out-dir",
@@ -838,6 +840,12 @@ def main() -> None:
         default=None,
         help="sentence-transformers model id for vector HTM (default: TERMPLAN_EMBED_MODEL env).",
     )
+    p.add_argument(
+        "--eval-file-set",
+        choices=["standard", "mistral_clean"],
+        default="standard",
+        help="Same as evaluate.py: which system JSONL filenames to read (mistral_clean = *_clean.jsonl for graph runs).",
+    )
     args = p.parse_args()
 
     try:
@@ -897,6 +905,7 @@ def main() -> None:
                 keep_segment_ids=keep_ids,
                 htm_vector_thresholds=htm_vec_thr if htm_vec_thr else None,
                 htm_embed_model=args.htm_embed_model or None,
+                eval_file_set=args.eval_file_set,
             )
         except NEO4J_CONN_ERRORS:
             raise SystemExit(neo4j_connection_help()) from None

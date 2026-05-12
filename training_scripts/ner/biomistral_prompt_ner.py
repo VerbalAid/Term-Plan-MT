@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.cuda_ld_path import ensure_cuda_pip_libs_visible
+from systems import ensure_cuda_pip_libs_visible
 
 ensure_cuda_pip_libs_visible()
 

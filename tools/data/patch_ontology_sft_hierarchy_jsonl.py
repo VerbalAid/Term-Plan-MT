@@ -40,7 +40,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.meddra_io import (
+from pipeline import (
     MEDDRA_TIERS,
     enrich_mdhier_row_pt,
     load_llt_to_parent_pt,
@@ -49,7 +49,7 @@ from pipeline.meddra_io import (
     read_meddra_asc,
     split_meddra_asc_line,
 )
-from pipeline.ontology_sft_alpaca import hierarchy_flat_fields
+from ontology_sft import hierarchy_flat_fields
 
 
 def _json_id_to_str(v: Any) -> str:

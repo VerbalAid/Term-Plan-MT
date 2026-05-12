@@ -19,7 +19,7 @@ def _load_converter():
 
 def test_split_mistral_hierarchical_roundtrip_keys() -> None:
     mod = _load_converter()
-    from pipeline.ontology_sft_alpaca import to_mistral_instruct_hierarchical
+    from ontology_sft import to_mistral_instruct_hierarchical
 
     fr_body = "French: Une pneumopathie.\n\nExtracted terms:\n- x → MedDRA ID: 1"
     assistant = '[{"fr": "x", "en": "y", "id": "1"}]'
@@ -31,7 +31,7 @@ def test_split_mistral_hierarchical_roundtrip_keys() -> None:
 
 def test_reframe_to_alpaca_contains_response_json() -> None:
     mod = _load_converter()
-    from pipeline.ontology_sft_alpaca import to_alpaca_hierarchical, to_mistral_instruct_hierarchical
+    from ontology_sft import to_alpaca_hierarchical, to_mistral_instruct_hierarchical
 
     fr_body = "French: test.\n\nTerms:\n- a → ID: 9"
     assistant = '[{"fr": "a", "en": "b", "tier": "LLT", "id": "9"}]'

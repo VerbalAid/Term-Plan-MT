@@ -6,14 +6,14 @@ import math
 
 import pytest
 
-from pipeline.metrics.htm import (
+from metrics import (
     compute_htm,
     compute_htm_en_ref,
     compute_htm_hyp_vs_ref,
     htm_vector_column_key,
     parse_cosine_thresholds_csv,
 )
-from pipeline.metrics.matching import normalize_text, phrase_in_hyp, phrase_in_text
+from metrics import normalize_text, phrase_in_hyp, phrase_in_text
 
 
 def test_htm_vector_column_key_rounding() -> None:
@@ -213,7 +213,7 @@ def test_compute_htm_hyp_vs_ref_nan_when_no_grounded_spans() -> None:
 def test_htm_vector_below_threshold_scores_zero(monkeypatch: pytest.MonkeyPatch) -> None:
     import numpy as np
 
-    from pipeline.metrics import htm as htm_mod
+    import metrics as htm_mod
 
     class _StubGraph:
         def ground(self, word: str, context=None):
@@ -264,7 +264,7 @@ def test_htm_vector_below_threshold_scores_zero(monkeypatch: pytest.MonkeyPatch)
 def test_htm_vector_above_threshold_aligns(monkeypatch: pytest.MonkeyPatch) -> None:
     import numpy as np
 
-    from pipeline.metrics import htm as htm_mod
+    import metrics as htm_mod
 
     class _StubGraph:
         def ground(self, word: str, context=None):
@@ -314,7 +314,7 @@ def test_htm_vector_above_threshold_aligns(monkeypatch: pytest.MonkeyPatch) -> N
 
 
 def test_macro_corpus_metric_by_group_is_mean_per_doc() -> None:
-    from pipeline.metrics.corpus_scores import corpus_bleu, macro_corpus_metric_by_group
+    from metrics import corpus_bleu, macro_corpus_metric_by_group
 
     # Two documents; perfect copies within each doc.
     hyps = ["alpha beta gamma", "delta epsilon", "zeta"]
@@ -327,7 +327,7 @@ def test_macro_corpus_metric_by_group_is_mean_per_doc() -> None:
 
 
 def test_macro_corpus_metric_single_group_matches_corpus() -> None:
-    from pipeline.metrics.corpus_scores import corpus_bleu, corpus_chrf, macro_corpus_metric_by_group
+    from metrics import corpus_bleu, corpus_chrf, macro_corpus_metric_by_group
 
     hyps = ["the cat sat", "on the mat"]
     refs = ["a cat sat", "on my mat"]
@@ -341,7 +341,7 @@ def test_macro_corpus_metric_single_group_matches_corpus() -> None:
 
 
 def test_macro_bleu_doc_concat_two_docs() -> None:
-    from pipeline.metrics.corpus_scores import corpus_bleu, macro_bleu_doc_concat
+    from metrics import corpus_bleu, macro_bleu_doc_concat
 
     hyps = ["hello world", "foo", "bar baz", "qux"]
     refs = ["hello there", "foo", "bar see", "qux"]
@@ -353,7 +353,7 @@ def test_macro_bleu_doc_concat_two_docs() -> None:
 
 
 def test_macro_bleu_doc_concat_single_doc_matches_one_line_corpus() -> None:
-    from pipeline.metrics.corpus_scores import corpus_bleu, macro_bleu_doc_concat
+    from metrics import corpus_bleu, macro_bleu_doc_concat
 
     hyps = ["the cat", "sat"]
     refs = ["a cat", "sat"]
@@ -364,6 +364,6 @@ def test_macro_bleu_doc_concat_single_doc_matches_one_line_corpus() -> None:
 
 
 def test_macro_bleu_doc_concat_mismatched_lengths_nan() -> None:
-    from pipeline.metrics.corpus_scores import macro_bleu_doc_concat
+    from metrics import macro_bleu_doc_concat
 
     assert math.isnan(macro_bleu_doc_concat(["a"], ["b", "c"], ["x"]))

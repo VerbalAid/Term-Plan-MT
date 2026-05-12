@@ -32,16 +32,16 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.graph import TermGraph
-from pipeline.metrics.eval_io import load_results_jsonl
-from pipeline.metrics.eval_manifest import EVAL_FILES
-from pipeline.metrics.htm import (
+from pipeline import TermGraph
+from metrics import load_results_jsonl
+from metrics import EVAL_FILES
+from metrics import (
     _ground_cached,
     _ref_from_concept,
     _rendering_strings,
 )
-from pipeline.metrics.matching import normalize_text, phrase_in_text
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
+from metrics import normalize_text, phrase_in_text
+from systems import load_all_segments, parse_exclude_segment_ids
 
 
 def _resolve(p: Path) -> Path:

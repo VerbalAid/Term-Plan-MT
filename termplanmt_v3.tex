@@ -1,0 +1,559 @@
+\documentclass[11pt,a4paper,twocolumn]{article}
+
+%% ── Packages ──────────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[margin=1in,top=0.85in,bottom=1in]{geometry}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{dblfloatfix}
+\usepackage{natbib}
+\usepackage{fancyhdr}
+\usepackage{abstract}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+%% ── Layout ────────────────────────────────────────────────────────────────
+\setlength{\columnsep}{0.25in}
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{4.5pt}
+\captionsetup{font=small,labelfont=bf}
+
+%% ── Section formatting ────────────────────────────────────────────────────
+\titleformat{\section}{\normalfont\bfseries\large}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\normalfont\bfseries\normalsize}{\thesubsection}{0.5em}{}
+\titleformat{\paragraph}[runin]{\normalfont\bfseries}{}{0em}{}[.\enspace]
+\titlespacing{\section}{0pt}{7pt plus 2pt minus 2pt}{3pt}
+\titlespacing{\subsection}{0pt}{5pt plus 2pt minus 2pt}{2pt}
+
+%% ── Header ────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small\textit{TermPlanMT}}
+\lhead{\small\textit{Kerins \& Abadour \textperiodcentered\ UPV/EHU}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+%% ── Abstract ──────────────────────────────────────────────────────────────
+\renewcommand{\abstractnamefont}{\normalfont\bfseries}
+\renewcommand{\abstracttextfont}{\normalfont\small}
+\setlength{\absleftindent}{0.4in}
+\setlength{\absrightindent}{0.4in}
+
+%% ── Finding box ───────────────────────────────────────────────────────────
+\newtcolorbox{finding}{
+  enhanced, colback=gray!8, colframe=gray!40,
+  boxrule=0.5pt, arc=2pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  fontupper=\small
+}
+
+%% ───────────────────────────────────────────────────────────────────────────
+\title{\LARGE\bfseries TermPlanMT: Graph-Grounded Terminology Planning\\
+for French--English Regulatory Medical Document Translation\\[4pt]
+\large\normalfont When Ontology Grounding Helps and When It Does Not}
+
+\author{
+  Darragh Russell Kerins\\
+  UPV/EHU\\
+  \texttt{drussell001@ikasle.ehu.eus}
+  \and
+  Noumidia Abadour\\
+  UPV/EHU\\
+  \texttt{nabadour001@ikasle.ehu.eus}
+}
+\date{}
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+%% ── Abstract ───────────────────────────────────────────────────────────────
+\begin{abstract}
+Terminology consistency is a patient-safety requirement in regulatory medical
+translation, yet neural MT systems are structurally indifferent to
+cross-segment term stability. We present \textbf{TermPlanMT}, a five-system
+ablation study on Section~4.8 of the KEYTRUDA SmPC---a 126-segment
+French--English corpus with maximum adverse-event density. Our central finding
+is that Concept Coverage Rate (CCR), the fraction of source spans grounded in
+a MedDRA ontology graph, is the binding constraint on terminology-aware MT: at
+35\% CCR graph-free baselines (S1--S2) outperform all graph-augmented systems,
+while improving NER quality yields $\approx$7~BLEU gains for Mistral graph
+systems (S3--S5-Mistral) but not for graph-free S1 or S5-NLLB; S2 lies in
+between with a wide bootstrap interval (Table~\ref{tab:delta}). We further show that our Hierarchy-Aware Terminology Metric (HTM)
+scores the certified human reference at about 0.13--0.18 depending on NER
+manifest, a score unchanged by
+full MedDRA ancestor alias expansion, confirming a structural mismatch between
+MedDRA nomenclature and professional translation practice. Finally, ambiguous
+MedDRA grounding causes the planning stage to abstain from locking critical
+terms, explaining a paradox in which graph-augmented systems produce
+\emph{lower} cross-document consistency than graph-free baselines.
+We complement aggregate scores with segment-level qualitative analysis
+(missing-term rates, drift, modal agreement) exported under
+\texttt{error\_analysis/} in the project repository.
+\end{abstract}
+
+%% ── Visual overview (systems + metric) ─────────────────────────────────────
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{docs/figures/figure_pipeline_four_stage.png}
+  \caption{Four-stage TermPlanMT pipeline (NER $\rightarrow$ grounding $\rightarrow$ planning $\rightarrow$ decoding).}
+  \label{fig:pipeline}
+\end{figure*}
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{docs/figures/figure_htm_metric.png}
+  \phantomcaption\label{fig:htm}
+\end{figure*}
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Introduction}
+\label{sec:intro}
+
+EMA Summaries of Product Characteristics (SmPCs) require a single
+adverse-event concept to receive one identical English rendering across an
+entire document---a requirement that affects pharmacovigilance signal detection
+and patient safety \citep{neves2022evaluation}. Neural MT handles medical prose
+fluently but is structurally indifferent to cross-segment consistency,
+producing term drift (same source term, multiple renderings), concept
+flattening (LLT-level terms collapsed to hypernyms), and coverage gaps
+(multi-token spans outside NER). MedDRA's five-level hierarchy
+(Table~\ref{tab:meddra}) provides validated English labels that are an
+attractive grounding resource---if the grounding pipeline can cover enough of
+the source text.
+
+\paragraph{Contributions.}
+(1)~A five-system ablation ladder (\S\ref{sec:systems}) isolating the effects
+of NER recall, ontology grounding, and decoding enforcement.
+(2)~HTM and alias-expanded HTM-A (\S\ref{sec:metrics}), with a diagnostic
+evaluation showing the metric systematically penalises the human reference.
+(3)~A CCR-bottleneck experiment (\S\ref{sec:results}) showing that NER
+quality---not graph retrieval strategy---determines whether ontology grounding
+helps.
+(4)~A mechanistic account (\S\ref{sec:consistency}) of why graph-augmented
+systems are \emph{less} consistent than graph-free ones.
+(5)~Structured qualitative error analysis tying drift to ambiguous grounding
+and abstaining locks, with reproducible CSV/MD artefacts.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Related Work}
+\label{sec:related}
+
+Lexically constrained decoding \citep{hokamp2017lexically,post2018fast} and
+terminology-aware training \citep{dinu2019training} enforce surface-level term
+appearance but ignore ontological hierarchy and do not address candidate
+selection when multiple levels are valid. \citet{herold2023improving} show
+that extending NMT context windows can degrade fluency, motivating document-level
+LLMs as a consistency baseline. \citet{labrak2024biomistral} release
+BioMistral, the medically adapted LLM used for NER here.
+\citet{neves2022evaluation} identify adverse-event terminology as a
+high-priority MT failure mode. GraphRAG-style retrieval
+\citep{edge2024local} into LLM prompts provides the template for our S3
+system, adapting knowledge-grounded MT \citep{moussallem2019augmenting} to
+a Neo4j MedDRA backend.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Dataset}
+\label{sec:data}
+
+\paragraph{Corpus.}
+Section~4.8 (Undesirable Effects) of the KEYTRUDA (pembrolizumab) SmPC
+\citep{ema2024keytruda}: 126 aligned French--English segment pairs after
+excluding segment~48\_028 (a dense frequency table whose n-gram overlap
+distorts corpus metrics). Coverage: $\approx$4,400 words; all three failure
+modes at high density.
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Level & Abbr. & Example \\
+\midrule
+L1 & SOC  & Respiratory disorders \\
+L2 & HLGT & Pulmonary conditions \\
+L3 & HLT  & Pneumonitis \\
+L4 & PT   & Pembro.\ pneumonitis \\
+L5 & LLT  & Immune-med.\ pneumonitis \\
+\bottomrule
+\end{tabular}
+\caption{MedDRA hierarchy. Adverse-event mentions in clinical
+text map almost exclusively to L5 ($\approx$96\%).}
+\label{tab:meddra}
+\end{table}
+
+\paragraph{NER conditions as a CCR perturbation.}
+Rather than comparing two NER systems, we use them as a controlled perturbation
+of CCR within the same pipeline. \textbf{Baseline NER} (\texttt{ner\_biollm}):
+BioMistral-7B zero-shot; CCR~=~35.4\%, 167 grounded spans. This condition
+exhibits a systematic artefact---the model generates \textit{hypothyro\"{i}die}
+for 92/127 segments regardless of content---partially contaminating consistency
+measurements. \textbf{Fine-tuned (higher-quality) NER} (\texttt{ner\_biollm\_ft}):
+BioMistral-7B fine-tuned on a hierarchical MedDRA SFT dataset; 170 grounded
+spans with cleaner boundaries and no hallucinated terms. Neo4j dataset CCR on
+the evaluation manifest (127 segments, incl.\ \texttt{48\_028}) is
+$\approx$36.4\%. Graph-augmented systems benefit substantially under this
+condition, confirming that \emph{effective} span quality (clean boundaries,
+usable grounding)---not raw graph retrieval---is the binding constraint once
+contamination is controlled.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{System Architecture}
+\label{sec:systems}
+
+Five systems form an ablation ladder (Table~\ref{tab:systems}). All share the
+same four-stage pipeline: French NER $\rightarrow$ MedDRA grounding via Neo4j
+$\rightarrow$ global terminology lock $\rightarrow$ MT decoding.
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lp{2.0cm}ll}
+\toprule
+ID & Model & Graph & Enforce. \\
+\midrule
+S1 & NLLB-200 600M    & No  & None \\
+S2 & Mistral-7B (doc) & No  & None \\
+S3 & Mistral + GraphRAG & Yes & None \\
+S4 & S3 + reranking     & Yes & Soft \\
+S5 & NLLB/Mistral + logit & Yes & Hard \\
+\bottomrule
+\end{tabular}
+\caption{Ablation ladder. S1 = NMT lower bound; S2 = LLM with
+full document context; S3 is the key novel condition.}
+\label{tab:systems}
+\end{table}
+
+\paragraph{Terminology planning.}
+Before translation, \texttt{compute\_global\_locks()} scores each candidate
+English rendering~$c$:
+\begin{equation}
+\text{Score}(c) = \alpha\,\text{Ctx}(c) + \beta\,\text{Nbr}(c)
+               - \gamma\,\text{HP}(c)
+\end{equation}
+where Ctx is cosine similarity to source segments containing the term,
+Nbr is similarity to adjacent MedDRA concept renderings, and
+$\text{HP} = |\hat{d} - d_{\text{src}}|$ penalises wrong specificity level
+($\alpha{=}0.5$, $\beta{=}0.3$, $\gamma{=}0.2$). When a term matches
+\emph{multiple} MedDRA concepts, no lock is committed
+(\S\ref{sec:consistency}).
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Metrics}
+\label{sec:metrics}
+
+\paragraph{Fluency.} Corpus BLEU \citep{papineni2002bleu} and
+chrF\texttt{++} \citep{popovic2017chrf} via SacreBLEU against one
+professional English reference.
+
+\paragraph{HTM and HTM-A.}
+For each segment containing a grounded French span, the hypothesis is scored
+against the MedDRA graph: $s_i = 1.0$ (exact level match), $0.5$ (same
+branch, wrong specificity), or $0.0$ (different branch / absent).
+$\text{HTM} = \text{mean}(s_i)$. HTM-A relaxes matching across three alias
+tiers: T1 exact LLT; T2 adds PT parent; T3 adds all same-branch ancestors.
+We compute \textbf{rHTM} by applying HTM to the professional reference as
+hypothesis, establishing a performance ceiling.
+
+\paragraph{Hyp--Ref Agreement (HRA).}
+Fraction of HTM-measured segments where the system's terminology choice
+matches the professional reference---a measure of human-like translation
+independent of MedDRA correctness.
+
+\paragraph{CCR and drift.}
+CCR~$=$~grounded/extracted spans; identical across S1--S5 for a given NER
+condition. Term drift~$= (D-1)/(N-1)$ for $D$ distinct renderings across
+$N$ segments; drift~$=0$ is perfect consistency.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Results}
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+System & BLEU & chrF\texttt{++} & HTM & HRA \\
+\midrule
+S1 NLLB       & \textbf{18.89} & \textbf{31.90} & 0.114 & 0.681 \\
+S2 Mistral    & 16.70 & 31.83 & 0.196 & 0.657 \\
+S3 GraphRAG   & 10.41 & 31.79 & 0.253 & 0.590 \\
+S4 rerank     & 10.10 & 32.01 & 0.237 & 0.596 \\
+S5 NLLB+boost & 17.70 & 30.88 & 0.135 & 0.663 \\
+S5 Mist+boost & 10.35 & 31.74 & \textbf{0.267} & 0.578 \\
+\midrule
+Reference     & ---   & ---   & 0.130 & 1.000 \\
+\bottomrule
+\end{tabular}
+\caption{Baseline NER condition (\texttt{ner\_biollm}, CCR~=~35.4\%;
+127~segments). Corpus BLEU/chrF\texttt{++} recomputed on stored JSONL
+(SacreBLEU); HTM/HRA from the latest full Neo4j eval when available.
+The human reference scores only 0.130 on HTM.}
+\label{tab:biollm}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+System & BLEU & chrF\texttt{++} & HTM & HRA \\
+\midrule
+S1 NLLB         & 18.89 & 31.90 & 0.195 & 0.435 \\
+S2 Mistral      & \textbf{20.37} & \textbf{35.85} & 0.274 & 0.497 \\
+S3 GraphRAG\textsuperscript{†} & 17.49 & 32.01 & 0.246 & 0.450 \\
+S4 rerank\textsuperscript{†}   & 17.52 & 32.04 & 0.246 & 0.461 \\
+S5 NLLB+boost   & 17.54 & 31.02 & 0.205 & 0.408 \\
+S5 Mist+boost\textsuperscript{†} & 17.50 & 32.35 & \textbf{0.248} & 0.455 \\
+\midrule
+Reference       & ---   & ---   & 0.180 & 1.000 \\
+\bottomrule
+\end{tabular}
+\caption{Fine-tuned (higher-quality) NER condition (\texttt{ner\_biollm\_ft};
+Neo4j dataset CCR $\approx$36.4\% on 127 segments incl.\ \texttt{48\_028}).
+\textsuperscript{†}Contamination-filtered (18/127 rows per system scored as
+empty hypotheses; raw scores biased by prompt-injected MedDRA strings: BLEU
+deflated, chrF inflated).}
+\label{tab:finetuned}
+\end{table}
+
+\subsection{CCR is the Binding Constraint}
+\label{sec:ccr_bottleneck}
+
+Table~\ref{tab:delta} isolates the effect of NER quality by holding all other
+pipeline components fixed and comparing the same system across NER conditions.
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lrrl}
+\toprule
+System & $\Delta$BLEU & $\Delta$chrF\texttt{++} & 95\% CI $\Delta$BLEU \\
+\midrule
+S1 NLLB        & $\pm$0.00 & $\pm$0.00 & $[$0.00,\,0.00$]$ \\
+S2 Mistral     & +3.67 & +4.02 & $[$$-1.16$,\,+7.95$]$ \\
+S3 GraphRAG    & \textbf{+7.07} & +0.22 & $[$+1.07,\,+11.10$]$ \\
+S4 rerank      & \textbf{+7.42} & +0.03 & $[$+1.18,\,+11.53$]$ \\
+S5 NLLB+boost  & $-$0.16 & +0.14 & $[$$-0.98$,\,+0.66$]$ \\
+S5 Mist+boost  & \textbf{+7.16} & +0.61 & $[$+1.10,\,+11.66$]$ \\
+\bottomrule
+\end{tabular}
+\caption{Paired gain (fine-tuned minus baseline NER) on 127 segments with the
+same references. $\Delta$chrF\texttt{++} is the paired corpus difference.
+\textbf{95\% bootstrap CIs} for $\Delta$BLEU (2{,}000 resamples, seed~42):
+\texttt{tools/eval/bootstrap\_bleu\_delta.py} with
+\texttt{--baseline-eval-file-set standard} and
+\texttt{--finetuned-eval-file-set mistral\_clean}
+(see \texttt{tools/README.md}). CIs for S3--S5-Mistral exclude~0; S2 and
+S5-NLLB intervals include~0.}
+\label{tab:delta}
+\end{table}
+
+\begin{finding}
+S1 is unchanged (no graph). S2 shows a sizeable corpus $\Delta$BLEU under
+better NER, but the paired bootstrap interval includes zero
+(Table~\ref{tab:delta}). S3--S5-Mistral show $\approx$7-point $\Delta$BLEU
+with intervals strictly above zero, isolating the NER bottleneck on the
+graph path. S5-NLLB is effectively flat. Under fine-tuned NER, chrF\texttt{++}
+rises for S2 and for Mistral graph runs, so the earlier ``chrF drops when the
+graph is on'' pattern is mostly a baseline-fluency artefact relative to the
+updated Mistral baseline JSONL.
+\end{finding}
+
+Graph-free systems (S1--S2) remain above all graph-augmented rows on corpus
+BLEU/chrF\texttt{++} at 35\% CCR (Table~\ref{tab:biollm}) because the graph
+influences fewer than one third of adverse-event spans while injected MedDRA
+strings still hurt fluency where the graph is active. The contrast between
+near-zero $\Delta$BLEU for S1/S5-NLLB, an uncertain S2 shift, and large
+$\Delta$BLEU for S3--S5-Mistral in Table~\ref{tab:delta} isolates the
+bottleneck upstream of decoding on the graph-augmented branch.
+Higher span coverage with cleaner NER would likely reverse the S2/S3
+ranking---achievable with better French biomedical NER.
+
+\subsection{Missing Terms, Flattening, and Consistency}
+
+S5-Mistral achieves the lowest missing-term rate in both conditions
+(baseline: 29.5\%; fine-tuned: 18.2\%). S1-NLLB misses 69.88\%
+(116/166) of grounded terms under baseline NER. Graph systems benefit from
+cleaner NER: S3's missing-term rate falls from 33.1\% to 19.4\% (55/166
+vs.\ 33/170 grounded spans). Mean cross-document modal agreement, averaged
+over French terms with $\geq$2 segments in \texttt{error\_analysis/*\_consistency.csv},
+is highest for graph-free systems under baseline NER (S1: 0.993; S2: 0.984)
+while S3 scores 0.946; under fine-tuned NER, S3 rises to 0.976, surpassing S1
+(0.970) but remaining below S2 (0.985)---so the ``graph hurts consistency''
+pattern is clearest under noisy baseline NER and partially attenuates when
+NER improves, matching the missing-term and BLEU deltas.
+
+Zero concept flattening events are observed: every grounded L5 source term
+produces an L5 hypothesis across all systems. This is partly an evaluation
+artefact---all gold terms are L5, and HTM cannot detect flattening unless
+upper-level aliases are provided---a limitation HTM-A addresses.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{The HTM--Practice Gap}
+\label{sec:htm_gap}
+
+\subsection{Why the Reference Scores Near Zero}
+
+On the baseline NER manifest, rHTM~$= 0.130$--$0.158$ on the professional
+reference (Table~\ref{tab:aliases}); under fine-tuned NER the reference HTM
+is 0.180 (Table~\ref{tab:finetuned}) because the grounded span set differs.
+In both cases the score stays below several MT systems on HTM. Professional
+translators do not transcribe MedDRA LLT strings
+verbatim: the LLT \textit{Immune-mediated pneumonitis} appears as
+\textit{pneumonitis} in tabular contexts and as \textit{immune-related
+pneumonitis} in descriptive contexts.
+
+\subsection{Alias Expansion Does Not Close the Gap}
+
+\begin{table}[!ht]
+\centering
+\small
+\begin{tabular}{lp{3.5cm}rr}
+\toprule
+Tier & Accepts & Low & Hi \\
+\midrule
+T1 & Exact LLT           & 0.130 & 0.158 \\
+T2 & T1 + PT parent      & 0.130 & 0.158 \\
+T3 & T2 + branch ancestors & 0.130 & 0.158 \\
+\bottomrule
+\end{tabular}
+\caption{rHTM-A on the professional reference under three alias tiers.
+All tiers yield identical scores.}
+\label{tab:aliases}
+\end{table}
+
+\begin{finding}
+The ancestor chain for \textit{pneumopathie inflammatoire} contains
+\textit{pneumonitis}, so the null T1$\to$T3 delta is not a graph
+coverage gap. Professional translators use phrasings such as
+\textit{immune-related pneumonitis} and \textit{inflammatory lung disease}
+that lie entirely outside the MedDRA preferred-label tree at any level.
+The mismatch is structural: MedDRA labels are designed for
+pharmacovigilance coding, not regulatory prose.
+\end{finding}
+
+HTM should therefore be interpreted as a measure of MedDRA-proximity,
+not translation quality. The HRA column is the complementary measure.
+Notably, graph-augmented systems score consistently \emph{lower} on HRA
+than S2 (Table~\ref{tab:biollm}: S3~=~0.590 vs.\ S2~=~0.657; Table~\ref{tab:finetuned}:
+S3~=~0.450 vs.\ S2~=~0.497): the graph pushes outputs toward MedDRA labels
+that professional translators avoid.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Consistency Failure Analysis}
+\label{sec:consistency}
+
+\paragraph{Term drift (qualitative).}
+\textit{Pneumopathie inflammatoire} occurs in four baseline segments where it
+is grounded for S3/S4/S5-Mistral, and in eight fine-tuned segments (more NER
+hits for the same French string). Those systems emit two renderings---often
+\textit{pneumonitis} in incidence-style sentences and \textit{immune-mediated
+pneumonitis} elsewhere---yielding drift scores of $1/3$ (baseline) and $1/7$
+(fine-tuned). S1 collapses to one rendering for this span in both conditions
+(drift~0). S2 is stable in baseline (drift~0) but shows non-zero drift under
+fine-tuned NER once the span appears in additional contexts. S3/S4/S5-Mistral
+thus exhibit the clearest cross-segment inconsistency for this exemplar.
+
+Mean modal agreement (\S\ref{sec:results}) shows the same pattern at corpus
+level: graph-free systems rank highest under baseline NER; graph-augmented
+systems recover partially under fine-tuned NER but do not overtake S2.
+
+\paragraph{Mechanism.}
+\textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
+in the string cache (one of 7,679 ambiguous normalised keys). The planning
+stage sets \texttt{has\_planning\_lock~=~0} for any ambiguous term and
+commits no lock. S3/S4/S5-Mistral then resolve the ambiguity
+context-locally per segment from RAG context: incidence-focused segments
+attract \textit{pneumonitis}; mechanism-focused segments attract
+\textit{immune-mediated pneumonitis}. S1-NLLB produces zero drift not
+because it reasons about terminology, but because its fixed vocabulary
+has no mechanism for context-dependent selection.
+
+\begin{finding}
+This failure is independent of CCR. Even with perfect NER recall, any
+term matching multiple MedDRA concepts will be left unlocked, producing
+potential drift in all Mistral-based graph systems. The fix is
+\emph{soft ambiguity resolution}: commit the top-scoring candidate as
+a provisional lock flagged for human review, consistent with CAT-tool
+workflows.
+\end{finding}
+
+\paragraph{Output contamination.}
+In the fine-tuned NER condition, 18/127 segments per system (14.2\%) contain
+prompt contamination: Mistral reproduced MedDRA metadata strings and
+instruction markers from its own system prompt. These rows were replaced
+with a null hypothesis for metric computation. Contamination biases raw
+scores in opposite directions---deflating BLEU (precision destroyed by
+injected strings) while inflating chrF (character overlap increased)---
+confirmed by S3 raw vs.\ filtered: BLEU 15.36$\to$17.49, chrF
+34.60$\to$32.01. S1 and S2 are unaffected as they receive no graph
+context in their prompts.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+The results collectively show that the TermPlanMT pipeline is architecturally
+sound but CCR-limited. Graph-augmented systems improve substantially when
+supplied with cleaner, higher-coverage NER input. The absence of BLEU
+movement for S1 (and near-zero change for S5-NLLB), together with large
+Mistral-graph $\Delta$BLEU in Table~\ref{tab:delta}, is direct evidence that
+the bottleneck lies upstream of graph retrieval on the graph-augmented path.
+
+The HRA--HTM inversion---graph systems score higher on HTM yet lower on
+HRA---reveals a real tension: optimising toward MedDRA formal labels
+diverges from how certified translators actually write. For regulatory MT
+in practice, HRA is the more meaningful target.
+
+\paragraph{Limitations.}
+\textit{Single document and reference.} All results derive from one SmPC
+section against one professional translation, limiting generalisability.
+\textit{HTM ceiling.} rHTM is low in absolute terms (about 0.13--0.18 across
+NER manifests) and invariant to alias expansion within a manifest, so HTM
+is only interpretable relatively.
+\textit{NER artefact.} The baseline NER condition contains hallucinated spans
+(\textit{hypothyro\"{i}die} in 92/127 segments).
+\textit{Contamination.} Fine-tuned-condition Mistral-based graph systems exhibit
+14.2\% prompt contamination; filtered scores are used throughout.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section{Conclusion}
+\label{sec:conclusion}
+
+TermPlanMT demonstrates that CCR is the binding constraint on
+graph-augmented regulatory MT: at low coverage graph-free baselines (S1--S2)
+dominate, while improving NER quality yields $\approx$7-point corpus BLEU
+gains for Mistral graph systems with bootstrap intervals excluding zero.
+Three broader findings emerge: MedDRA nomenclature and
+professional translation practice are structurally misaligned in ways that
+alias expansion cannot fix; ambiguous grounding produces predictable term
+drift through a mechanism fully explained by the planning stage's
+abstain-on-ambiguity policy; and consistency metrics must control for system
+type, since NLLB's apparent consistency is an artefact of its fixed vocabulary.
+Substantially higher CCR with cleaner span boundaries would likely be required
+to reverse the S2/S3 fluency ordering; quantifying that threshold is left to
+future work with broader French biomedical NER.
+
+%% ═══════════════════════════════════════════════════════════════════════════
+\section*{Acknowledgements}
+MedDRA licence held under non-commercial academic agreement
+via MSSO/UPV/EHU, supervised by Gorka Labaka.
+
+\bibliographystyle{plainnat}
+\bibliography{termplanmt_refs_v3}
+
+\end{document}

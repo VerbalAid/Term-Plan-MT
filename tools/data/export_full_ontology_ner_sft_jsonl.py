@@ -40,8 +40,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.graph import TermGraph, normalize_fr_for_grounding
-from pipeline.ontology_sft_alpaca import (
+from pipeline import TermGraph
+from pipeline import normalize_fr_for_grounding
+from ontology_sft import (
     row_payload_json,
     row_payload_json_hierarchical,
     to_alpaca,

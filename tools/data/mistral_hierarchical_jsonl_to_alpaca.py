@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.ontology_sft_alpaca import to_alpaca_hierarchical
+from ontology_sft import to_alpaca_hierarchical
 
 _MISTRAL_PREFIX = "<s>[INST] "
 _MISTRAL_SEP = " [/INST] "

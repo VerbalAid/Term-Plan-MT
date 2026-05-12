@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 load_dotenv(ROOT / ".env")
 
-from pipeline.meddra_io import (
+from pipeline import (
     enrich_mdhier_row_pt,
     load_llt_to_parent_pt,
     load_pt_names,

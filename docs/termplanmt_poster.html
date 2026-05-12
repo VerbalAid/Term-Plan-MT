@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TermPlanMT Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2f45;
+    --navy-light: #253d55;
+    --amber: #e8a020;
+    --amber-light: #f5c567;
+    --amber-pale: #fdf3dc;
+    --cream: #f7f3ec;
+    --white: #ffffff;
+    --teal: #1a8585;
+    --teal-light: #2eb8b8;
+    --coral: #d45d3a;
+    --green: #2d7a4f;
+    --orange: #c45c1a;
+    --orange-pale: #fff4e8;
+    --red-decode: #9b2335;
+    --text: #1a1a1a;
+    --text-mid: #3a3a3a;
+    --border: #d4c9b0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #e8e2d8;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .poster {
+    width: 960px;
+    margin: 20px auto;
+    background: var(--cream);
+    box-shadow: 0 8px 60px rgba(0,0,0,0.35);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    padding: 32px 36px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 300px; height: 100%;
+    background: linear-gradient(135deg, transparent 40%, rgba(232,160,32,0.12) 100%);
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), var(--teal-light), var(--amber));
+  }
+
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+
+  .logo-badge {
+    flex-shrink: 0;
+    width: 52px; height: 52px;
+    background: var(--amber);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    font-size: 10px;
+    color: var(--navy);
+    text-align: center;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+  }
+
+  .title-block { flex: 1; }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--amber-light);
+    font-style: italic;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  .authors {
+    color: #a8c4dc;
+    font-size: 12.5px;
+    font-weight: 400;
+  }
+
+  .authors strong {
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #a8c4dc;
+  }
+
+  .pill .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  /* ── BODY GRID ── */
+  .body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0;
+  }
+
+  .panel {
+    padding: 18px 18px 16px;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel:nth-child(3n) { border-right: none; }
+  .panel-full {
+    grid-column: 1 / -1;
+    padding: 18px 20px 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 2px solid var(--amber);
+    padding-bottom: 5px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px; height: 20px;
+    background: var(--navy);
+    color: var(--amber);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--navy-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 10px 0 6px;
+  }
+
+  p {
+    color: var(--text-mid);
+    font-size: 12px;
+    line-height: 1.55;
+    margin-bottom: 6px;
+  }
+
+  /* ── FAILURE MODES ── */
+  .failure-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .failure-item {
+    background: var(--white);
+    border-left: 3px solid var(--coral);
+    border-radius: 0 4px 4px 0;
+    padding: 7px 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .failure-item .icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .failure-item .label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--navy);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .failure-item .desc {
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.4;
+  }
+
+  /* ── DATASET BOX ── */
+  .dataset-box {
+    background: var(--navy);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: var(--white);
+  }
+
+  .dataset-box .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .stat-item {
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 6px 4px;
+  }
+
+  .stat-item .val {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--amber-light);
+    line-height: 1;
+  }
+
+  .stat-item .lab {
+    display: block;
+    font-size: 9.5px;
+    color: #8aadca;
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  /* ── PIPELINE DIAGRAM ── */
+  .pipeline-svg-wrap {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  /* ── SYSTEMS TABLE ── */
+  .systems-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .sg-head {
+    background: var(--navy);
+    color: var(--amber-light);
+    padding: 5px 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .sg-cell {
+    background: var(--white);
+    padding: 5px 7px;
+    color: var(--text-mid);
+    vertical-align: middle;
+    line-height: 1.35;
+  }
+
+  .sg-cell.mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .tag-graph { background: #e3f2ee; color: #1e6b47; }
+  .tag-none  { background: #f0f0f0; color: #666; }
+  .tag-novel { background: #fff3e0; color: #b45309; border: 1px solid #f5c567; }
+  .tag-hard  { background: #fee2e2; color: #991b1b; }
+  .tag-soft  { background: #fef3c7; color: #92400e; }
+
+  .sg-cell-highlight {
+    background: #fffbf0;
+  }
+
+  /* ── METRICS BOX ── */
+  .metric-def {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 9px 11px;
+    margin-bottom: 7px;
+  }
+
+  .metric-def .name {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 3px;
+  }
+
+  .metric-formula {
+    background: #f4f0ff;
+    border-left: 3px solid #7c5cbf;
+    border-radius: 0 4px 4px 0;
+    padding: 5px 9px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #4a2e8a;
+    margin: 5px 0;
+    line-height: 1.6;
+  }
+
+  .score-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+
+  .score-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    border-radius: 3px;
+    padding: 2px 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .sp-exact  { background: #e3f2ee; color: #1e5c3a; }
+  .sp-branch { background: #fff7e0; color: #7a4f00; }
+  .sp-none   { background: #fde8e8; color: #7a1f1f; }
+
+  /* ── RESULTS TABLES ── */
+  .results-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .rtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    background: var(--white);
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .rtable caption {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--navy);
+    text-align: left;
+    padding: 7px 10px 0;
+    background: var(--white);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .rtable caption span {
+    font-family: 'DM Mono', monospace;
+    font-weight: 400;
+    color: var(--teal);
+  }
+
+  .rtable th {
+    background: var(--navy);
+    color: var(--amber-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    padding: 5px 7px;
+    text-align: right;
+    letter-spacing: 0.03em;
+  }
+
+  .rtable th:first-child { text-align: left; }
+
+  .rtable td {
+    padding: 4px 7px;
+    text-align: right;
+    color: var(--text-mid);
+    border-bottom: 1px solid #ece8e0;
+    font-size: 11px;
+  }
+
+  .rtable td:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: var(--navy);
+    font-size: 10.5px;
+  }
+
+  .rtable tr:last-child td { border-bottom: none; }
+
+  .rtable .best { font-weight: 700; color: var(--green); }
+  .rtable .ref-row td { color: #888; font-style: italic; }
+  .rtable .ref-row td:first-child { font-weight: 400; }
+  .rtable tr:hover td { background: #f8f5ef; }
+
+  .delta-pos { color: var(--green); font-weight: 600; }
+  .delta-neg { color: var(--coral); font-weight: 500; }
+  .delta-zero { color: #999; }
+  .delta-big { background: #e8f5ee; font-weight: 700; }
+
+  /* ── FINDINGS ── */
+  .findings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .finding-card {
+    background: var(--white);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .finding-card .fc-head {
+    padding: 9px 11px 7px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .finding-card .fc-num {
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .finding-card .fc-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--navy);
+  }
+
+  .finding-card .fc-body {
+    padding: 0 11px 11px;
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .finding-card .fc-stat {
+    margin: 6px 0 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+
+  /* Color themes per finding */
+  .fc-1 .fc-head { background: linear-gradient(135deg, #0d1b2a, #1a2f45); }
+  .fc-1 .fc-num  { color: var(--amber); }
+  .fc-1 .fc-title { color: var(--white); }
+  .fc-1 .fc-stat { background: #e8f5ee; color: var(--green); }
+
+  .fc-2 .fc-head { background: linear-gradient(135deg, #1a5252, #1e7a7a); }
+  .fc-2 .fc-num  { color: var(--teal-light); }
+  .fc-2 .fc-title { color: var(--white); }
+  .fc-2 .fc-stat { background: #fde8e8; color: var(--coral); }
+
+  .fc-3 .fc-head { background: linear-gradient(135deg, #5c2a0d, #8b3e14); }
+  .fc-3 .fc-num  { color: #f5c567; }
+  .fc-3 .fc-title { color: var(--white); }
+  .fc-3 .fc-stat { background: #fff3e0; color: #8b4500; }
+
+  .fc-4 .fc-head { background: linear-gradient(135deg, #2d1b52, #4a2e8a); }
+  .fc-4 .fc-num  { color: #c4a8f0; }
+  .fc-4 .fc-title { color: var(--white); }
+  .fc-4 .fc-stat { background: #f0ebff; color: #4a2e8a; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--navy);
+    padding: 14px 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .api-strip {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-size: 10.5px;
+    color: #a8c4dc;
+    line-height: 1.55;
+  }
+  .api-strip code { color: var(--teal-light); font-size: 10px; }
+  .footer-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .footer-conclusion {
+    color: #a8c4dc;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .footer-conclusion strong {
+    color: var(--amber-light);
+    font-weight: 500;
+  }
+
+  .footer-meta {
+    text-align: right;
+    color: #6a8faa;
+    font-size: 10.5px;
+    line-height: 1.6;
+  }
+
+  .footer-meta a {
+    color: var(--teal-light);
+    text-decoration: none;
+  }
+
+  /* ── CCR CALLOUT ── */
+  .ccr-callout {
+    background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+    border-radius: 5px;
+    padding: 9px 11px;
+    margin: 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .ccr-callout .big-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .ccr-callout .big-label {
+    color: #a8c4dc;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .ccr-callout .big-label strong {
+    display: block;
+    color: var(--white);
+    font-size: 12px;
+    margin-bottom: 1px;
+  }
+
+  .ner-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 6px;
+  }
+
+  .ner-item {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 10.5px;
+  }
+
+  .ner-item .ner-name {
+    font-weight: 600;
+    color: var(--navy);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .ner-item .ner-stat {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--teal);
+  }
+
+  .ner-item.ner-b .ner-name { color: var(--coral); }
+  .ner-item.ner-b .ner-stat { color: var(--coral); }
+
+  /* Decoder channel legend: green = no graph; amber = graph in prompt; red = graph in decode; orange = glossary in decode */
+  .channel-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--text-mid);
+  }
+  .ch { display: inline-flex; align-items: center; gap: 5px; }
+  .ch i {
+    width: 11px; height: 11px; border-radius: 2px;
+    display: inline-block; flex-shrink: 0;
+  }
+  .ch-green i { background: var(--green); }
+  .ch-amber i { background: var(--amber); }
+  .ch-red i { background: var(--red-decode); }
+  .ch-orange i { background: var(--orange); }
+  .tag-gloss {
+    background: var(--orange-pale);
+    color: var(--orange);
+    border: 1px solid #e8a070;
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-badge">TERM<br>PLAN<br>MT</div>
+      <div class="title-block">
+        <h1>Graph-Grounded Terminology Planning<br>for French–English Regulatory MT</h1>
+        <div class="subtitle">When Ontology Grounding Helps — and When It Does Not</div>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="authors">
+        <strong>Darragh Russell Kerins</strong> &amp; <strong>Noumidia Abadour</strong>
+        &nbsp;·&nbsp; UPV/EHU
+      </div>
+      <div class="pill"><span class="dot"></span> KEYTRUDA SmPC §4.8 · FR→EN</div>
+      <div class="pill"><span class="dot"></span> MedDRA · Neo4j · BioMistral-7B</div>
+      <div class="pill"><span class="dot"></span> 127 segments · 6 systems + S6 oracle</div>
+    </div>
+  </div>
+
+  <!-- ══ BODY ══ -->
+  <div class="body">
+
+    <!-- COL 1: Problem + Dataset -->
+    <div class="panel">
+      <h2><span class="num">1</span> Problem</h2>
+      <p>Neural MT is fluent but structurally indifferent to cross-segment terminology consistency — a patient-safety requirement in EMA regulatory documents.</p>
+
+      <div class="failure-grid">
+        <div class="failure-item">
+          <span class="icon">↔</span>
+          <div>
+            <span class="label">Term Drift</span>
+            <span class="desc"><em>pneumopathie immuno-médiée</em> appears 30+ times; zero-shot MT produces 3+ distinct English renderings.</span>
+          </div>
+        </div>
+        <div class="failure-item">
+          <span class="icon">⬇</span>
+          <div>
+            <span class="label">Concept Flattening</span>
+            <span class="desc">LLT-level terms (L5) collapsed to hypernyms — <em>immune-mediated pneumonitis</em> → <em>pneumonitis</em>.</span>
+          </div>
+        </div>
+        <div class="failure-item">
+          <span class="icon">✕</span>
+          <div>
+            <span class="label">Coverage Gaps</span>
+            <span class="desc">Multi-token adverse-event names spanning clause boundaries fall outside standard NER.</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Dataset</h3>
+      <div class="dataset-box">
+        <div style="color:#a8c4dc;font-size:11px;margin-bottom:2px;">KEYTRUDA (pembrolizumab) SmPC</div>
+        <div style="color:var(--white);font-size:12px;font-weight:500;">Section 4.8 — Undesirable Effects</div>
+        <div class="stat-row">
+          <div class="stat-item"><span class="val">127</span><span class="lab">aligned FR/EN segments (eval manifest)</span></div>
+          <div class="stat-item"><span class="val">4.4k</span><span class="lab">words · adverse-event dense</span></div>
+          <div class="stat-item"><span class="val">MedDRA</span><span class="lab">5-level hierarchy (L1–L5)</span></div>
+          <div class="stat-item"><span class="val">Neo4j</span><span class="lab">graph · BROADER_THAN edges</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 2: Pipeline + Systems -->
+    <div class="panel">
+      <h2><span class="num">2</span> Pipeline Architecture</h2>
+
+      <!-- Inline SVG pipeline diagram -->
+      <div class="pipeline-svg-wrap">
+        <svg viewBox="0 0 620 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+          <defs>
+            <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L6,3 z" fill="#e8a020"/>
+            </marker>
+          </defs>
+          <!-- Stage boxes -->
+          <rect x="4" y="22" width="112" height="44" rx="5" fill="#0d1b2a"/>
+          <rect x="132" y="22" width="112" height="44" rx="5" fill="#1a5252"/>
+          <rect x="260" y="22" width="112" height="44" rx="5" fill="#5c2a0d"/>
+          <rect x="388" y="22" width="112" height="44" rx="5" fill="#2d1b52"/>
+          <!-- Arrows -->
+          <path d="M116 44 L130 44" stroke="#e8a020" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M244 44 L258 44" stroke="#e8a020" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M372 44 L386 44" stroke="#e8a020" stroke-width="2" marker-end="url(#arrow)"/>
+          <path d="M500 44 L514 44" stroke="#e8a020" stroke-width="2" marker-end="url(#arrow)"/>
+          <!-- Stage markers -->
+          <text x="10" y="14" font-family="DM Mono" font-size="9" fill="#e8a020">①</text>
+          <text x="138" y="14" font-family="DM Mono" font-size="9" fill="#2eb8b8">②</text>
+          <text x="266" y="14" font-family="DM Mono" font-size="9" fill="#f5c567">③</text>
+          <text x="394" y="14" font-family="DM Mono" font-size="9" fill="#c4a8f0">④</text>
+          <text x="60" y="42" font-family="DM Sans" font-size="10.5" font-weight="600" fill="white" text-anchor="middle">French NER</text>
+          <text x="60" y="58" font-family="DM Sans" font-size="9" fill="#a8c4dc" text-anchor="middle">BioMistral-7B</text>
+          <text x="188" y="42" font-family="DM Sans" font-size="10.5" font-weight="600" fill="white" text-anchor="middle">MedDRA</text>
+          <text x="188" y="58" font-family="DM Sans" font-size="9" fill="#6ed4d4" text-anchor="middle">Neo4j</text>
+          <text x="316" y="42" font-family="DM Sans" font-size="10.5" font-weight="600" fill="white" text-anchor="middle">Planning</text>
+          <text x="316" y="58" font-family="DM Sans" font-size="9" fill="#f5c567" text-anchor="middle">global locks</text>
+          <text x="444" y="42" font-family="DM Sans" font-size="10.5" font-weight="600" fill="white" text-anchor="middle">Decoding</text>
+          <text x="444" y="58" font-family="DM Sans" font-size="9" fill="#c4a8f0" text-anchor="middle">S1–S6</text>
+          <!-- Decoder channel strip -->
+          <text x="4" y="86" font-family="DM Sans" font-size="9.5" font-weight="600" fill="#333">Decoder channel</text>
+          <rect x="4" y="92" width="14" height="14" rx="2" fill="#2d7a4f"/>
+          <text x="22" y="103" font-family="DM Sans" font-size="8.5" fill="#444">S1–S2 · no graph</text>
+          <rect x="118" y="92" width="14" height="14" rx="2" fill="#e8a020"/>
+          <text x="136" y="103" font-family="DM Sans" font-size="8.5" fill="#444">S3–S4 · graph → prompt</text>
+          <rect x="268" y="92" width="14" height="14" rx="2" fill="#9b2335"/>
+          <text x="286" y="103" font-family="DM Sans" font-size="8.5" fill="#444">S5 · graph → logit boost</text>
+          <rect x="418" y="92" width="14" height="14" rx="2" fill="#c45c1a"/>
+          <text x="436" y="103" font-family="DM Sans" font-size="8.5" fill="#444">S6 · glossary → logit boost (oracle)</text>
+          <text x="4" y="126" font-family="DM Mono" font-size="8.5" fill="#888">FR SmPC →</text>
+          <text x="540" y="126" font-family="DM Mono" font-size="8.5" fill="#888">→ EN output</text>
+        </svg>
+      </div>
+      <div class="channel-legend">
+        <span class="ch ch-green"><i></i>Green — no ontology in decoder</span>
+        <span class="ch ch-amber"><i></i>Amber — MedDRA context in LLM prompt only</span>
+        <span class="ch ch-red"><i></i>Red — MedDRA phrases + PhraseLogitBoost (same mechanism as S6)</span>
+        <span class="ch ch-orange"><i></i>Orange — gold glossary replaces MedDRA lookup (S6 ablation)</span>
+      </div>
+
+      <h3>Planning Score Function</h3>
+      <div class="metric-formula">Score(c) = α · Ctx(c) + β · Nbr(c) − γ · HP(c)<br><span style="color:#9a8ad0">α=0.5  β=0.3  γ=0.2   HP = |level_cand − level_src|</span></div>
+
+      <h3>Six-System Ladder + S6 Oracle</h3>
+      <div class="systems-grid">
+        <div class="sg-head">ID</div><div class="sg-head">Model</div><div class="sg-head">Terms</div><div class="sg-head">Enforce</div>
+
+        <div class="sg-cell mono">S1</div>
+        <div class="sg-cell">NLLB-200 600M</div>
+        <div class="sg-cell"><span class="tag tag-none">None</span></div>
+        <div class="sg-cell"><span class="tag tag-none">None</span></div>
+
+        <div class="sg-cell mono">S2</div>
+        <div class="sg-cell">Mistral-7B doc</div>
+        <div class="sg-cell"><span class="tag tag-none">None</span></div>
+        <div class="sg-cell"><span class="tag tag-none">None</span></div>
+
+        <div class="sg-cell mono sg-cell-highlight">S3</div>
+        <div class="sg-cell sg-cell-highlight">Mistral + GraphRAG <span class="tag tag-novel">novel</span></div>
+        <div class="sg-cell sg-cell-highlight"><span class="tag tag-graph">MedDRA → prompt</span></div>
+        <div class="sg-cell sg-cell-highlight"><span class="tag tag-none">None</span></div>
+
+        <div class="sg-cell mono">S4</div>
+        <div class="sg-cell">S3 + rerank</div>
+        <div class="sg-cell"><span class="tag tag-graph">MedDRA → prompt</span></div>
+        <div class="sg-cell"><span class="tag tag-soft">Soft</span></div>
+
+        <div class="sg-cell mono">S5</div>
+        <div class="sg-cell">NLLB/Mistral + logit</div>
+        <div class="sg-cell"><span class="tag tag-graph">MedDRA → decode</span></div>
+        <div class="sg-cell"><span class="tag tag-hard">Logit boost</span></div>
+
+        <div class="sg-cell mono">S6</div>
+        <div class="sg-cell">Same as S5 + <span class="tag tag-gloss">gold glossary</span></div>
+        <div class="sg-cell"><span class="tag tag-gloss">Glossary → decode</span></div>
+        <div class="sg-cell"><span class="tag tag-hard">Logit boost</span></div>
+      </div>
+      <p style="font-size:10.5px;color:#666;margin-top:10px;line-height:1.45"><strong>S6</strong> swaps only the phrase source: <code>collect_glossary_phrases</code> instead of Neo4j <code>collect_english_phrases</code>. Same PhraseLogitBoost / optional <code>force_words_ids</code> as S5 — isolates term-selection vs mechanism. Build <code>gold_glossary.json</code> with <code>tools/data/build_gold_terms_from_parallel_ner.py</code> (draft; hand-review).</p>
+    </div>
+
+    <!-- COL 3: Metrics + NER -->
+    <div class="panel">
+      <h2><span class="num">3</span> Metrics</h2>
+
+      <div class="metric-def">
+        <div class="name">HTM — Hierarchy-Aware Terminology Metric</div>
+        <div class="metric-formula">HTM = mean(sᵢ) over NER-grounded spans<br>sᵢ = 1.0 · exact MedDRA level match<br>sᵢ = 0.5 · same branch, wrong level<br>sᵢ = 0.0 · different branch / absent</div>
+        <div class="score-row">
+          <span class="score-pill sp-exact">1.0 exact level</span>
+          <span class="score-pill sp-branch">0.5 same branch</span>
+          <span class="score-pill sp-none">0.0 absent</span>
+        </div>
+      </div>
+
+      <div class="metric-def" style="margin-bottom:7px">
+        <div class="name">rHTM — reference ceiling</div>
+        <p style="font-size:11px;margin:3px 0 0;">HTM applied to the professional human reference as hypothesis. Measures how well certified translators use MedDRA labels.</p>
+      </div>
+
+      <div class="metric-def" style="margin-bottom:7px">
+        <div class="name">HRA — Hyp–Ref Agreement</div>
+        <p style="font-size:11px;margin:3px 0 0;">Fraction of segments where system terminology choice matches the professional reference, independent of MedDRA correctness.</p>
+      </div>
+
+      <div class="metric-def">
+        <div class="name">CCR — Concept Coverage Rate</div>
+        <p style="font-size:11px;margin:3px 0 0;">Grounded NER spans ÷ total extracted spans. Dataset-level; identical across all systems within a NER condition.</p>
+      </div>
+
+      <div class="metric-def" style="margin-bottom:7px">
+        <div class="name">Document BLEU / COMET (optional)</div>
+        <p style="font-size:11px;margin:3px 0 0;"><strong>BLdoc</strong> = macro mean of corpus BLEU per document (segment hyps/refs concatenated). <strong>COMET</strong> = reference-based DA when <code>evaluate.py</code> / <code>plot_figures.py --comet</code> runs with Unbabel COMET installed.</p>
+      </div>
+
+      <h3>NER Conditions</h3>
+      <div class="ner-compare">
+        <div class="ner-item">
+          <span class="ner-name">Baseline (biollm)</span>
+          <span class="ner-stat">CCR 35.4% · 167 spans</span>
+          <p style="font-size:10px;color:#888;margin-top:3px;margin-bottom:0">Hallucinated spans in 92/127 segments (baseline BioMistral)</p>
+        </div>
+        <div class="ner-item ner-b">
+          <span class="ner-name">Fine-tuned (ft)</span>
+          <span class="ner-stat">CCR 32.4% · 170 spans</span>
+          <p style="font-size:10px;color:#888;margin-top:3px;margin-bottom:0">Cleaner boundaries · no hallucinations</p>
+        </div>
+      </div>
+      <div class="ccr-callout">
+        <div class="big-num">35%</div>
+        <div class="big-label"><strong>CCR = binding constraint</strong>Graph influences fewer than ⅓ of adverse-event spans. Graph-free S2 covers the rest implicitly via document context.</div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Results tables spanning all 3 cols -->
+    <div class="panel-full">
+      <h2><span class="num">4</span> Results</h2>
+      <div class="results-wrap">
+
+        <!-- Table 1: Low-CCR -->
+        <table class="rtable">
+          <caption>Baseline NER &nbsp;<span>(CCR ≈ 35%; corpus + doc metrics — run <code>evaluate.py</code>)</span></caption>
+          <tr>
+            <th>System</th><th>BLEU</th><th>BLdoc</th><th>chrF++</th><th>COMET</th><th>HTM</th><th>HRA</th>
+          </tr>
+          <tr><td>S1 NLLB</td><td>18.89</td><td>—</td><td>31.90</td><td>—</td><td>0.114</td><td>0.681</td></tr>
+          <tr><td>S2 Mistral</td><td>16.70</td><td>—</td><td>31.83</td><td>—</td><td>0.196</td><td>0.657</td></tr>
+          <tr><td>S3 GraphRAG</td><td>10.41</td><td>—</td><td>31.79</td><td>—</td><td>0.253</td><td>0.590</td></tr>
+          <tr><td>S4 rerank</td><td>10.10</td><td>—</td><td>32.01</td><td>—</td><td>0.237</td><td>0.596</td></tr>
+          <tr><td>S5 NLLB+boost</td><td>17.70</td><td>—</td><td>30.88</td><td>—</td><td>0.135</td><td>0.663</td></tr>
+          <tr><td>S5 Mist+boost</td><td>10.35</td><td>—</td><td>31.74</td><td>—</td><td class="best">0.267</td><td>0.578</td></tr>
+          <tr style="opacity:0.85"><td>S6 NLLB+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr style="opacity:0.85"><td>S6 Mist+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr class="ref-row"><td>Human ref.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0.130</td><td>1.000</td></tr>
+        </table>
+
+        <!-- Table 2: Fine-tuned -->
+        <table class="rtable">
+          <caption>Fine-tuned NER &nbsp;<span>(mistral_clean graph rows; see repo docs)</span></caption>
+          <tr>
+            <th>System</th><th>BLEU</th><th>BLdoc</th><th>chrF++</th><th>COMET</th><th>HTM</th><th>HRA</th>
+          </tr>
+          <tr><td>S1 NLLB</td><td>18.89</td><td>—</td><td>31.90</td><td>—</td><td>0.195</td><td>0.435</td></tr>
+          <tr><td>S2 Mistral</td><td class="best">20.37</td><td>—</td><td class="best">35.85</td><td>—</td><td>0.274</td><td>0.497</td></tr>
+          <tr><td>S3 GraphRAG†</td><td>17.49</td><td>—</td><td>32.01</td><td>—</td><td>0.246</td><td>0.450</td></tr>
+          <tr><td>S4 rerank†</td><td>17.52</td><td>—</td><td>32.04</td><td>—</td><td>0.246</td><td>0.461</td></tr>
+          <tr><td>S5 NLLB+boost</td><td>17.54</td><td>—</td><td>31.02</td><td>—</td><td>0.205</td><td>0.408</td></tr>
+          <tr><td>S5 Mist+boost†</td><td>17.50</td><td>—</td><td>32.35</td><td>—</td><td class="best">0.248</td><td>0.455</td></tr>
+          <tr style="opacity:0.85"><td>S6 NLLB+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr style="opacity:0.85"><td>S6 Mist+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr class="ref-row"><td>Human ref.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>0.180</td><td>1.000</td></tr>
+        </table>
+
+        <!-- Table 3: Delta -->
+        <table class="rtable" style="grid-column:1/-1">
+          <caption>ΔBLEU (baseline → fine-tuned) &nbsp;<span>+ paired bootstrap CIs — see <code>tools/eval/bootstrap_bleu_delta.py</code></span></caption>
+          <tr>
+            <th>System</th>
+            <th>ΔBLEU</th>
+            <th>95% CI</th>
+            <th style="text-align:left;padding-left:12px">Note</th>
+          </tr>
+          <tr><td>S1</td><td class="delta-zero">0.00</td><td>[0, 0]</td><td style="text-align:left;font-size:10px">No graph path</td></tr>
+          <tr><td>S2</td><td class="delta-pos">+3.67</td><td style="font-size:9px">incl. 0</td><td style="text-align:left;font-size:10px">Wide segment-bootstrap interval</td></tr>
+          <tr class="delta-big"><td>S3–S5 Mist</td><td class="delta-pos">≈ +7</td><td style="font-size:9px">&gt; 0</td><td style="text-align:left;font-size:10px">Graph path gains when NER is cleaner</td></tr>
+          <tr style="opacity:0.9"><td>S6</td><td class="delta-zero">—</td><td>—</td><td style="text-align:left;font-size:10px"><strong>Run pending</strong> — compare S6 vs S5 HTM for oracle readout</td></tr>
+        </table>
+
+      </div>
+    </div>
+
+    <!-- ROW 3: Key Findings -->
+    <div class="panel-full" style="background:#f2ede4">
+      <h2><span class="num">5</span> Key Findings</h2>
+      <div class="findings-grid">
+
+        <div class="finding-card fc-1">
+          <div class="fc-head">
+            <div class="fc-num">①</div>
+            <div class="fc-title">CCR is the Binding Constraint</div>
+          </div>
+          <div class="fc-body">
+            <div class="fc-stat">+≈7 BLEU (graph); S6 oracle</div>
+            NER quality unlocks graph fluency (paired bootstrap: strictly positive Δ for S3–S5-Mistral). <strong>S6</strong> (gold glossary, same logit boost as S5) isolates whether MedDRA <em>labels</em> vs the <em>mechanism</em> cap HTM — run after hand-reviewed <code>gold_glossary.json</code>.
+          </div>
+        </div>
+
+        <div class="finding-card fc-2">
+          <div class="fc-head">
+            <div class="fc-num">②</div>
+            <div class="fc-title">HTM–Practice Gap</div>
+          </div>
+          <div class="fc-body">
+            <div class="fc-stat">rHTM = 0.13–0.16 on human ref.</div>
+            The professional reference scores lower than several MT systems on HTM. Alias expansion T1→T2→T3 produces <strong>zero movement</strong>. MedDRA labels are designed for pharmacovigilance coding, not regulatory prose — the gap is structural, not a coverage issue.
+          </div>
+        </div>
+
+        <div class="finding-card fc-3">
+          <div class="fc-head">
+            <div class="fc-num">③</div>
+            <div class="fc-title">Consistency Paradox</div>
+          </div>
+          <div class="fc-body">
+            <div class="fc-stat">drift = 0.333 for S3/S4/S5</div>
+            Graph systems produce <em>lower</em> cross-document consistency than graph-free systems. Mechanism: ambiguous French terms match multiple MedDRA concepts → planning stage abstains from locking → per-segment context-dependent resolution → drift. S1-NLLB's consistency is a vocabulary artefact, not reasoning.
+          </div>
+        </div>
+
+        <div class="finding-card fc-4">
+          <div class="fc-head">
+            <div class="fc-num">④</div>
+            <div class="fc-title">HRA–HTM Inversion</div>
+          </div>
+          <div class="fc-body">
+            <div class="fc-stat">S3 HRA=0.59 vs S2 HRA=0.66</div>
+            Graph systems score <em>higher</em> on HTM yet <em>lower</em> on HRA. Optimising toward MedDRA formal labels diverges from how certified translators actually write. For regulatory MT in practice, HRA is the more meaningful target. HTM measures MedDRA-proximity, not translation quality.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end body grid -->
+
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    <div class="api-strip">
+      <strong style="color:var(--amber-light)">Deployable pattern.</strong>
+      S6’s stack — curated FR→EN glossary + PhraseLogitBoost (+ optional <code>force_words_ids</code>) — is the same mechanism as S5 with a <em>domain glossary</em> instead of MedDRA. Suitable for regulated domains (finance, legal, pharma) where terminology is fixed and auditable.
+    </div>
+    <div class="footer-row">
+    <div class="footer-conclusion">
+      <strong>Conclusion</strong> &nbsp;·&nbsp;
+      CCR limits graph utility at low coverage. <strong>S6</strong> answers a finer question: if oracle glossary phrases beat S5 on HTM, MedDRA <em>term choice</em> is the residual bottleneck; if S6 ≈ S5, the logit-boost channel is too weak. Run <code>run_pipeline.py --system s6 --glossary data/section48/gold_glossary.json --s6-backend both</code> after building the glossary.
+    </div>
+    <div class="footer-meta">
+      MedDRA licence via MSSO/UPV/EHU<br>
+      Supervised by Gorka Labaka<br>
+      <span style="color:#4a7a9a">drussell001@ikasle.ehu.eus</span><br>
+      <span style="color:#4a7a9a">nabadour001@ikasle.ehu.eus</span>
+    </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

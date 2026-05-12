@@ -42,20 +42,21 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.metrics.eval_io import load_results_jsonl as _load_jsonl
-from pipeline.metrics.eval_manifest import (
+from metrics import load_results_jsonl as _load_jsonl
+from metrics import (
     EVAL_FILES,
     EVAL_RERUN_PROFILES,
+    unpack_eval_rerun_profile,
     condition_name_from_results_subdir,
 )
-from pipeline.metrics.htm import (
+from metrics import (
     compute_htm,
     compute_htm_vector,
     htm_vector_column_key,
     parse_cosine_thresholds_csv,
 )
-from pipeline.graph import TermGraph
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
+from pipeline import TermGraph
+from systems import load_all_segments, parse_exclude_segment_ids
 
 try:
     from neo4j.exceptions import ServiceUnavailable
@@ -83,7 +84,7 @@ DISPLAY_NAMES: dict[str, str] = {
 
 # Preferred NER pipeline order for grouped bars (see ``EVAL_RERUN_PROFILES``).
 PIPELINE_ORDER: list[str] = [
-    condition_name_from_results_subdir(s) for s, _rels in EVAL_RERUN_PROFILES
+    condition_name_from_results_subdir(unpack_eval_rerun_profile(p)[0]) for p in EVAL_RERUN_PROFILES
 ]
 
 _PIPELINE_LEGEND_BASE: dict[str, str] = {
@@ -100,7 +101,8 @@ PIPELINE_LEGEND: dict[str, str] = {
 PIPELINE_COLORS: list[str] = ["#0173B2", "#DE8F05", "#029E73", "#CC78BC", "#56B4E9", "#D55E00"]
 
 SEGMENTS_REL_FOR_CONDITION: dict[str, tuple[str, ...]] = {
-    condition_name_from_results_subdir(sub): rels for sub, rels in EVAL_RERUN_PROFILES
+    condition_name_from_results_subdir(unpack_eval_rerun_profile(p)[0]): unpack_eval_rerun_profile(p)[1]
+    for p in EVAL_RERUN_PROFILES
 }
 
 

@@ -32,8 +32,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.graph import TermGraph, normalize_fr_for_grounding
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
+from pipeline import TermGraph
+from pipeline import normalize_fr_for_grounding
+from systems import load_all_segments, parse_exclude_segment_ids
 
 
 def _term_keys(rows: list[dict[str, Any]]) -> tuple[dict[str, int], dict[str, set[str]], dict[str, str]]:

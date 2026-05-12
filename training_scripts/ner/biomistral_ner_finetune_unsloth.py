@@ -34,7 +34,7 @@ _DEFAULT_ONTOLOGY_ALPACA_JSONL = ROOT / "data" / "ontology_ner_full_hierarchical
 # CLI default for --max-seq-length (used with --fit-8gb + --ontology-only to apply fit-8gb-max-seq).
 _DEFAULT_MAX_SEQ_LENGTH_CLI = 256
 
-from pipeline.cuda_ld_path import ensure_cuda_pip_libs_visible
+from systems import ensure_cuda_pip_libs_visible
 
 ensure_cuda_pip_libs_visible()
 

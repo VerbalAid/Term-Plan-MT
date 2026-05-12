@@ -14,16 +14,16 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.metrics.ccr import compute_ccr_stats
-from pipeline.metrics.eval_manifest import EVAL_FILES
-from pipeline.metrics.eval_table import (
+from metrics import compute_ccr_stats
+from metrics import eval_files_for_set
+from metrics import (
     NEO4J_CONN_ERRORS,
     collect_system_metric_rows,
     neo4j_connection_help,
 )
-from pipeline.metrics.htm import htm_vector_column_key, parse_cosine_thresholds_csv
-from pipeline.graph import TermGraph
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
+from metrics import htm_vector_column_key, parse_cosine_thresholds_csv
+from pipeline import TermGraph
+from systems import load_all_segments, parse_exclude_segment_ids
 
 
 def _fmt_metric(x: float) -> str:
@@ -70,7 +70,7 @@ def main() -> None:
         "--results-dir",
         type=Path,
         default=None,
-        help="Directory containing s1.jsonl … s5_mistral.jsonl (default: results/ad_hoc/).",
+        help="Directory containing s1.jsonl … s6_mistral.jsonl (default: results/ad_hoc/).",
     )
     ap.add_argument(
         "--grounding-mode",
@@ -101,6 +101,16 @@ def main() -> None:
         help=(
             "Optional comma-separated cosine thresholds in [0,1] for vector HTM columns "
             "(e.g. 0.8,0.9). Requires Neo4j + sentence-transformers; slow on first model load."
+        ),
+    )
+    ap.add_argument(
+        "--eval-file-set",
+        choices=["standard", "mistral_clean"],
+        default="standard",
+        help=(
+            "Which system JSONL filenames to read under --results-dir. "
+            "'mistral_clean' uses s3_clean.jsonl / s4_clean.jsonl / s5_mistral_clean.jsonl "
+            "(contamination-filtered graph outputs; s6 unchanged). See docs/CANONICAL_METRICS.md."
         ),
     )
     args = ap.parse_args()
@@ -185,6 +195,7 @@ def main() -> None:
                     n_expected=n_expected,
                     fill_missing=True,
                     out_warnings=warn_buf,
+                    eval_file_set=args.eval_file_set,
                 )
             except NEO4J_CONN_ERRORS:
                 raise SystemExit(neo4j_connection_help()) from None
@@ -204,12 +215,13 @@ def main() -> None:
                 n_expected=n_expected,
                 fill_missing=True,
                 out_warnings=warn_buf,
+                eval_file_set=args.eval_file_set,
             )
 
         for ln in warn_buf:
             print(ln, file=sys.stderr)
 
-        label_w = max(len(t[0]) for t in EVAL_FILES)
+        label_w = max(len(t[0]) for t in eval_files_for_set(args.eval_file_set))
         hdr = f"{'System':<{label_w}}"
         vpad = "".join(f" {k:>14}" for k in htm_vec_keys)
         print(

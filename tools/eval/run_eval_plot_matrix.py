@@ -20,15 +20,16 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.metrics.eval_manifest import (
-    EVAL_FILES,
+from metrics import (
     EVAL_RERUN_PROFILES,
     condition_name_from_results_subdir,
+    eval_files_for_set,
+    unpack_eval_rerun_profile,
 )
 
 
-def _has_pipeline_outputs(results_dir: Path) -> bool:
-    return any((results_dir / fn).is_file() for _, fn in EVAL_FILES)
+def _has_pipeline_outputs(results_dir: Path, eval_file_set: str = "standard") -> bool:
+    return any((results_dir / fn).is_file() for _, fn in eval_files_for_set(eval_file_set))
 
 
 def _resolve_segments(root: Path, rels: tuple[str, ...]) -> Path | None:
@@ -73,7 +74,8 @@ def main() -> None:
     _skip_raw = os.environ.get("SKIP_EVAL_PROFILES", "").strip()
     _skip_profiles = {x.strip() for x in _skip_raw.split(",") if x.strip()}
 
-    for results_sub, seg_rels in EVAL_RERUN_PROFILES:
+    for prof in EVAL_RERUN_PROFILES:
+        results_sub, seg_rels, excl_ov, eval_file_set = unpack_eval_rerun_profile(prof)
         cond = condition_name_from_results_subdir(results_sub)
         if cond in _skip_profiles:
             print(
@@ -85,7 +87,7 @@ def main() -> None:
         if not rd.is_dir():
             print(f"[run_eval_plot_matrix] skip (no dir): {results_sub}", file=sys.stderr)
             continue
-        if not _has_pipeline_outputs(rd):
+        if not _has_pipeline_outputs(rd, eval_file_set):
             print(f"[run_eval_plot_matrix] skip (no pipeline JSONLs): {results_sub}", file=sys.stderr)
             continue
         seg = _resolve_segments(root, seg_rels)
@@ -96,6 +98,7 @@ def main() -> None:
                 file=sys.stderr,
             )
             continue
+        excl_arg = args.exclude_segment_ids if excl_ov is None else excl_ov
 
         for gm in modes:
             gm = gm.strip()
@@ -106,6 +109,7 @@ def main() -> None:
             print("=" * 72, file=sys.stderr)
             print(f"[run_eval_plot_matrix] eval+plot  {results_sub}  grounding={gm}", file=sys.stderr)
             print(f"  segments: {seg.relative_to(root)}", file=sys.stderr)
+            print(f"  exclude-segment-ids: {excl_arg!r}  eval-file-set: {eval_file_set}", file=sys.stderr)
             print("=" * 72, file=sys.stderr)
 
             ev_cmd = [
@@ -118,7 +122,9 @@ def main() -> None:
                 "--segments",
                 str(seg.relative_to(root)),
                 "--exclude-segment-ids",
-                str(args.exclude_segment_ids),
+                str(excl_arg),
+                "--eval-file-set",
+                eval_file_set,
                 *hvf,
                 *extra,
             ]
@@ -135,7 +141,9 @@ def main() -> None:
                 "--out-dir",
                 str(od.relative_to(root)),
                 "--exclude-segment-ids",
-                str(args.exclude_segment_ids),
+                str(excl_arg),
+                "--eval-file-set",
+                eval_file_set,
                 *hvf,
                 *extra,
             ]

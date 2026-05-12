@@ -48,7 +48,7 @@
 | 3 | `docker compose up -d` — Neo4j for grounding / metrics ([`docker-compose.yml`](docker-compose.yml)). |
 | 4 | Segment JSONL under [`data/section48/`](data/section48/) (`segments_ner*.jsonl`). To (re)generate NER, use [`training_scripts/ner/biomistral_prompt_ner.py`](training_scripts/ner/biomistral_prompt_ner.py) (see [`training_scripts/README.md`](training_scripts/README.md)). |
 | 5 | **Full matrix:** [`./rerun_all.sh`](rerun_all.sh) (see script header for `SKIP_*`). **Ad hoc:** `PYTHONPATH=. python` [`tools/pipeline/run_pipeline.py`](tools/pipeline/run_pipeline.py) `--segments … --results-dir …` |
-| 6 | **Scores / figures:** [`tools/eval/evaluate.py`](tools/eval/evaluate.py), [`tools/eval/plot_figures.py`](tools/eval/plot_figures.py), or the eval phase inside [`rerun_all.sh`](rerun_all.sh) / [`tools/eval/run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py). |
+| 6 | **Scores / figures:** [`tools/eval/evaluate.py`](tools/eval/evaluate.py), [`tools/eval/plot_figures.py`](tools/eval/plot_figures.py), [`tools/eval/bootstrap_bleu_delta.py`](tools/eval/bootstrap_bleu_delta.py) (bootstrap CIs for BLEU deltas), or the eval phase inside [`rerun_all.sh`](rerun_all.sh) / [`tools/eval/run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py). |
 
 **S1 / S2 reuse:** In [`rerun_all.sh`](rerun_all.sh), `REUSE_S1_S2_FROM_BIOLLM=1` (default) copies [`results/ner_biollm/s1.jsonl`](results/ner_biollm/) and `s2.jsonl` into other result trees and runs **S3–S5** only. Set to `0` for a full S1–S5 rerun per condition.
 

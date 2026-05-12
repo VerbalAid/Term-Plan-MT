@@ -58,5 +58,11 @@ Decision:
 
 ### Which numbers go in the paper (and why)
 
-- **HTM ceilings / rHTM**: use the **standalone HTM-A** values above for alias-tier discussion, and explicitly note they differ from the committed `scores_summary.csv` `htm_en_ref_dataset` values (different evaluation path).\n+- **S3/S4/S5-Mistral text metrics (BLEU/chrF)**: use **cleaned** numbers or present both raw vs clean; raw scores are not reliable due to prompt leakage.
+- **HTM ceilings / rHTM**: use the **standalone HTM-A** values above for alias-tier discussion, and explicitly note they differ from the committed `scores_summary.csv` `htm_en_ref_dataset` values (different evaluation path).
+- **S3/S4/S5-Mistral text metrics (BLEU/chrF)**: use **cleaned** numbers or present both raw vs clean; raw scores are not reliable due to prompt leakage.
 
+### S6 (glossary oracle) — eval manifest
+
+- **Result files**: `s6.jsonl` (NLLB + glossary PhraseLogitBoost), `s6_mistral.jsonl` (Mistral + glossary prompt + boost).
+- **`mistral_clean` set**: S6 uses the same filenames as `standard` (no MedDRA prompt contamination from graph metadata; still use sensible qualitative checks on outputs).
+- **Glossary**: build a draft with `tools/data/build_gold_terms_from_parallel_ner.py`; **hand-review** before interpreting S6 as an oracle vs S5.

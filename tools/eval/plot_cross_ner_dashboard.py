@@ -41,14 +41,15 @@ import matplotlib.ticker as mticker
 import numpy as np
 from matplotlib.patches import Patch
 
-from pipeline.metrics.ccr import compute_ccr
-from pipeline.metrics.eval_manifest import (
+from metrics import compute_ccr
+from metrics import (
     EVAL_FILES,
     EVAL_RERUN_PROFILES,
+    unpack_eval_rerun_profile,
     condition_name_from_results_subdir,
 )
-from pipeline.graph import TermGraph
-from pipeline.systems.data_io import load_all_segments, parse_exclude_segment_ids
+from pipeline import TermGraph
+from systems import load_all_segments, parse_exclude_segment_ids
 
 try:
     from neo4j.exceptions import ServiceUnavailable
@@ -75,7 +76,7 @@ CONDITION_LABELS: dict[str, str] = {
 }
 
 DEFAULT_CONDITION_ORDER = [
-    condition_name_from_results_subdir(sub) for sub, _rels in EVAL_RERUN_PROFILES
+    condition_name_from_results_subdir(unpack_eval_rerun_profile(p)[0]) for p in EVAL_RERUN_PROFILES
 ]
 
 # Colorblind-friendly NER-pipeline colours (extend when adding ``EVAL_RERUN_PROFILES`` rows).
@@ -88,7 +89,8 @@ CONDITION_COLORS: dict[str, str] = {
 
 # Same mapping as ``tools/eval/run_eval_plot_matrix.py`` / ``rerun_all.sh``.
 SEGMENTS_REL_FOR_CONDITION: dict[str, tuple[str, ...]] = {
-    condition_name_from_results_subdir(sub): rels for sub, rels in EVAL_RERUN_PROFILES
+    condition_name_from_results_subdir(unpack_eval_rerun_profile(p)[0]): unpack_eval_rerun_profile(p)[1]
+    for p in EVAL_RERUN_PROFILES
 }
 
 

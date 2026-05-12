@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from pipeline.metrics.eval_manifest import EVAL_FILES
+from metrics import EVAL_FILES
 
 # Optional heavy deps for --annotation-sheet (Mistral 4-bit).
 try:
@@ -686,8 +686,8 @@ def run_annotation_sheet(args: argparse.Namespace) -> None:
     """Top-N segments by Mistral-graded error richness; CSV for all systems."""
     if torch is None:
         raise SystemExit("torch is required for --annotation-sheet (install PyTorch).")
-    from pipeline.cuda_ld_path import ensure_cuda_pip_libs_visible
-    from pipeline.systems.models import load_mistral_4bit, unload_mistral
+    from systems import ensure_cuda_pip_libs_visible
+    from systems import load_mistral_4bit, unload_mistral
 
     ensure_cuda_pip_libs_visible()
     results_dir = _resolve_results_dir_arg(Path(args.results_dir))

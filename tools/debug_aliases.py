@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 
-from pipeline.graph import TermGraph
+from pipeline import TermGraph
 
 
 def debug_aliases(fr_term: str, graph: TermGraph) -> list[tuple[str, str]]:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pipeline.meddra_io import (
+from pipeline import (
     canonical_meddra_tier,
     enrich_mdhier_row_pt,
     load_llt_to_parent_pt,
@@ -41,7 +41,7 @@ def test_canonical_meddra_tier_prefers_valid_string() -> None:
 
 
 def test_hierarchy_flat_llt_fills_soc_and_pt() -> None:
-    from pipeline.ontology_sft_alpaca import hierarchy_flat_fields
+    from ontology_sft import hierarchy_flat_fields
 
     by_tier = {
         "SOC": {"name": "Respiratory disorders"},
