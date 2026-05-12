@@ -898,7 +898,7 @@
       <div class="ner-compare">
         <div class="ner-item">
           <span class="ner-name">Baseline (biollm)</span>
-          <span class="ner-stat">CCR 35.4% · 167 spans</span>
+          <span class="ner-stat">CCR 39.0% · 184 spans</span>
           <p style="font-size:10px;color:#888;margin-top:3px;margin-bottom:0">Hallucinated spans in 92/127 segments (baseline BioMistral)</p>
         </div>
         <div class="ner-item ner-b">
@@ -924,11 +924,11 @@
           <tr>
             <th>System</th><th>BLEU</th><th>BLdoc</th><th>chrF++</th><th>COMET</th><th>HTM</th><th>HRA</th>
           </tr>
-          <tr><td>S1 NLLB</td><td>18.89</td><td>—</td><td>31.90</td><td>—</td><td>0.114</td><td>0.681</td></tr>
+          <tr><td>S1 NLLB</td><td>22.89</td><td>—</td><td>37.14</td><td>—</td><td>0.321</td><td>0.672</td></tr>
           <tr><td>S2 Mistral</td><td>16.70</td><td>—</td><td>31.83</td><td>—</td><td>0.196</td><td>0.657</td></tr>
           <tr><td>S3 GraphRAG</td><td>10.41</td><td>—</td><td>31.79</td><td>—</td><td>0.253</td><td>0.590</td></tr>
           <tr><td>S4 rerank</td><td>10.10</td><td>—</td><td>32.01</td><td>—</td><td>0.237</td><td>0.596</td></tr>
-          <tr><td>S5 NLLB+boost</td><td>17.70</td><td>—</td><td>30.88</td><td>—</td><td>0.135</td><td>0.663</td></tr>
+          <tr><td>S5 NLLB+boost</td><td>21.59</td><td>—</td><td>35.91</td><td>—</td><td>0.353</td><td>0.661</td></tr>
           <tr><td>S5 Mist+boost</td><td>10.35</td><td>—</td><td>31.74</td><td>—</td><td class="best">0.267</td><td>0.578</td></tr>
           <tr style="opacity:0.85"><td>S6 NLLB+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
           <tr style="opacity:0.85"><td>S6 Mist+gl.</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -941,7 +941,7 @@
           <tr>
             <th>System</th><th>BLEU</th><th>BLdoc</th><th>chrF++</th><th>COMET</th><th>HTM</th><th>HRA</th>
           </tr>
-          <tr><td>S1 NLLB</td><td>18.89</td><td>—</td><td>31.90</td><td>—</td><td>0.195</td><td>0.435</td></tr>
+          <tr><td>S1 NLLB</td><td>22.89</td><td>—</td><td>37.14</td><td>—</td><td>0.550</td><td>0.429</td></tr>
           <tr><td>S2 Mistral</td><td class="best">20.37</td><td>—</td><td class="best">35.85</td><td>—</td><td>0.274</td><td>0.497</td></tr>
           <tr><td>S3 GraphRAG†</td><td>17.49</td><td>—</td><td>32.01</td><td>—</td><td>0.246</td><td>0.450</td></tr>
           <tr><td>S4 rerank†</td><td>17.52</td><td>—</td><td>32.04</td><td>—</td><td>0.246</td><td>0.461</td></tr>
