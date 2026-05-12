@@ -4,69 +4,130 @@
   <a href="https://huggingface.co/docs/transformers"><img src="https://img.shields.io/badge/Transformers-Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black" alt="Hugging Face Transformers"></a>
   <a href="https://www.sbert.net/"><img src="https://img.shields.io/badge/sentence--transformers-embeddings-7C3AED?style=for-the-badge" alt="sentence-transformers"></a>
   <a href="https://neo4j.com/"><img src="https://img.shields.io/badge/Neo4j-graph-008CC1?style=for-the-badge&logo=neo4j&logoColor=white" alt="Neo4j"></a>
-</p>
-<p align="center">
-  <a href="https://docs.docker.com/compose/"><img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Compose"></a>
-  <a href="https://numpy.org/"><img src="https://img.shields.io/badge/NumPy-arrays-013243?style=for-the-badge&logo=numpy&logoColor=white" alt="NumPy"></a>
-  <a href="https://matplotlib.org/"><img src="https://img.shields.io/badge/Matplotlib-plots-11557C?style=for-the-badge&logo=matplotlib&logoColor=white" alt="Matplotlib"></a>
   <a href="https://github.com/mjpost/sacrebleu"><img src="https://img.shields.io/badge/sacreBLEU-metric-222222?style=for-the-badge" alt="sacreBLEU"></a>
   <a href="https://pytest.org/"><img src="https://img.shields.io/badge/pytest-tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="pytest"></a>
 </p>
 
 # TermPlan-MT
 
-**Terminology-aware machine translation** — French → English for SmPC Section 4.8, with MedDRA-grounded terminology across six MT systems (S1–S6).
+**Terminology-aware machine translation** — French → English for pharmaceutical adverse-event text (SmPC Section 4.8), with MedDRA-grounded terminology planning across six MT systems (S1–S6).
 
 ---
 
-## Where is what
+## Structure
 
-| Location | Purpose |
-|----------|---------|
-| [`pipeline.py`](pipeline.py) | MedDRA graph grounding, terminology planning, MedDRA flat-file I/O. |
-| [`systems.py`](systems.py) | Translation systems S1–S6, segment loading, model management. |
-| [`metrics.py`](metrics.py) | HTM, CCR, BLEU, chrF, COMET, eval helpers, figures infrastructure. |
-| [`tools/pipeline/`](tools/pipeline/) | CLI runner — [`run_pipeline.py`](tools/pipeline/run_pipeline.py). |
-| [`tools/eval/`](tools/eval/) | Scoring and plots — [`evaluate.py`](tools/eval/evaluate.py), [`plot_figures.py`](tools/eval/plot_figures.py), [`run_eval_plot_matrix.py`](tools/eval/run_eval_plot_matrix.py), [`bootstrap_bleu_delta.py`](tools/eval/bootstrap_bleu_delta.py). |
-| [`tools/data/`](tools/data/) | MedDRA extract/load scripts (`extract_meddra.py`, `build_graph.py`). |
-| [`tools/error_analysis/`](tools/error_analysis/) | Qualitative analysis scripts (outputs under [`error_analysis/`](error_analysis/)). |
-| [`data/section48/`](data/section48/) | Segment JSONLs (`segments_ner_biollm.jsonl`, `segments_ner_unsloth.jsonl`). |
-| [`results/`](results/) | Run outputs — `s*.jsonl` are gitignored; figures and CSV summaries are committed. |
-| [`docs/`](docs/) | [`RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md), [`CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md), error-review schema. |
-| [`tests/`](tests/) | [`pytest`](https://pytest.org/) unit tests. |
-| [`rerun_all.sh`](rerun_all.sh) | Full reproducibility driver (NER conditions + eval matrix). |
-| [`docker-compose.yml`](docker-compose.yml) | Neo4j for graph grounding and HTM/CCR metrics. |
+```
+pipeline.py          # MedDRA graph grounding and terminology planning
+systems.py           # Translation systems S1–S6
+metrics.py           # HTM, CCR, BLEU, chrF, COMET, evaluation helpers
 
----
+run_pipeline.py      # Run a system:   python run_pipeline.py --system s3
+evaluate.py          # Score results:  python evaluate.py --results-dir results/ner_biollm
+plot_figures.py      # Figures + scores_summary.csv for one results/ tree
+plot_cross_ner_dashboard.py  # Cross-condition comparison plots
+bootstrap_bleu_delta.py      # Paired bootstrap CIs for ΔBLEU (paper Table 5)
+run_eval_plot_matrix.py      # Batch evaluate + plot over all profiles (used by rerun_all.sh)
+rerun_all.sh         # Full reproducibility driver
 
-## Reproducing the paper results
+data/
+  section48/         # Segment JSONLs (inputs to the pipeline)
+  build_graph.py     # Load MedDRA into Neo4j
+  extract_meddra.py  # Extract MedDRA ASCII from zip
 
-| Step | What to do |
-|------|------------|
-| 1 | `cd` into the repo root. |
-| 2 | `python -m venv .venv` → `.venv/bin/pip install -r requirements.txt` |
-| 3 | `docker compose up -d` — starts Neo4j ([`docker-compose.yml`](docker-compose.yml)). |
-| 4 | Load MedDRA: obtain a licence, extract with [`tools/data/extract_meddra.py`](tools/data/extract_meddra.py), then load with `PYTHONPATH=. python tools/data/build_graph.py` (see [`data/README.md`](data/README.md)). |
-| 5 | Segment JSONLs are already in [`data/section48/`](data/section48/) — no NER re-run needed. |
-| 6 | **Run the pipeline:** `PYTHONPATH=. python tools/pipeline/run_pipeline.py --segments data/section48/segments_ner_biollm.jsonl --results-dir results/ner_biollm` |
-| 7 | **Score and plot:** `PYTHONPATH=. python tools/eval/evaluate.py --results-dir results/ner_biollm --segments data/section48/segments_ner_biollm.jsonl` then `PYTHONPATH=. python tools/eval/plot_figures.py …` |
-| 8 | **Full matrix:** `./rerun_all.sh` runs both NER conditions and all eval/plot steps. |
+results/
+  ner_biollm/        # BioMistral-7B prompted NER condition
+  ner_biollm_finetuned/  # Fine-tuned BioMistral NER condition
 
-**S1 / S2 reuse:** `REUSE_S1_S2_FROM_BIOLLM=1` (default in `rerun_all.sh`) copies `results/ner_biollm/s1.jsonl` and `s2.jsonl` into the finetuned-NER tree and only reruns S3–S6. Set to `0` for a full S1–S6 run per condition.
+tests/               # pytest unit tests
+docker-compose.yml   # Neo4j
+requirements.txt
+```
 
 ---
 
-## Read more
+## Reproducing the paper
+
+**1. Environment**
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -r requirements.txt
+docker compose up -d          # starts Neo4j
+```
+
+**2. MedDRA graph** (obtain a licence from the MSSO first)
+
+```bash
+PYTHONPATH=. python data/extract_meddra.py --meddra-dir data/meddra
+PYTHONPATH=. python data/build_graph.py
+```
+
+**3. Run the pipeline** (segment JSONLs already in `data/section48/`)
+
+```bash
+# Ad hoc — one condition:
+PYTHONPATH=. python run_pipeline.py \
+  --segments data/section48/segments_ner_biollm.jsonl \
+  --results-dir results/ner_biollm
+
+# Full matrix (both NER conditions, S1–S6, eval, figures):
+./rerun_all.sh
+```
+
+`rerun_all.sh` skips phases with env flags — see the header comments. Key flag: `REUSE_S1_S2_FROM_BIOLLM=1` (default) copies S1/S2 from `ner_biollm` into the finetuned tree and runs S3–S6 only.
+
+**4. Evaluate and plot**
+
+```bash
+PYTHONPATH=. python evaluate.py \
+  --results-dir results/ner_biollm \
+  --segments data/section48/segments_ner_biollm.jsonl
+
+PYTHONPATH=. python plot_figures.py \
+  --results-dir results/ner_biollm \
+  --segments data/section48/segments_ner_biollm.jsonl
+```
+
+**5. Bootstrap ΔBLEU** (paper Table 5)
+
+```bash
+PYTHONPATH=. python bootstrap_bleu_delta.py \
+  --baseline-dir results/ner_biollm \
+  --finetuned-dir results/ner_biollm_finetuned \
+  --segments data/section48/segments_ner_unsloth_full.jsonl \
+  --exclude-segment-ids "" \
+  --baseline-eval-file-set standard \
+  --finetuned-eval-file-set mistral_clean \
+  --out-csv results/ner_biollm_finetuned/figures/bleu_delta_bootstrap_95ci.csv
+```
+
+---
+
+## Core modules
+
+| File | Contents |
+|------|----------|
+| `pipeline.py` | `TermGraph` (Neo4j grounding), `load_or_compute_locks` (planning), MedDRA flat-file I/O. |
+| `systems.py` | S1 NLLB baseline · S2 Mistral doc-context · S3 GraphRAG · S4 rerank · S5 logit-boost · S6 glossary oracle. |
+| `metrics.py` | HTM (hierarchy-aware terminology match), CCR, BLEU, chrF, COMET, eval helpers, figures infrastructure. |
+
+---
+
+## Results directories
+
+| Directory | NER condition | Segment file |
+|-----------|--------------|-------------|
+| `results/ner_biollm/` | BioMistral-7B JSON-list prompting | `segments_ner_biollm.jsonl` |
+| `results/ner_biollm_finetuned/` | Fine-tuned BioMistral NER | `segments_ner_unsloth_full.jsonl` |
+
+`s*.jsonl` outputs are gitignored (large); figures and `scores_summary.csv` are committed. Regenerate with `rerun_all.sh`.
+
+---
+
+## Further reading
 
 | File | Topic |
-|------|--------|
-| [`tools/README.md`](tools/README.md) | CLI reference for pipeline, eval, and data tools. |
-| [`data/README.md`](data/README.md) | Data tree and MedDRA setup. |
-| [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot, discrepancy notes, paper checklist. |
-| [`docs/CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md) | Definition of each metric and how contamination is handled. |
-
----
-
-## Error analysis
-
-Scripts under [`tools/error_analysis/`](tools/error_analysis/) produce CSVs from the pipeline JSONLs. The annotation schema is in [`docs/error_analysis/schema.md`](docs/error_analysis/schema.md). Outputs are stored under [`error_analysis/`](error_analysis/).
+|------|-------|
+| [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot, paper table checklist, known discrepancies. |
+| [`docs/CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md) | Metric definitions and contamination-handling rules. |
+| [`data/README.md`](data/README.md) | Segment JSONL format and MedDRA setup. |

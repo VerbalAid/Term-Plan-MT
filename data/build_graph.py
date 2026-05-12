@@ -15,9 +15,7 @@ from dotenv import load_dotenv
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
 from pipeline import (
@@ -74,7 +72,7 @@ def extract_meddra_zips_if_configured(meddra: Path) -> None:
         if list(meddra.glob("MedDRA_*_English.zip")) or list(meddra.glob("MedDRA_*_French.zip")):
             print(
                 "MedDRA .zip files found but ASCII not extracted. "
-                "Set MEDDRA_ZIP_PASSWORD in .env, then run: python tools/data/extract_meddra.py"
+                "Set MEDDRA_ZIP_PASSWORD in .env, then run: python data/extract_meddra.py"
             )
         return
 

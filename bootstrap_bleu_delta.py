@@ -18,9 +18,7 @@ import random
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ROOT = Path(__file__).resolve().parent
 
 from metrics import corpus_bleu
 from metrics import fluency_hypothesis_text, load_results_jsonl

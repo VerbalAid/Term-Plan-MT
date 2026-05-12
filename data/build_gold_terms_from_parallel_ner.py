@@ -11,7 +11,7 @@ oracle experiments.
 
 Example::
 
-    PYTHONPATH=. python tools/data/build_gold_terms_from_parallel_ner.py \\
+    PYTHONPATH=. python data/build_gold_terms_from_parallel_ner.py \\
         --segments data/section48/segments_ner_biollm.jsonl \\
         --out data/section48/gold_glossary.json
 """
@@ -25,7 +25,7 @@ import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parent.parent
 
 
 def normalise_fr(s: str) -> str:

@@ -42,7 +42,7 @@ def normalize_fr_for_grounding(text: str) -> str:
 
 
 # ── MedDRA flat-file I/O ───────────────────────────────────────────────────
-# These helpers are used by tools/data/build_graph.py to import MedDRA into Neo4j.
+# These helpers are used by data/build_graph.py to import MedDRA into Neo4j.
 # MedDRA is not redistributed; obtain a licence from the MSSO.
 
 # ICH standard: MedDRA hierarchy level → tier abbreviation.

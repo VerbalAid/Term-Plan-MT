@@ -65,4 +65,4 @@ Decision:
 
 - **Result files**: `s6.jsonl` (NLLB + glossary PhraseLogitBoost), `s6_mistral.jsonl` (Mistral + glossary prompt + boost).
 - **`mistral_clean` set**: S6 uses the same filenames as `standard` (no MedDRA prompt contamination from graph metadata; still use sensible qualitative checks on outputs).
-- **Glossary**: build a draft with `tools/data/build_gold_terms_from_parallel_ner.py`; **hand-review** before interpreting S6 as an oracle vs S5.
+- **Glossary**: build a draft with `data/build_gold_terms_from_parallel_ner.py`; **hand-review** before interpreting S6 as an oracle vs S5.

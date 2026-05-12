@@ -15,5 +15,5 @@ This repo uses **two** main result trees that share the same structure.
 - **Figures / tables**: `results/ner_biollm_finetuned/figures/`
 
 Notes:
-- Large intermediate `*.jsonl` outputs may be gitignored; regenerate with `rerun_all.sh` and the scripts under `tools/`.
+- Large intermediate `*.jsonl` outputs may be gitignored; regenerate with `rerun_all.sh` and the root-level scripts (run_pipeline.py, evaluate.py, plot_figures.py).
 

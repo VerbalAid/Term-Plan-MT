@@ -30,9 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ROOT = Path(__file__).resolve().parent
 
 from metrics import corpus_comet_da as _try_comet
 from metrics import corpus_bleu, corpus_chrf
@@ -914,7 +912,7 @@ def main() -> None:
             graph.close()
 
     if not rows:
-        raise SystemExit("No result files found — run tools/pipeline/run_pipeline.py first.")
+        raise SystemExit("No result files found — run run_pipeline.py first.")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     base = out_dir / "comparison"

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Aggregate ``scores_summary.csv`` from several ``results/ner_*`` trees into cross-condition figures.
 
-Reads per-condition outputs produced by ``tools/eval/plot_figures.py`` (default: ``{results-dir}/figures/``).
+Reads per-condition outputs produced by ``plot_figures.py`` (default: ``{results-dir}/figures/``).
 Each CSV row is one system; ``ccr_dataset`` is identical across rows for that condition.
 
 Unless ``--no-graph`` is set, dataset CCR for the bar chart is **recomputed** from each
@@ -14,7 +14,7 @@ Neo4j run — successful recomputation overwrites that file).
 
 Example::
 
-    PYTHONPATH=. python tools/eval/plot_cross_ner_dashboard.py \\
+    PYTHONPATH=. python plot_cross_ner_dashboard.py \\
         --out-dir results/cross_ner_comparison
 
 Use ``--figures-subdir figures_vector`` after a vector-grounding rerun.
@@ -29,9 +29,7 @@ import math
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ROOT = Path(__file__).resolve().parent
 
 import matplotlib
 
@@ -87,7 +85,7 @@ CONDITION_COLORS: dict[str, str] = {
     "ner_finetuned": "#0072B2",  # blue
 }
 
-# Same mapping as ``tools/eval/run_eval_plot_matrix.py`` / ``rerun_all.sh``.
+# Same mapping as ``run_eval_plot_matrix.py`` / ``rerun_all.sh``.
 SEGMENTS_REL_FOR_CONDITION: dict[str, tuple[str, ...]] = {
     condition_name_from_results_subdir(unpack_eval_rerun_profile(p)[0]): unpack_eval_rerun_profile(p)[1]
     for p in EVAL_RERUN_PROFILES

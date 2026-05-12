@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run translation pipeline systems S1–S6. See ``tools/README.md`` for flags."""
+"""Run translation pipeline systems S1–S6. See README.md for flags."""
 
 from __future__ import annotations
 
@@ -8,9 +8,7 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+ROOT = Path(__file__).resolve().parent
 
 from systems import ensure_cuda_pip_libs_visible
 
