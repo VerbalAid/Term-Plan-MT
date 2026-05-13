@@ -86,10 +86,11 @@ ablation study on Section~4.8 of the KEYTRUDA SmPC---a 126-segment
 French--English corpus with maximum adverse-event density. Our central finding
 is that Concept Coverage Rate (CCR), the fraction of source spans grounded in
 a MedDRA ontology graph, is the binding constraint on terminology-aware MT: at
-39\% CCR graph-free baselines (S1--S2) outperform all graph-augmented systems
-on BLEU and chrF, while improving NER quality yields $\approx$7~BLEU gains for
-Mistral graph systems (S3--S5-Mistral) but not for graph-free S1 or S5-NLLB;
-S2 is condition-invariant (same inference run in both conditions); S3--S5-Mistral are not (Table~\ref{tab:delta}). We
+39\% CCR, graph-free systems (S1--S2) outperform all graph-augmented systems
+on fluency---S1 leads on BLEU, S2 on chrF and HRA---while improving NER quality
+yields $\approx$7~BLEU gains for graph-augmented Mistral systems (S3--S5-Mistral)
+but not for NLLB systems or S2, whose inference is shared across both NER
+conditions (Table~\ref{tab:delta}). We
 further show that our Hierarchy-Aware Terminology Metric (HTM) scores the
 certified human reference at about 0.15--0.18 depending on NER manifest, a
 score unchanged by full MedDRA ancestor alias expansion, confirming a
@@ -289,7 +290,7 @@ $N$ segments; drift~$=0$ is perfect consistency.
 \begin{table}[!ht]
 \centering
 \small
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
 System & BLEU & chrF\texttt{++} & COMET & HTM & HRA \\
 \midrule
@@ -314,7 +315,7 @@ COMET via wmt22-comet-da; HTM/HRA from Neo4j.
 \begin{table}[!ht]
 \centering
 \small
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
 System & BLEU & chrF\texttt{++} & COMET & HTM & HRA \\
 \midrule
@@ -377,14 +378,15 @@ that logit boosting with reference-extracted terms does not improve over
 the graph path once NER quality is matched.
 \end{finding}
 
-Graph-free systems (S1, S5-NLLB) dominate on corpus BLEU and chrF in the
-baseline NER condition (Table~\ref{tab:biollm}) because the graph influences
-fewer than 40\% of adverse-event spans while injected MedDRA strings still hurt
-fluency where the graph is active. The contrast between zero $\Delta$BLEU for S1, S2, and S5-NLLB
-versus large $\Delta$BLEU for
-S3--S5-Mistral in Table~\ref{tab:delta} isolates the bottleneck upstream of
-graph retrieval on the Mistral-augmented branch. Higher span coverage with
-cleaner NER would likely reverse the S2/S3 ranking.
+S1 leads on corpus BLEU and S2 leads on chrF and HRA in the baseline NER
+condition (Table~\ref{tab:biollm}): graph-augmented systems fall well below
+both because the graph covers fewer than 40\% of source spans while injected
+MedDRA strings hurt fluency in segments where it is active. S2's lead on HRA
+(0.743) reflects the human-like output of full-document Mistral context without
+graph interference. The contrast between zero $\Delta$BLEU for S1, S2, and
+S5-NLLB versus large $\Delta$BLEU for S3--S5-Mistral isolates the bottleneck
+upstream of graph retrieval. Higher NER coverage would likely close the S2/S3
+fluency gap.
 
 \subsection{Missing Terms, Flattening, and Consistency}
 
@@ -450,7 +452,7 @@ MedDRA labels are designed for pharmacovigilance coding, not regulatory prose.
 HTM should therefore be interpreted as a measure of MedDRA-proximity, not
 translation quality. The HRA column is the complementary measure. Notably,
 graph-augmented systems score consistently \emph{lower} on HRA than S2
-(Table~\ref{tab:biollm}: S3~=~0.601 vs.\ S2~=~0.699;
+(Table~\ref{tab:biollm}: S3~=~0.601 vs.\ S2~=~0.743;
 Table~\ref{tab:finetuned}: S3~=~0.440 vs.\ S2~=~0.476): the graph pushes
 outputs toward MedDRA labels that professional translators avoid.
 
@@ -542,10 +544,11 @@ Ollama; genuine oracle quality depends on extraction recall.
 \label{sec:conclusion}
 
 TermPlanMT demonstrates that CCR is the binding constraint on
-graph-augmented regulatory MT: at low coverage graph-free baselines (S1,
-S5-NLLB) dominate on BLEU and chrF, while improving NER quality yields
-$\approx$7-point corpus BLEU gains for Mistral graph systems with bootstrap
-intervals excluding zero. Three broader findings emerge: MedDRA nomenclature
+graph-augmented regulatory MT: at low coverage, graph-free systems (S1--S2,
+S5-NLLB) outperform all graph-augmented systems on fluency---S1 leading on
+BLEU, S2 on chrF and HRA---while improving NER quality yields $\approx$7-point
+corpus BLEU gains for Mistral graph systems with bootstrap intervals excluding
+zero. Three broader findings emerge: MedDRA nomenclature
 and professional translation practice are structurally misaligned in ways that
 alias expansion cannot fix; ambiguous grounding produces predictable term
 drift through a mechanism fully explained by the planning stage's
