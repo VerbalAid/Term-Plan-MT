@@ -201,29 +201,33 @@ def macro_bleu_doc_concat(
     return sum(scores) / len(scores) if scores else float("nan")
 
 
+_comet_model = None
+
+
+def _get_comet_model():
+    global _comet_model
+    if _comet_model is None:
+        try:
+            from comet import download_model, load_from_checkpoint
+            _comet_model = load_from_checkpoint(download_model("Unbabel/wmt22-comet-da"))
+        except Exception:
+            pass
+    return _comet_model
+
+
 def corpus_comet(srcs: list[str], hyps: list[str], refs: list[str]) -> float | None:
-    """Run COMET-DA in a subprocess to avoid Lightning/CUDA lifecycle issues."""
-    rows = [{"src": s, "mt": h, "ref": r} for s, h, r in zip(srcs, hyps, refs)]
-    fd, tmp = tempfile.mkstemp(suffix=".json")
+    """COMET-DA system score (wmt22-comet-da). Returns None if comet is not installed."""
+    if not srcs or len(srcs) != len(hyps) or len(hyps) != len(refs):
+        return None
     try:
-        import os as _os; _os.close(fd)
-        Path(tmp).write_text(json.dumps(rows), encoding="utf-8")
-        script = (
-            "import json, sys\n"
-            "from comet import download_model, load_from_checkpoint\n"
-            "rows = json.loads(open(sys.argv[1]).read())\n"
-            "model = load_from_checkpoint(download_model('Unbabel/wmt22-comet-da'))\n"
-            "result = model.predict([{'src':r['src'],'mt':r['mt'],'ref':r['ref']} for r in rows], batch_size=16)\n"
-            "print(result.system_score)\n"
-        )
-        proc = subprocess.run([sys.executable, "-c", script, tmp],
-                              capture_output=True, text=True, timeout=900)
-        out = (proc.stdout or "").strip()
-        return float(out.splitlines()[-1]) if out and proc.returncode == 0 else None
+        model = _get_comet_model()
+        if model is None:
+            return None
+        data = [{"src": s, "mt": h, "ref": r} for s, h, r in zip(srcs, hyps, refs)]
+        result = model.predict(data, batch_size=16)
+        return float(result.system_score)
     except Exception:
         return None
-    finally:
-        Path(tmp).unlink(missing_ok=True)
 
 
 def corpus_comet_da(srcs: list[str], hyps: list[str], refs: list[str]) -> float | None:
