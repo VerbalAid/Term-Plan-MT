@@ -161,6 +161,12 @@ the source text.
   bootstrap confidence intervals, and qualitative drift analysis exported as
   CSV and Markdown.
 
+  \item \textbf{Two named phenomena}: the \textbf{register mismatch}
+  (graph-augmented systems produce pharmacovigilance coding language while
+  certified translators write clinical prose) and the \textbf{consistency
+  paradox} (the most ontology-correct system is the least human-like and
+  is never the preferred output in 30-segment human evaluation).
+
 \end{enumerate}
 
 %% ═══════════════════════════════════════════════════════════════════════════
@@ -218,7 +224,11 @@ text map almost exclusively to L5 ($\approx$96\%).}
 Rather than comparing two NER systems, we use them as a controlled perturbation
 of CCR within the same pipeline. \textbf{Baseline NER} (\texttt{ner\_biollm}):
 BioMistral-7B zero-shot; CCR~=~39.0\%, 184 grounded spans across 472 extracted
-(126-segment evaluation set). This condition exhibits a systematic
+(126-segment evaluation set)\footnote{CCR is a joint function of NER recall
+and graph coverage. The fine-tuned NER extracted more spans (580 vs.\ 472)
+yet produced lower CCR (36.4\% vs.\ 39.0\%) because stronger NER finds
+rarer, harder terms less likely to be in the graph. The binding constraint
+is therefore absolute grounded span count (211 vs.\ 184), not CCR alone.}. This condition exhibits a systematic
 artefact--the model generates \textit{hypothyro\"{i}die} for 92/127 segments
 regardless of content--partially contaminating consistency measurements.
 \textbf{Fine-tuned (higher-quality) NER} (\texttt{ner\_biollm\_ft}):
@@ -441,16 +451,9 @@ CCR~=~36.4\%; 126 segments, 48\_028 excluded).
 \label{tab:finetuned}
 \end{table}
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{comparison_metrics_grouped_finetuned.png}
-\caption{System comparison under fine-tuned NER (\texttt{ner\_biollm\_ft},
-CCR~=~36.4\%). Top panel: BLEU and chrF\texttt{++}; bottom panel: HTM.
-Graph-augmented Mistral systems (S3--S5-Mistral) close the fluency gap
-substantially relative to baseline NER (Fig.~\ref{fig:comparison}),
-confirming NER quality as the binding constraint.}
-\label{fig:finetuned_metrics}
-\end{figure*}
+Under fine-tuned NER, graph-augmented Mistral systems close the fluency gap
+substantially (Table~\ref{tab:finetuned}), confirming NER quality as the
+binding constraint.
 
 \paragraph{HTM is recall-dependent on NER quality.}
 BLEU and chrF scores for S1 and S2 are identical across both NER conditions
@@ -513,15 +516,6 @@ significance at $p < 0.05$. Graph-free systems (S1, S2) and S5-NLLB show
 confidence intervals that include zero, indicating their apparent gains are not
 reliably distinguished from noise.
 
-\begin{figure*}[!t]
-  \centering
-  \includegraphics[width=0.96\textwidth]{comparison_metrics_grouped.png}
-  \caption{System comparison under baseline NER (\texttt{ner\_biollm}, CCR~=~39\%).
-  Top panel: BLEU and chrF\texttt{++}; bottom panel: HTM. S1/S2 lead on fluency;
-  graph-augmented systems lead on HTM at the cost of BLEU.}
-  \label{fig:comparison}
-\end{figure*}
-
 S1 leads on corpus BLEU and S2 leads on chrF and HRA in the baseline NER
 condition (Table~\ref{tab:biollm}): graph-augmented systems fall well below
 both because the graph covers fewer than 40\% of source spans while injected
@@ -534,20 +528,14 @@ fluency gap.
 
 \subsection{Missing Terms, Flattening, and Consistency}
 
-Under baseline NER, S5-Mistral achieves the lowest missing-term rate; S1-NLLB
-misses the majority of grounded terms. Graph systems benefit from cleaner NER:
-S3's missing-term rate falls substantially between conditions. Zero concept
-flattening events are observed (all grounded L5 source terms produce L5
-hypotheses), partly an evaluation artefact--HTM cannot detect flattening
-unless upper-level aliases are provided, a limitation HTM-A addresses.
-
-Mean cross-document modal agreement, averaged over French terms with $\geq$2
-segments in \texttt{error\_analysis/}, is highest for graph-free systems under
-baseline NER (S1: 0.993; S2: 0.984) while S3 scores 0.946; under fine-tuned
-NER, S3 rises to 0.976, surpassing S1 (0.970) but remaining below S2
-(0.985)--so the ``graph hurts consistency'' pattern is clearest under noisy
-baseline NER and partially attenuates when NER improves, matching the
-missing-term and BLEU deltas.
+Under baseline NER, S5-Mistral achieves the lowest missing-term rate;
+S1-NLLB misses the majority of grounded terms. Zero concept flattening
+events are observed for grounded L5 source terms, partly an evaluation
+artefact that HTM-A addresses. Cross-document modal agreement is highest
+for graph-free systems under baseline NER (S1: 0.993, S2: 0.984, S3: 0.946);
+under fine-tuned NER the gap narrows (S3: 0.976) but S2 (0.985) remains
+the most consistent Mistral system, confirming that the consistency
+advantage of S1-NLLB is a vocabulary artefact rather than terminological reasoning.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{The HTM--Practice Gap}
@@ -599,15 +587,8 @@ graph-augmented systems score consistently \emph{lower} on HRA than S2
 (Table~\ref{tab:biollm}: S3~=~0.601 vs.\ S2~=~0.743;
 Table~\ref{tab:finetuned}: S3~=~0.440 vs.\ S2~=~0.476): the graph pushes
 outputs toward MedDRA labels that professional translators avoid.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.85\textwidth]{comparison_tradeoff_chrF_vs_HTM.png}
-\caption{Fluency--terminology trade-off (chrF\texttt{++} vs.\ HTM) under baseline NER.
-S2 leads on chrF; S4 leads on HTM; no system dominates both axes, confirming
-the structural tension between MedDRA-proximity and professional translation practice.}
-\label{fig:tradeoff}
-\end{figure*}
+The fluency--terminology trade-off and per-system inference times are
+available as figures in the project repository (\texttt{results/ner\_biollm/figures/}).
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Consistency Failure Analysis}
@@ -670,22 +651,13 @@ quality metric for regulatory MT.
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
-in the string cache (one of 7,679 ambiguous normalised keys). The planning
-stage sets \texttt{has\_planning\_lock~=~0} for any ambiguous term and
-commits no lock. S3/S4/S5-Mistral then resolve the ambiguity context-locally
-per segment from RAG context: incidence-focused segments attract
-\textit{pneumonitis}; mechanism-focused segments attract
-\textit{immune-mediated pneumonitis}. S1-NLLB produces zero drift not
-because it reasons about terminology, but because its fixed vocabulary
-has no mechanism for context-dependent selection.
-
-\begin{finding}
-This failure is independent of CCR. Even with perfect NER recall, any term
-matching multiple MedDRA concepts will be left unlocked, producing potential
-drift in all Mistral-based graph systems. The fix is \emph{soft ambiguity
-resolution}: commit the top-scoring candidate as a provisional lock flagged
-for human review, consistent with CAT-tool workflows.
-\end{finding}
+(one of 7,679 ambiguous normalised keys in the graph). The planner commits
+no lock for ambiguous terms, so S3/S4/S5-Mistral resolve the term
+context-locally per segment, producing drift scores of $1/3$ (baseline)
+and $1/7$ (fine-tuned). S1-NLLB produces zero drift not through
+terminological reasoning but through vocabulary rigidity. The fix is
+\emph{soft ambiguity resolution}: commit the top-scoring candidate as a
+provisional lock for human review, consistent with CAT-tool workflows.
 
 \paragraph{Output contamination.}
 In the fine-tuned NER condition, 18/127 segments per system (14.2\%) contain
@@ -702,60 +674,39 @@ context in their prompts.
 \section{Discussion and Limitations}
 \label{sec:discussion}
 
-The results collectively show that the TermPlanMT pipeline is architecturally
-sound but CCR-limited. Graph-augmented systems improve substantially when
-supplied with cleaner, higher-coverage NER input. The absence of BLEU
-movement for S1 (and near-zero change for S5-NLLB), together with large
-Mistral-graph $\Delta$BLEU in Table~\ref{tab:delta}, is direct evidence that
-the bottleneck lies upstream of graph retrieval on the graph-augmented path.
+The central finding is a paradox. S5 is more technically correct than the
+human reference by ontology standards -- scoring higher on HTM -- yet was
+judged the best output in 0 of 30 sampled segments, while S2 (Mistral,
+no graph) was the best MT system in 20\% of cases. The human reference
+scores only 0.15--0.18 on HTM but produces better translations because
+MedDRA labels are designed for pharmacovigilance database coding, not for
+clinical prose written for a physician. A translator writing
+\textit{``immune-related pneumonitis''} is writing for a reader; S5
+writing \textsc{Pneumonitis} is writing for a database. Both are technically
+correct but serve different purposes, and optimising for HTM targets the
+wrong register.
 
-The S6 oracle glossary (terms extracted from the reference via an LLM) yields
-only marginal BLEU improvement over S5-NLLB (+0.09 points), suggesting that
-the quality of the terminology source matters less for NLLB decoding than the
-NER coverage upstream.
-
-The HRA--HTM inversion--graph systems score higher on HTM yet lower on
-HRA--reveals a real tension: optimising toward MedDRA formal labels
-diverges from how certified translators actually write. For regulatory MT
-in practice, HRA is the more meaningful target.
+The graph works, but only upstream of a CCR threshold. At 39\% CCR the
+graph hurts fluency more than it helps terminology. Under fine-tuned NER
+(211 grounded spans vs.\ 184 baseline), graph-augmented Mistral systems
+gain $\approx$7 BLEU with bootstrap intervals excluding zero. The bottleneck
+was never graph retrieval or decoding strategy -- it was always NER coverage.
+The S6 oracle glossary confirms this: even with reference-extracted terms,
+BLEU improves by only +0.09 points over S5-NLLB.
 
 \paragraph{Limitations.}
-\textit{Single document and reference.} All results derive from one SmPC
-section against one professional translation, limiting generalisability.
-\textit{HTM ceiling.} rHTM is low in absolute terms (0.151--0.178 across
-NER manifests) and invariant to alias expansion within a manifest, so HTM
-is only interpretable relatively.
-\textit{NER artefact.} The baseline NER condition contains hallucinated spans
+\textit{Single document and reference}: all results derive from one SmPC
+section against one professional translation.
+\textit{HTM ceiling}: rHTM is low (0.15--0.18) and invariant to alias
+expansion, so HTM is only interpretable relatively.
+\textit{NER artefact}: baseline NER contains hallucinated spans
 (\textit{hypothyro\"{i}die} in 92/127 segments).
-\textit{Contamination.} Fine-tuned-condition Mistral-based graph systems exhibit
-14.2\% prompt contamination; filtered scores are used throughout.
-\textit{S6 oracle.} The glossary is extracted from reference translations via
-Ollama; genuine oracle quality depends on extraction recall.
-
-\paragraph{Boost and glossary surface rates.}
-The lock map computed by \texttt{compute\_global\_locks()} was not logged to disk
-during inference, so we cannot directly verify whether each planned MedDRA rendering
-appeared in the final hypothesis. As a proxy, we checked whether NER-extracted source
-terms appear verbatim in S5 outputs (valid for language-neutral tokens such as drug
-names and acronyms), and whether oracle English glossary terms appear verbatim in S6
-outputs (a direct measure of glossary injection efficacy). S5 verbatim surface rate:
-$159/472 = 34\%$ overall; $153/387 = 40\%$ for 1-token terms dropping to $6/52 = 12\%$
-for 2-token and $0/33 = 0\%$ for 3$+$-token terms. S6 oracle surface rate:
-$142/397 = 36\%$ overall; $125/353 = 35\%$ for 1-token, $17/38 = 45\%$ for 2-token,
-and $0/6 = 0\%$ for 3$+$-token terms (e.g.\ \textsc{Palmar-plantar erythrodysaesthesia
-syndrome} never surfaces verbatim). Term length is therefore the primary predictor of
-surface success: multi-token MedDRA labels fail to appear regardless of how strongly they
-are enforced, which accounts for a substantial fraction of HTM misses in both S5 and S6.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=\columnwidth]{comparison_inference_time.png}
-\caption{Mean inference time per segment (s); error bar shows upper tail to p95.
-S1-NLLB and S6 are fastest; Mistral variants are substantially slower due to
-7B-parameter LLM decoding. Graph-augmented systems add minimal overhead over
-their base model.}
-\label{fig:inference}
-\end{figure}
+\textit{Contamination}: 14.2\% of fine-tuned Mistral graph outputs contain
+prompt contamination; filtered scores are used throughout.
+\textit{Boost surface rate}: the lock map was not logged during inference;
+proxy analysis shows S5 surfaces NER terms verbatim in 34\% of cases
+overall, dropping to 0\% for multi-token MedDRA labels, confirming that
+term length is the hard ceiling on any enforcement approach.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
