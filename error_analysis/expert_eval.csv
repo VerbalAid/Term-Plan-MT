@@ -1,0 +1,536 @@
+id,fr,human_ref,best_system,ranking,ner_winner,s1_verdict,s2_verdict,s3base_verdict,s3ft_verdict,s5base_verdict,s5ft_verdict,s6_verdict,key_observation,raw_response
+48_052,"Chez les patients atteints de cancer colorectal traités par pembrolizumab
+en monothérapie (n = 153), l’incidence de la colite était de 6,5 % (tous grades) avec 2,0 % de Grade 3 et
+1,3 % de Grade 4.",Colitis led to discontinuation of pembrolizumab in 48 (0.6%) patients.,S3-FT,"HUMAN,S3-ft,S5-ft,S6,S1,S2,S3-base,S5-base",finetuned,"The translation is accurate but lacks the precision of the certified human reference, particularly in the use of ""in all grades"" which is less standard.","Similar to S1, this output is accurate but uses ""of Grade"" which is slightly less precise than the human reference.","This output incorrectly translates ""colitis"" as ""gastrointestinal inflammation,"" which is not precise enough for regulatory standards.","This output accurately translates ""colitis"" and maintains the correct structure, closely aligning with the human reference.","Like S3-base, this output uses ""gastrointestinal inflammation"" instead of ""colitis,"" which is not precise enough.","This output correctly uses ""colitis"" and aligns well with the human reference, similar to S3-ft.","This output is accurate but uses ""percent"" instead of ""%"" which is less standard in EMA submissions.","The critical observation is the use of the term ""colitis"" versus ""gastrointestinal inflammation."" The fine-tuned systems (S3-ft and S5-ft) correctly use ""colitis,"" aligning with MedDRA terminology and EMA standards, whereas the baseline systems (S3-base and S5-base) use a less precise term.","BEST_SYSTEM: S3-ft
+
+RANKING: HUMAN,S3-ft,S5-ft,S6,S1,S2,S3-base,S5-base
+
+S1_VERDICT: The translation is accurate but lacks the precision of the certified human reference, particularly in the use of ""in all grades"" which is less standard.
+
+S2_VERDICT: Similar to S1, this output is accurate but uses ""of Grade"" which is slightly less precise than the human reference.
+
+S3_BASE_VERDICT: This output incorrectly translates ""colitis"" as ""gastrointestinal inflammation,"" which is not precise enough for regulatory standards.
+
+S3_FT_VERDICT: This output accurately translates ""colitis"" and maintains the correct structure, closely aligning with the human reference.
+
+S5_BASE_VERDICT: Like S3-base, this output uses ""gastrointestinal inflammation"" instead of ""colitis,"" which is not precise enough.
+
+S5_FT_VERDICT: This output correctly uses ""colitis"" and aligns well with the human reference, similar to S3-ft.
+
+S6_VERDICT: This output is accurate but uses ""percent"" instead of ""%"" which is less standard in EMA submissions.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition consistently uses the correct MedDRA term ""colitis,"" which is crucial for regulatory precision.
+
+KEY_OBSERVATION: The critical observation is the use of the term ""colitis"" versus ""gastrointestinal inflammation."" The fine-tuned systems (S3-ft and S5-ft) correctly use ""colitis,"" aligning with MedDRA terminology and EMA standards, whereas the baseline systems (S3-base and S5-base) use a less precise term."
+48_049,"Le délai d’apparition médian de la
+colite a été de 4,3 mois (de 2 jours à 24,3 mois) et la durée médiane a été de 1,1 mois (de 1 jour à 45,2 mois).","Immune-mediated colitis
+Colitis occurred in 158 (2.1%) patients, including Grade 2, 3 or 4 cases in 49 (0.6%), 82 (1.1%) and
+6 (0.1%) patients, respectively, receiving pembrolizumab.",S3-FT,"HUMAN,S3-ft,S5-ft,S3-base,S5-base,S2,S1,S6",finetuned,"The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a critical error in medical context.","This output uses ""duration of Colitis onset,"" which is incorrect; it should be ""time to onset of colitis.""","The translation accurately captures ""time to onset of colitis,"" aligning well with the source text.","This translation is precise and uses the correct terminology, closely matching the certified human reference.",The translation is accurate but slightly less polished than the fine-tuned version.,"This output is precise and uses correct terminology, similar to S3-ft, but lacks slight nuances.","The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a significant error.","The critical distinction between ""time to onset"" and ""incidence"" is crucial; several systems incorrectly used ""incidence,"" which changes the clinical meaning significantly.","BEST_SYSTEM: S3-ft
+RANKING: HUMAN,S3-ft,S5-ft,S3-base,S5-base,S2,S1,S6
+S1_VERDICT: The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a critical error in medical context.
+S2_VERDICT: This output uses ""duration of Colitis onset,"" which is incorrect; it should be ""time to onset of colitis.""
+S3_BASE_VERDICT: The translation accurately captures ""time to onset of colitis,"" aligning well with the source text.
+S3_FT_VERDICT: This translation is precise and uses the correct terminology, closely matching the certified human reference.
+S5_BASE_VERDICT: The translation is accurate but slightly less polished than the fine-tuned version.
+S5_FT_VERDICT: This output is precise and uses correct terminology, similar to S3-ft, but lacks slight nuances.
+S6_VERDICT: The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a significant error.
+NER_WINNER: finetuned
+NER_REASON: The fine-tuned NER condition provides more accurate and contextually appropriate translations.
+KEY_OBSERVATION: The critical distinction between ""time to onset"" and ""incidence"" is crucial; several systems incorrectly used ""incidence,"" which changes the clinical meaning significantly."
+48_026,"Les effets indésirables connus pour survenir avec pembrolizumab ou les médicaments du traitement
+en association administrés seuls peuvent apparaître pendant le traitement avec ces médicaments en
+assoc","Adverse reactions known to occur with
+pembrolizumab or combination therapy components given alone may occur during treatment with
+these medicinal products in combination, even if these reactions were ",HUMAN,"HUMAN,S2,S6,S1,S3-ft,S3-base,S5-ft,S5-base",tied,"The translation is generally accurate but uses ""therapeutic association"" which is less precise than ""combination therapy"" in the context of EMA submissions.","This output closely mirrors the human reference, using appropriate terminology like ""adverse effects"" and ""therapeutic combination,"" making it the best machine translation.","The translation is clear but uses ""therapeutic association studies,"" which is less precise than ""clinical studies with combination therapy.""","Similar to S3-base, it lacks precision in the phrase ""therapeutic association studies"" compared to the human reference.",This output is identical to S3-base and shares the same issues with less precise terminology.,This output is identical to S3-ft and shares the same issues with less precise terminology.,"The translation is accurate but uses ""therapeutic association,"" which is less precise than ""combination therapy"" in the context of EMA submissions.","The most critical aspect of terminology quality in this segment is the use of ""combination therapy"" versus ""therapeutic association."" The human reference and S2 correctly use ""combination therapy,"" which aligns with EMA's preferred terminology, while other systems use less precise alternatives.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S2,S6,S1,S3-ft,S3-base,S5-ft,S5-base
+
+S1_VERDICT: The translation is generally accurate but uses ""therapeutic association"" which is less precise than ""combination therapy"" in the context of EMA submissions.
+
+S2_VERDICT: This output closely mirrors the human reference, using appropriate terminology like ""adverse effects"" and ""therapeutic combination,"" making it the best machine translation.
+
+S3_BASE_VERDICT: The translation is clear but uses ""therapeutic association studies,"" which is less precise than ""clinical studies with combination therapy.""
+
+S3_FT_VERDICT: Similar to S3-base, it lacks precision in the phrase ""therapeutic association studies"" compared to the human reference.
+
+S5_BASE_VERDICT: This output is identical to S3-base and shares the same issues with less precise terminology.
+
+S5_FT_VERDICT: This output is identical to S3-ft and shares the same issues with less precise terminology.
+
+S6_VERDICT: The translation is accurate but uses ""therapeutic association,"" which is less precise than ""combination therapy"" in the context of EMA submissions.
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs, indicating no difference in translation quality.
+
+KEY_OBSERVATION: The most critical aspect of terminology quality in this segment is the use of ""combination therapy"" versus ""therapeutic association."" The human reference and S2 correctly use ""combination therapy,"" which aligns with EMA's preferred terminology, while other systems use less precise alternatives."
+48_077,"L’hypothyroïdie a conduit à un arrêt de pembrolizumab chez 6 (0,1 %) patients.","The median time to onset of
+hyperthyroidism was 1.4 months (range: 1 day to 23.2 months).",S3-FT,"S3-ft,S5-ft,S2,S1,S6,S3-base,S5-base,HUMAN",finetuned,"The translation is accurate and clear, but lacks the slight nuance of professional prose expected in certified translations.","This output is similar to S1 but omits the article ""a,"" which slightly affects the fluency of the sentence.","This translation incorrectly uses ""Hypercarotenaemia"" instead of ""Hypothyroidism,"" which is a significant error.","This output accurately translates the source text and uses appropriate clinical language, closely matching the certified human reference.","Similar to S3-base, this translation incorrectly uses ""Hypercarotinaemia,"" which is a critical error.","This translation is accurate and uses appropriate clinical language, closely matching the certified human reference.","The use of ""cessation"" instead of ""discontinuation"" is less precise in the context of pharmacovigilance terminology.","The critical observation is the accurate use of ""Hypothyroidism"" in S3-ft and S5-ft, which aligns with the MedDRA PT and is crucial for maintaining the integrity of adverse event reporting.","BEST_SYSTEM: S3-ft
+
+RANKING: S3-ft,S5-ft,S2,S1,S6,S3-base,S5-base,HUMAN
+
+S1_VERDICT: The translation is accurate and clear, but lacks the slight nuance of professional prose expected in certified translations.
+
+S2_VERDICT: This output is similar to S1 but omits the article ""a,"" which slightly affects the fluency of the sentence.
+
+S3_BASE_VERDICT: This translation incorrectly uses ""Hypercarotenaemia"" instead of ""Hypothyroidism,"" which is a significant error.
+
+S3_FT_VERDICT: This output accurately translates the source text and uses appropriate clinical language, closely matching the certified human reference.
+
+S5_BASE_VERDICT: Similar to S3-base, this translation incorrectly uses ""Hypercarotinaemia,"" which is a critical error.
+
+S5_FT_VERDICT: This translation is accurate and uses appropriate clinical language, closely matching the certified human reference.
+
+S6_VERDICT: The use of ""cessation"" instead of ""discontinuation"" is less precise in the context of pharmacovigilance terminology.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition consistently produces translations with correct medical terminology.
+
+KEY_OBSERVATION: The critical observation is the accurate use of ""Hypothyroidism"" in S3-ft and S5-ft, which aligns with the MedDRA PT and is crucial for maintaining the integrity of adverse event reporting."
+48_023,"Ces effets sont
+présentés par classes de systèmes d’organes et par fréquence.","These reactions are presented by system
+organ class and by frequency.",HUMAN,"HUMAN,S6,S1,S2,S3-base,S5-base,S3-ft,S5-ft",baseline,"This translation is close to the reference but uses ""organ system classes"" instead of ""system organ class,"" which is less precise.","This output is similar to S1 but omits the article ""by"" before ""frequency,"" making it slightly less fluent.","The translation incorrectly uses ""systems organ classes,"" which is not standard terminology, and includes an unnecessary comment.","This version incorrectly translates the phrase as ""systems organs and by frequency classes,"" which is not accurate.","Similar to S3-base, this translation uses ""systems organ classes"" and includes an unnecessary comment, deviating from standard terminology.","This output repeats the error of ""systems organs and by frequency classes,"" which is not correct.","This translation is very close to the reference, using ""classes of organ systems,"" which is acceptable but slightly less standard than ""system organ class.""","The critical issue in these translations is the handling of ""system organ class,"" a standard term in EMA documentation. Most systems deviate from this precise terminology, with variations like ""organ system classes"" or ""systems organ classes,"" which are less accurate. The human reference maintains the precise and standardized language required for regulatory submissions.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S6,S1,S2,S3-base,S5-base,S3-ft,S5-ft
+
+S1_VERDICT: This translation is close to the reference but uses ""organ system classes"" instead of ""system organ class,"" which is less precise.
+
+S2_VERDICT: This output is similar to S1 but omits the article ""by"" before ""frequency,"" making it slightly less fluent.
+
+S3_BASE_VERDICT: The translation incorrectly uses ""systems organ classes,"" which is not standard terminology, and includes an unnecessary comment.
+
+S3_FT_VERDICT: This version incorrectly translates the phrase as ""systems organs and by frequency classes,"" which is not accurate.
+
+S5_BASE_VERDICT: Similar to S3-base, this translation uses ""systems organ classes"" and includes an unnecessary comment, deviating from standard terminology.
+
+S5_FT_VERDICT: This output repeats the error of ""systems organs and by frequency classes,"" which is not correct.
+
+S6_VERDICT: This translation is very close to the reference, using ""classes of organ systems,"" which is acceptable but slightly less standard than ""system organ class.""
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produces translations that are closer to the standard terminology without unnecessary comments.
+
+KEY_OBSERVATION: The critical issue in these translations is the handling of ""system organ class,"" a standard term in EMA documentation. Most systems deviate from this precise terminology, with variations like ""organ system classes"" or ""systems organ classes,"" which are less accurate. The human reference maintains the precise and standardized language required for regulatory submissions."
+48_030,§Rapportée dans une étude en dehors des données poolées (liée à une injection sous-cutanée).,§Reported in a study outside of the pooled dataset (subcutaneous injection related).,HUMAN,"HUMAN,S6,S1,S3-ft,S5-ft,S2,S3-base,S5-base",finetuned,"The translation is close to the human reference but uses ""pooled data"" instead of ""pooled dataset,"" which is a minor deviation from the preferred terminology.","This output uses ""relating to"" instead of ""related to,"" which is less precise and slightly alters the intended meaning.","The phrase ""out-of-pool study"" is less standard and deviates from the expected terminology, impacting clarity.","This translation is similar to S2, using ""relating to,"" which is less precise than ""related to.""","Similar to S3-base, ""out-of-pool study"" is non-standard and affects the clarity of the translation.","This output is similar to S2 and S3-ft, using ""relating to,"" which is less precise than ""related to.""","This translation closely matches the human reference, maintaining the correct terminology and structure.","The use of ""related to"" versus ""relating to"" is a critical distinction in maintaining the precision required in EMA submissions, with ""related to"" being the preferred choice for clarity and adherence to standard terminology.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S6,S1,S3-ft,S5-ft,S2,S3-base,S5-base
+
+S1_VERDICT: The translation is close to the human reference but uses ""pooled data"" instead of ""pooled dataset,"" which is a minor deviation from the preferred terminology.
+
+S2_VERDICT: This output uses ""relating to"" instead of ""related to,"" which is less precise and slightly alters the intended meaning.
+
+S3_BASE_VERDICT: The phrase ""out-of-pool study"" is less standard and deviates from the expected terminology, impacting clarity.
+
+S3_FT_VERDICT: This translation is similar to S2, using ""relating to,"" which is less precise than ""related to.""
+
+S5_BASE_VERDICT: Similar to S3-base, ""out-of-pool study"" is non-standard and affects the clarity of the translation.
+
+S5_FT_VERDICT: This output is similar to S2 and S3-ft, using ""relating to,"" which is less precise than ""related to.""
+
+S6_VERDICT: This translation closely matches the human reference, maintaining the correct terminology and structure.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER systems produce translations that are more consistent with the human reference in terms of terminology.
+
+KEY_OBSERVATION: The use of ""related to"" versus ""relating to"" is a critical distinction in maintaining the precision required in EMA submissions, with ""related to"" being the preferred choice for clarity and adherence to standard terminology."
+48_032,"⁎ Les termes suivants représentent un groupe d’évènements liés qui décrivent un état pathologique plutôt qu’un évènement isolé :
+• anémie hémolytique (anémie hémolytique auto-immune et anémie hémolyti","⁎ The following terms represent a group of related events that describe a medical condition rather than a single event:
+•
+haemolytic anaemia (autoimmune haemolytic anaemia and Coombs negative haemolyt",HUMAN,"HUMAN,S2,S3-ft,S5-ft,S3-base,S5-base,S6,S1",finetuned,"The translation is incomplete and contains repetition errors, particularly in the list of hypersensitivity reactions, which compromises clarity and accuracy.","This output is relatively accurate but lacks some specificity in terminology and omits certain terms, such as ""drug hypersensitivity.""","The translation is mostly accurate but contains an error in the term ""hemolytic anemia auto-immune,"" which should be ""autoimmune hemolytic anemia.""","This version improves on the baseline by correcting some terminology errors, but it still lacks the precision of the human reference.","Similar to S3-base, this output has issues with terminology order and lacks the specificity of the human reference.","This output is slightly better than the baseline, but it still does not fully match the human reference in terms of terminology precision.","The translation is incomplete and contains multiple repetition errors, particularly in the list of hypersensitivity reactions, which affects its accuracy.","The most critical observation is the consistent misuse or omission of specific MedDRA terms, such as ""drug hypersensitivity,"" which is crucial for maintaining the precision required in regulatory documents.","BEST_SYSTEM: HUMAN
+RANKING: HUMAN,S2,S3-ft,S5-ft,S3-base,S5-base,S6,S1
+S1_VERDICT: The translation is incomplete and contains repetition errors, particularly in the list of hypersensitivity reactions, which compromises clarity and accuracy.
+S2_VERDICT: This output is relatively accurate but lacks some specificity in terminology and omits certain terms, such as ""drug hypersensitivity.""
+S3_BASE_VERDICT: The translation is mostly accurate but contains an error in the term ""hemolytic anemia auto-immune,"" which should be ""autoimmune hemolytic anemia.""
+S3_FT_VERDICT: This version improves on the baseline by correcting some terminology errors, but it still lacks the precision of the human reference.
+S5_BASE_VERDICT: Similar to S3-base, this output has issues with terminology order and lacks the specificity of the human reference.
+S5_FT_VERDICT: This output is slightly better than the baseline, but it still does not fully match the human reference in terms of terminology precision.
+S6_VERDICT: The translation is incomplete and contains multiple repetition errors, particularly in the list of hypersensitivity reactions, which affects its accuracy.
+NER_WINNER: finetuned
+NER_REASON: The fine-tuned NER condition provides more accurate and contextually appropriate translations.
+KEY_OBSERVATION: The most critical observation is the consistent misuse or omission of specific MedDRA terms, such as ""drug hypersensitivity,"" which is crucial for maintaining the precision required in regulatory documents."
+48_018,"La sécurité de pembrolizumab intraveineux en association à l'axitinib ou au lenvatinib dans le CCR avancé,
+et en association au lenvatinib dans le CE avancé, a été évaluée chez un total de 1 456 patie","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced RCC,
+and in combination with lenvatinib in advanced EC has been evaluated in a total of 1 456 patients wi",HUMAN,"HUMAN,S2,S6,S1,S3-ft,S3-base,S5-ft,S5-base",tied,"This translation incorrectly uses ""daxitinib"" instead of ""axitinib"" and lacks the precision of the certified human reference.","This translation is close to the human reference but lacks the precision in the phrase ""depending on the case"" and omits ""advanced"" before ""CE.""","This translation omits the distinction between RCC and EC and lacks the phrase ""as appropriate,"" which is crucial for regulatory clarity.","Similar to S3-base, this translation lacks the necessary distinction and precision required for regulatory submissions.",This translation is identical to S3-base and shares the same issues with lack of specificity and regulatory precision.,This translation is identical to S3-ft and shares the same issues with lack of specificity and regulatory precision.,"This translation contains the same error as S1 with ""daxitinib"" and lacks the nuanced phrasing of the human reference.","The most critical issue in these translations is the incorrect use of ""daxitinib"" instead of ""axitinib"" in S1 and S6, which is a significant error in pharmacovigilance terminology. Additionally, the omission of ""advanced"" before ""CE"" in some translations reduces clinical specificity.","BEST_SYSTEM: HUMAN
+RANKING: HUMAN,S2,S6,S1,S3-ft,S3-base,S5-ft,S5-base
+S1_VERDICT: This translation incorrectly uses ""daxitinib"" instead of ""axitinib"" and lacks the precision of the certified human reference.
+S2_VERDICT: This translation is close to the human reference but lacks the precision in the phrase ""depending on the case"" and omits ""advanced"" before ""CE.""
+S3_BASE_VERDICT: This translation omits the distinction between RCC and EC and lacks the phrase ""as appropriate,"" which is crucial for regulatory clarity.
+S3_FT_VERDICT: Similar to S3-base, this translation lacks the necessary distinction and precision required for regulatory submissions.
+S5_BASE_VERDICT: This translation is identical to S3-base and shares the same issues with lack of specificity and regulatory precision.
+S5_FT_VERDICT: This translation is identical to S3-ft and shares the same issues with lack of specificity and regulatory precision.
+S6_VERDICT: This translation contains the same error as S1 with ""daxitinib"" and lacks the nuanced phrasing of the human reference.
+NER_WINNER: tied
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs.
+KEY_OBSERVATION: The most critical issue in these translations is the incorrect use of ""daxitinib"" instead of ""axitinib"" in S1 and S6, which is a significant error in pharmacovigilance terminology. Additionally, the omission of ""advanced"" before ""CE"" in some translations reduces clinical specificity."
+48_098,Aucun patient n’a présenté de MVO hépatique.,"Rare cases of SJS and TEN, some of them with fatal outcome, have been observed (see sections 4.2
+and 4.4).",S2,"HUMAN,S2,S3-ft,S5-ft,S1,S6,S3-base,S5-base",finetuned,"The translation is accurate but lacks the specificity of the full term ""veno-occlusive disease,"" which is crucial for clarity in medical contexts.","This output accurately translates the term ""MVO hépatique"" to ""hepatic veno-occlusive disease,"" aligning well with clinical language standards.","The translation incorrectly interprets ""MVO hépatique"" as ""hepatic morphological abnormalities,"" which is a significant deviation from the intended meaning.","The translation is accurate and includes the abbreviation explanation, but ""Microvascular Obstruction"" is not the standard term for ""veno-occlusive disease.""","Similar to S3-base, this translation incorrectly interprets ""MVO hépatique"" as ""hepatic morphological abnormalities,"" which is incorrect.","The translation is accurate and includes the abbreviation explanation, but ""Microvascular Obstruction"" is not the standard term for ""veno-occlusive disease.""","The translation is close but uses ""were presented with,"" which is less standard than ""presented with"" in medical documentation.","The term ""MVO hépatique"" should be translated as ""hepatic veno-occlusive disease"" to maintain consistency with MedDRA terminology and ensure clarity in medical communication. The use of ""Microvascular Obstruction"" is less standard and could lead to confusion.","BEST_SYSTEM: S2
+RANKING: HUMAN,S2,S3-ft,S5-ft,S1,S6,S3-base,S5-base
+S1_VERDICT: The translation is accurate but lacks the specificity of the full term ""veno-occlusive disease,"" which is crucial for clarity in medical contexts.
+S2_VERDICT: This output accurately translates the term ""MVO hépatique"" to ""hepatic veno-occlusive disease,"" aligning well with clinical language standards.
+S3_BASE_VERDICT: The translation incorrectly interprets ""MVO hépatique"" as ""hepatic morphological abnormalities,"" which is a significant deviation from the intended meaning.
+S3_FT_VERDICT: The translation is accurate and includes the abbreviation explanation, but ""Microvascular Obstruction"" is not the standard term for ""veno-occlusive disease.""
+S5_BASE_VERDICT: Similar to S3-base, this translation incorrectly interprets ""MVO hépatique"" as ""hepatic morphological abnormalities,"" which is incorrect.
+S5_FT_VERDICT: The translation is accurate and includes the abbreviation explanation, but ""Microvascular Obstruction"" is not the standard term for ""veno-occlusive disease.""
+S6_VERDICT: The translation is close but uses ""were presented with,"" which is less standard than ""presented with"" in medical documentation.
+NER_WINNER: finetuned
+NER_REASON: Fine-tuned NER systems provide more accurate and contextually appropriate translations.
+KEY_OBSERVATION: The term ""MVO hépatique"" should be translated as ""hepatic veno-occlusive disease"" to maintain consistency with MedDRA terminology and ensure clarity in medical communication. The use of ""Microvascular Obstruction"" is less standard and could lead to confusion."
+48_012,"La sécurité de pembrolizumab intraveineux en association à une chimiothérapie, une RT ou une RCT a été
+évaluée dans des études cliniques chez 7 015 patients dans différents types de tumeurs recevant 2","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CRT has been
+evaluated in 6 695 patients across tumour types receiving 200 mg, 2 mg/kg bw or 10 mg/kg bw
+pembrolizumab e",HUMAN,"HUMAN,S6,S1,S5-base,S3-base,S2,S3-ft,S5-ft",baseline,"S1 accurately translates the source text but uses ""CT"" instead of ""RCT,"" which is less precise in the context of radiochemotherapy.","S2 provides a clear translation but uses ""pembrolizumab intravenous"" instead of ""intravenous pembrolizumab,"" which is less natural in English.","S3-base correctly translates the source text but lacks the use of parentheses for abbreviations, which is standard in EMA style.","S3-ft uses ""Neoplasm types"" instead of ""tumour types,"" which is less consistent with the certified human reference and standard EMA terminology.","S5-base accurately translates the source text but, like S3-base, does not use parentheses for abbreviations, which is a minor deviation from EMA style.","S5-ft repeats the same issue as S3-ft with ""Neoplasm types"" and uses ""pembrolizumab intravenous use,"" which is less natural.","S6 closely matches the certified human reference, maintaining correct terminology and style, but slightly deviates in the order of ""2 mg/kg of pembrolizumab.""","The most critical observation is the consistent use of ""tumour types"" in the human reference, which aligns with standard EMA terminology, whereas some systems incorrectly use ""Neoplasm types,"" demonstrating a lack of adherence to preferred clinical language.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S6,S1,S5-base,S3-base,S2,S3-ft,S5-ft
+
+S1_VERDICT: S1 accurately translates the source text but uses ""CT"" instead of ""RCT,"" which is less precise in the context of radiochemotherapy.
+
+S2_VERDICT: S2 provides a clear translation but uses ""pembrolizumab intravenous"" instead of ""intravenous pembrolizumab,"" which is less natural in English.
+
+S3_BASE_VERDICT: S3-base correctly translates the source text but lacks the use of parentheses for abbreviations, which is standard in EMA style.
+
+S3_FT_VERDICT: S3-ft uses ""Neoplasm types"" instead of ""tumour types,"" which is less consistent with the certified human reference and standard EMA terminology.
+
+S5_BASE_VERDICT: S5-base accurately translates the source text but, like S3-base, does not use parentheses for abbreviations, which is a minor deviation from EMA style.
+
+S5_FT_VERDICT: S5-ft repeats the same issue as S3-ft with ""Neoplasm types"" and uses ""pembrolizumab intravenous use,"" which is less natural.
+
+S6_VERDICT: S6 closely matches the certified human reference, maintaining correct terminology and style, but slightly deviates in the order of ""2 mg/kg of pembrolizumab.""
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition maintains more consistent terminology with the human reference, avoiding unnecessary deviations like ""Neoplasm types.""
+
+KEY_OBSERVATION: The most critical observation is the consistent use of ""tumour types"" in the human reference, which aligns with standard EMA terminology, whereas some systems incorrectly use ""Neoplasm types,"" demonstrating a lack of adherence to preferred clinical language."
+48_033,"La sécurité de pembrolizumab intraveineux en association à l'enfortumab vedotin a été évaluée chez
+564 patients atteints d'un carcinome urothélial non résécable ou métastatique recevant 200 mg de
+pemb","The safety of intravenous pembrolizumab in combination with enfortumab vedotin has been evaluated
+among 564 patients with unresectable or metastatic urothelial carcinoma receiving 200 mg
+pembrolizumab",HUMAN,"HUMAN,S5-ft,S2,S3-ft,S5-base,S3-base,S6,S1",finetuned,"Incorrectly translates ""urothelial carcinoma"" as ""urethral carcinoma,"" which is a significant clinical error.","Correctly translates ""urothelial carcinoma"" and maintains the structure of the original sentence well.","Uses ""inoperable"" instead of ""non-resectable,"" which is less precise in the context of EMA submissions.","Correctly uses ""non-resectable"" and maintains accurate terminology throughout.","Uses ""inoperable"" instead of ""non-resectable,"" which is less precise, but otherwise maintains good terminology.","Correctly uses ""non-resectable"" and maintains accurate terminology throughout, closely matching the human reference.","Incorrectly translates ""urothelial carcinoma"" as ""urethral carcinoma,"" which is a significant clinical error.","The distinction between ""urothelial"" and ""urethral"" carcinoma is critical, as they refer to different anatomical sites and clinical conditions; systems that maintain ""urothelial carcinoma"" demonstrate a better understanding of medical terminology.","BEST_SYSTEM: HUMAN  
+RANKING: HUMAN,S5-ft,S2,S3-ft,S5-base,S3-base,S6,S1  
+S1_VERDICT: Incorrectly translates ""urothelial carcinoma"" as ""urethral carcinoma,"" which is a significant clinical error.  
+S2_VERDICT: Correctly translates ""urothelial carcinoma"" and maintains the structure of the original sentence well.  
+S3_BASE_VERDICT: Uses ""inoperable"" instead of ""non-resectable,"" which is less precise in the context of EMA submissions.  
+S3_FT_VERDICT: Correctly uses ""non-resectable"" and maintains accurate terminology throughout.  
+S5_BASE_VERDICT: Uses ""inoperable"" instead of ""non-resectable,"" which is less precise, but otherwise maintains good terminology.  
+S5_FT_VERDICT: Correctly uses ""non-resectable"" and maintains accurate terminology throughout, closely matching the human reference.  
+S6_VERDICT: Incorrectly translates ""urothelial carcinoma"" as ""urethral carcinoma,"" which is a significant clinical error.  
+NER_WINNER: finetuned  
+NER_REASON: Fine-tuned NER systems consistently use more precise and contextually appropriate terminology.  
+KEY_OBSERVATION: The distinction between ""urothelial"" and ""urethral"" carcinoma is critical, as they refer to different anatomical sites and clinical conditions; systems that maintain ""urothelial carcinoma"" demonstrate a better understanding of medical terminology."
+48_094,"Parmi les 32 patients de KEYNOTE-087 ayant reçu une GCSH allogénique après un traitement par
+pembrolizumab, 16 patients ont développé une GVH aiguë et 7 patients ont développé une GVH chronique,
+dont ","The median time to onset of severe skin reactions was 2.8 months (range: 2 days to
+25.5 months).",S5-FT,"S5-ft,HUMAN,S3-ft,S2,S1,S6,S3-base,S5-base",finetuned,"S1 provides a generally accurate translation but uses the abbreviation ""GVH"" without expanding it, which may not meet EMA standards for clarity.","S2 incorrectly refers to ""allogeneic GVHD"" instead of ""allogeneic GCSH,"" and while it expands GVHD, it introduces an error in the treatment description.","S3-base correctly translates the treatment as ""allogeneic GCSH,"" but the sentence is incomplete, which affects the overall quality.","S3-ft correctly translates the treatment and expands GVHD, but it incorrectly refers to ""chimeric antigen receptor T-cell therapy,"" which is not in the source text.","S5-base correctly translates the treatment but suffers from an incomplete sentence, similar to S3-base.","S5-ft provides a precise translation with correct terminology and expands GVHD, aligning closely with EMA standards.","S6 uses ""fatal outbreaks,"" which is not appropriate for describing patient outcomes and lacks the expansion of GVH.","The translations vary in their handling of ""GCSH"" and ""GVH""; the best systems correctly expand ""GVH"" to ""graft-versus-host disease"" and maintain the correct treatment terminology, which is crucial for regulatory clarity and compliance.","BEST_SYSTEM: S5-ft
+
+RANKING: S5-ft,HUMAN,S3-ft,S2,S1,S6,S3-base,S5-base
+
+S1_VERDICT: S1 provides a generally accurate translation but uses the abbreviation ""GVH"" without expanding it, which may not meet EMA standards for clarity.
+
+S2_VERDICT: S2 incorrectly refers to ""allogeneic GVHD"" instead of ""allogeneic GCSH,"" and while it expands GVHD, it introduces an error in the treatment description.
+
+S3_BASE_VERDICT: S3-base correctly translates the treatment as ""allogeneic GCSH,"" but the sentence is incomplete, which affects the overall quality.
+
+S3_FT_VERDICT: S3-ft correctly translates the treatment and expands GVHD, but it incorrectly refers to ""chimeric antigen receptor T-cell therapy,"" which is not in the source text.
+
+S5_BASE_VERDICT: S5-base correctly translates the treatment but suffers from an incomplete sentence, similar to S3-base.
+
+S5_FT_VERDICT: S5-ft provides a precise translation with correct terminology and expands GVHD, aligning closely with EMA standards.
+
+S6_VERDICT: S6 uses ""fatal outbreaks,"" which is not appropriate for describing patient outcomes and lacks the expansion of GVH.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition produces more accurate expansions and terminology alignment with the source text.
+
+KEY_OBSERVATION: The translations vary in their handling of ""GCSH"" and ""GVH""; the best systems correctly expand ""GVH"" to ""graft-versus-host disease"" and maintain the correct treatment terminology, which is crucial for regulatory clarity and compliance."
+48_050,"Une colite a conduit à un arrêt de pembrolizumab chez 48 (0,6 %) patients.","The median time to onset of colitis was
+4.3 months (range: 2 days to 24.3 months).",S3-FT,"S3-ft,S5-ft,S1,S3-base,S5-base,S2,S6,HUMAN",finetuned,"The translation is accurate and maintains the original meaning, but lacks the slight clinical nuance often found in professional SmPC prose.","The use of ""A case of colitis"" is less precise and could imply a singular event rather than multiple instances, which is not ideal for regulatory clarity.","The translation is accurate but uses ""A colitis,"" which is less common in professional medical writing; ""colitis"" without an article is preferred.","This output is precise and aligns well with professional SmPC prose, using ""Colitis"" without an article, which is more appropriate.","Similar to S3-base, it uses ""A colitis,"" which is less standard in medical writing, though the rest of the translation is accurate.","This output is precise and aligns well with professional SmPC prose, using ""Colitis"" without an article, which is more appropriate.","The use of ""a cessation"" instead of ""discontinuation"" is less standard in SmPCs, making this translation less suitable for regulatory purposes.","The translations that omit the article before ""colitis"" (S3-ft and S5-ft) are more aligned with the professional register expected in SmPCs, where precision and adherence to standard medical terminology are crucial. The use of ""discontinuation"" over ""cessation"" is also a key factor in maintaining the appropriate regulatory language.","BEST_SYSTEM: S3-ft
+
+RANKING: S3-ft,S5-ft,S1,S3-base,S5-base,S2,S6,HUMAN
+
+S1_VERDICT: The translation is accurate and maintains the original meaning, but lacks the slight clinical nuance often found in professional SmPC prose.
+
+S2_VERDICT: The use of ""A case of colitis"" is less precise and could imply a singular event rather than multiple instances, which is not ideal for regulatory clarity.
+
+S3_BASE_VERDICT: The translation is accurate but uses ""A colitis,"" which is less common in professional medical writing; ""colitis"" without an article is preferred.
+
+S3_FT_VERDICT: This output is precise and aligns well with professional SmPC prose, using ""Colitis"" without an article, which is more appropriate.
+
+S5_BASE_VERDICT: Similar to S3-base, it uses ""A colitis,"" which is less standard in medical writing, though the rest of the translation is accurate.
+
+S5_FT_VERDICT: This output is precise and aligns well with professional SmPC prose, using ""Colitis"" without an article, which is more appropriate.
+
+S6_VERDICT: The use of ""a cessation"" instead of ""discontinuation"" is less standard in SmPCs, making this translation less suitable for regulatory purposes.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition produces translations that better align with professional medical writing standards, avoiding unnecessary articles.
+
+KEY_OBSERVATION: The translations that omit the article before ""colitis"" (S3-ft and S5-ft) are more aligned with the professional register expected in SmPCs, where precision and adherence to standard medical terminology are crucial. The use of ""discontinuation"" over ""cessation"" is also a key factor in maintaining the appropriate regulatory language."
+48_068,"Une hypophysite a conduit à un arrêt de pembrolizumab chez 14 (0,2 %) patients.","The median duration was not
+reached (range: 3 days to 40.1+ months).",S2,"S2,HUMAN,S1,S3-base,S3-ft,S5-base,S5-ft,S6",tied,"The translation is accurate and uses appropriate terminology, but lacks the slight clinical nuance that might be expected in professional prose.","This output is precise and uses slightly more descriptive language, aligning well with professional SmPC prose standards.","The addition of ""A case of"" is unnecessary and deviates from the concise style typical in SmPCs.","Similar to S3-base, the phrase ""A case of"" is superfluous and not typical of SmPC language.","The output mirrors S3-base, with the same issue of unnecessary phrasing that detracts from the precision expected in regulatory documents.","This output is identical to S5-base, with the same issue of superfluous language.","The use of ""hypophysite"" is incorrect, as it does not match the MedDRA PT ""hypophysitis,"" and ""cessation"" is less precise than ""discontinuation.""","The most critical observation is the use of the term ""hypophysitis,"" which is the correct MedDRA PT and aligns with professional SmPC prose, whereas ""hypophysite"" in S6 is incorrect and not standard terminology.","BEST_SYSTEM: S2
+
+RANKING: S2,HUMAN,S1,S3-base,S3-ft,S5-base,S5-ft,S6
+
+S1_VERDICT: The translation is accurate and uses appropriate terminology, but lacks the slight clinical nuance that might be expected in professional prose.
+
+S2_VERDICT: This output is precise and uses slightly more descriptive language, aligning well with professional SmPC prose standards.
+
+S3_BASE_VERDICT: The addition of ""A case of"" is unnecessary and deviates from the concise style typical in SmPCs.
+
+S3_FT_VERDICT: Similar to S3-base, the phrase ""A case of"" is superfluous and not typical of SmPC language.
+
+S5_BASE_VERDICT: The output mirrors S3-base, with the same issue of unnecessary phrasing that detracts from the precision expected in regulatory documents.
+
+S5_FT_VERDICT: This output is identical to S5-base, with the same issue of superfluous language.
+
+S6_VERDICT: The use of ""hypophysite"" is incorrect, as it does not match the MedDRA PT ""hypophysitis,"" and ""cessation"" is less precise than ""discontinuation.""
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs, indicating no difference in performance for this segment.
+
+KEY_OBSERVATION: The most critical observation is the use of the term ""hypophysitis,"" which is the correct MedDRA PT and aligns with professional SmPC prose, whereas ""hypophysite"" in S6 is incorrect and not standard terminology."
+48_088,"Des réactions
+cutanées sévères ont conduit à un arrêt de pembrolizumab chez 18 (0,2 %) patients.","In patients with
+recurrent or metastatic HNSCC treated with pembrolizumab as monotherapy (n=909), the incidence of
+hypothyroidism was 16.1% (all Grades) with 0.3% Grade 3.",S2,"S2,S3-base,S3-ft,S5-base,S5-ft,S1,S6,HUMAN",tied,"The translation is accurate but uses ""skin reactions"" instead of the more precise ""cutaneous reactions,"" which is less aligned with professional SmPC prose.","This output uses ""cutaneous reactions,"" which is more aligned with the professional language expected in SmPCs, making it the closest to a certified EMA translation.","The translation is accurate and uses ""cutaneous reactions,"" maintaining consistency with professional SmPC language.","This output is identical to S3-base, accurately using ""cutaneous reactions"" and maintaining professional language.","The translation is accurate and uses ""cutaneous reactions,"" consistent with professional SmPC language.","This output is identical to S5-base, accurately using ""cutaneous reactions"" and maintaining professional language.","This translation is less precise, using ""reactions to pembrolizumab"" instead of specifying ""cutaneous reactions,"" which reduces clarity.","The use of ""cutaneous reactions"" instead of ""skin reactions"" is crucial for aligning with the professional and precise language expected in SmPCs, as it reflects the clinical terminology more accurately.","BEST_SYSTEM: S2
+
+RANKING: S2,S3-base,S3-ft,S5-base,S5-ft,S1,S6,HUMAN
+
+S1_VERDICT: The translation is accurate but uses ""skin reactions"" instead of the more precise ""cutaneous reactions,"" which is less aligned with professional SmPC prose.
+
+S2_VERDICT: This output uses ""cutaneous reactions,"" which is more aligned with the professional language expected in SmPCs, making it the closest to a certified EMA translation.
+
+S3_BASE_VERDICT: The translation is accurate and uses ""cutaneous reactions,"" maintaining consistency with professional SmPC language.
+
+S3_FT_VERDICT: This output is identical to S3-base, accurately using ""cutaneous reactions"" and maintaining professional language.
+
+S5_BASE_VERDICT: The translation is accurate and uses ""cutaneous reactions,"" consistent with professional SmPC language.
+
+S5_FT_VERDICT: This output is identical to S5-base, accurately using ""cutaneous reactions"" and maintaining professional language.
+
+S6_VERDICT: This translation is less precise, using ""reactions to pembrolizumab"" instead of specifying ""cutaneous reactions,"" which reduces clarity.
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs, indicating no difference in translation quality for this segment.
+
+KEY_OBSERVATION: The use of ""cutaneous reactions"" instead of ""skin reactions"" is crucial for aligning with the professional and precise language expected in SmPCs, as it reflects the clinical terminology more accurately."
+48_090,"De rares cas de SSJ et de NET, dont certains d’issue fatale, ont été observés (voir rubriques 4.2 et 4.4).","In patients with
+resectable locally advanced HNSCC treated with pembrolizumab as neoadjuvant treatment and in
+combination with radiation therapy with or without concomitant cisplatin for adjuvant trea",S3-FT,"S3-ft,HUMAN,S5-ft,S2,S3-base,S5-base,S1,S6",finetuned,"The translation uses ""fatal outbreaks,"" which is not appropriate for the context of adverse events and deviates from standard terminology.","This output uses ""Serious Skin Reactions"" and ""Toxic Epidermal Necrosis,"" which are incorrect expansions of the acronyms SSJ and TEN.","The translation incorrectly expands NET to ""Neutrophilic Dermatosis,"" which is not the correct term for the context.","This output correctly uses ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis,"" aligning with standard EMA terminology.","Similar to S3-base, this translation incorrectly expands NET to ""Neutrophilic Dermatosis.""","This output is similar to S3-ft, correctly using ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis.""","The translation uses ""fatal outbreaks,"" which is not appropriate for the context of adverse events and deviates from standard terminology.","The most critical aspect of terminology quality in this segment is the correct expansion of the acronyms SSJ and TEN to ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis,"" respectively. This precision is crucial for maintaining the accuracy and reliability of adverse event reporting in regulatory documents.","BEST_SYSTEM: S3-ft
+
+RANKING: S3-ft,HUMAN,S5-ft,S2,S3-base,S5-base,S1,S6
+
+S1_VERDICT: The translation uses ""fatal outbreaks,"" which is not appropriate for the context of adverse events and deviates from standard terminology.
+
+S2_VERDICT: This output uses ""Serious Skin Reactions"" and ""Toxic Epidermal Necrosis,"" which are incorrect expansions of the acronyms SSJ and TEN.
+
+S3_BASE_VERDICT: The translation incorrectly expands NET to ""Neutrophilic Dermatosis,"" which is not the correct term for the context.
+
+S3_FT_VERDICT: This output correctly uses ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis,"" aligning with standard EMA terminology.
+
+S5_BASE_VERDICT: Similar to S3-base, this translation incorrectly expands NET to ""Neutrophilic Dermatosis.""
+
+S5_FT_VERDICT: This output is similar to S3-ft, correctly using ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis.""
+
+S6_VERDICT: The translation uses ""fatal outbreaks,"" which is not appropriate for the context of adverse events and deviates from standard terminology.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition correctly identifies and expands the acronyms to their appropriate medical terms.
+
+KEY_OBSERVATION: The most critical aspect of terminology quality in this segment is the correct expansion of the acronyms SSJ and TEN to ""Stevens-Johnson Syndrome"" and ""Toxic Epidermal Necrosis,"" respectively. This precision is crucial for maintaining the accuracy and reliability of adverse event reporting in regulatory documents."
+48_069,"L’hypophysite s’est résolue chez 23 patients, 8 avec des séquelles.","Adrenal insufficiency led to discontinuation of
+pembrolizumab in 13 (0.2%) patients.",HUMAN,"HUMAN,S2,S3-base,S3-ft,S5-base,S5-ft,S1,S6",tied,The translation is accurate but lacks the professional prose style expected in an EMA submission.,"This output is concise and uses appropriate clinical language, closely aligning with EMA standards.","The translation is precise and clear, but it lacks the nuanced language of a certified translation.","Similar to S3-base, it is accurate but does not fully capture the professional tone of an EMA submission.","The translation is accurate and clear, but it does not exhibit the refined language of a human translator.","This output is precise and clear, yet it lacks the professional prose style of a certified EMA translation.","The use of ""solved"" is inappropriate in this context, as it does not convey the medical resolution accurately.","The machine translations consistently use the term ""hypophysitis,"" which is accurate, but they fail to capture the professional nuance and style of the human reference, particularly in the phrase ""resolved in 23 patients, 8 with sequelae,"" which lacks the polished clinical language expected in EMA submissions.","BEST_SYSTEM: HUMAN
+RANKING: HUMAN,S2,S3-base,S3-ft,S5-base,S5-ft,S1,S6
+S1_VERDICT: The translation is accurate but lacks the professional prose style expected in an EMA submission.
+S2_VERDICT: This output is concise and uses appropriate clinical language, closely aligning with EMA standards.
+S3_BASE_VERDICT: The translation is precise and clear, but it lacks the nuanced language of a certified translation.
+S3_FT_VERDICT: Similar to S3-base, it is accurate but does not fully capture the professional tone of an EMA submission.
+S5_BASE_VERDICT: The translation is accurate and clear, but it does not exhibit the refined language of a human translator.
+S5_FT_VERDICT: This output is precise and clear, yet it lacks the professional prose style of a certified EMA translation.
+S6_VERDICT: The use of ""solved"" is inappropriate in this context, as it does not convey the medical resolution accurately.
+NER_WINNER: tied
+NER_REASON: Both baseline and fine-tuned NER conditions produced similar quality translations in this segment.
+KEY_OBSERVATION: The machine translations consistently use the term ""hypophysitis,"" which is accurate, but they fail to capture the professional nuance and style of the human reference, particularly in the phrase ""resolved in 23 patients, 8 with sequelae,"" which lacks the polished clinical language expected in EMA submissions."
+48_118,"La population avec un LHc (n = 22) incluait des patients âgés de 11 à
+17 ans.","Immunogenicity
+In a clinical study in patients treated with subcutaneous administration of KEYTRUDA solution for
+injection 790 mg every 6 weeks or intravenous administration of pembrolizumab 400 mg ev",S6,"S6,S1,S2,HUMAN,S3-base,S5-base,S3-ft,S5-ft",baseline,"S1 provides a straightforward translation that maintains the original meaning, but lacks the clinical context seen in the human reference.","S2 is similar to S1 but adds unnecessary complexity with ""among whom were,"" which is not present in the source.","S3-base incorrectly translates ""LHc"" as ""hypothyroidism,"" which is a significant error in medical context.","S3-ft attempts to interpret ""LHc"" but introduces an incorrect and non-standard term, ""body weight less than or equal to the healthy child.""","S5-base repeats the error of translating ""LHc"" as ""hypothyroidism,"" which is misleading.","S5-ft, like S3-ft, incorrectly interprets ""LHc"" and introduces non-standard terminology.","S6 accurately translates the segment, maintaining the original meaning and context, making it the closest to a certified EMA translation.","The critical issue in this segment is the incorrect interpretation of ""LHc"" by several systems, leading to significant deviations from the source meaning. The best system, S6, avoids this by maintaining the original term without unnecessary alteration.","BEST_SYSTEM: S6
+RANKING: S6,S1,S2,HUMAN,S3-base,S5-base,S3-ft,S5-ft
+S1_VERDICT: S1 provides a straightforward translation that maintains the original meaning, but lacks the clinical context seen in the human reference.
+S2_VERDICT: S2 is similar to S1 but adds unnecessary complexity with ""among whom were,"" which is not present in the source.
+S3_BASE_VERDICT: S3-base incorrectly translates ""LHc"" as ""hypothyroidism,"" which is a significant error in medical context.
+S3_FT_VERDICT: S3-ft attempts to interpret ""LHc"" but introduces an incorrect and non-standard term, ""body weight less than or equal to the healthy child.""
+S5_BASE_VERDICT: S5-base repeats the error of translating ""LHc"" as ""hypothyroidism,"" which is misleading.
+S5_FT_VERDICT: S5-ft, like S3-ft, incorrectly interprets ""LHc"" and introduces non-standard terminology.
+S6_VERDICT: S6 accurately translates the segment, maintaining the original meaning and context, making it the closest to a certified EMA translation.
+NER_WINNER: baseline
+NER_REASON: The baseline NER condition avoids introducing incorrect interpretations of ""LHc"" seen in the fine-tuned outputs.
+KEY_OBSERVATION: The critical issue in this segment is the incorrect interpretation of ""LHc"" by several systems, leading to significant deviations from the source meaning. The best system, S6, avoids this by maintaining the original term without unnecessary alteration."
+48_080,"Chez les
+patients atteints d’un CETEC récidivant ou métastatique traités par pembrolizumab en monothérapie
+(n = 909), l’incidence de l’hypothyroïdie était de 16,1 % (tous grades) avec 0,3 % de Grade 3","Hyperthyroidism resolved in 326 (82.7%) patients, 11 with sequelae.",S6,"HUMAN,S6,S2,S1,S3-ft,S5-ft,S3-base,S5-base",finetuned,"S1 provides a clear translation but uses ""in all grades"" which is less precise than ""all grades"" and does not match the human reference style.","S2 is similar to S1 but uses ""all grades"" which is closer to the human reference style, making it slightly better.","S3-base introduces an error by adding ""Hypercarotinaemia,"" which is not present in the source text, making it inaccurate.","S3-ft corrects the error seen in S3-base and provides a clear translation, but the phrasing ""monotherapy of pembrolizumab"" is slightly awkward.","S5-base repeats the error of introducing ""Hypercarotinaemia,"" making it inaccurate like S3-base.","S5-ft corrects the error seen in S5-base and provides a clear translation, but the phrasing ""monotherapy of pembrolizumab"" is slightly awkward.","S6 closely matches the human reference, using precise terminology and phrasing consistent with EMA style, making it the best machine translation.","The key observation is that the introduction of extraneous terms like ""Hypercarotinaemia"" in some outputs significantly detracts from the accuracy and quality of the translation, highlighting the importance of precise terminology management in machine translation systems for medical documents.","BEST_SYSTEM: S6
+
+RANKING: HUMAN,S6,S2,S1,S3-ft,S5-ft,S3-base,S5-base
+
+S1_VERDICT: S1 provides a clear translation but uses ""in all grades"" which is less precise than ""all grades"" and does not match the human reference style.
+
+S2_VERDICT: S2 is similar to S1 but uses ""all grades"" which is closer to the human reference style, making it slightly better.
+
+S3_BASE_VERDICT: S3-base introduces an error by adding ""Hypercarotinaemia,"" which is not present in the source text, making it inaccurate.
+
+S3_FT_VERDICT: S3-ft corrects the error seen in S3-base and provides a clear translation, but the phrasing ""monotherapy of pembrolizumab"" is slightly awkward.
+
+S5_BASE_VERDICT: S5-base repeats the error of introducing ""Hypercarotinaemia,"" making it inaccurate like S3-base.
+
+S5_FT_VERDICT: S5-ft corrects the error seen in S5-base and provides a clear translation, but the phrasing ""monotherapy of pembrolizumab"" is slightly awkward.
+
+S6_VERDICT: S6 closely matches the human reference, using precise terminology and phrasing consistent with EMA style, making it the best machine translation.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER systems avoid introducing extraneous terms like ""Hypercarotinaemia,"" leading to more accurate translations.
+
+KEY_OBSERVATION: The key observation is that the introduction of extraneous terms like ""Hypercarotinaemia"" in some outputs significantly detracts from the accuracy and quality of the translation, highlighting the importance of precise terminology management in machine translation systems for medical documents."
+48_063,"Le délai
+d’apparition médian de l’insuffisance surrénalienne a été de 5,4 mois (de 1 jour à 23,7 mois) et la durée
+médiane n’a pas été atteinte (de 3 jours à 40,1+ mois).","Nephritis led to discontinuation of pembrolizumab in 17 (0.2%)
+patients.",S3-FT,"S3-ft,S5-ft,S3-base,S5-base,S2,S1,S6,HUMAN",tied,"The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a critical error in conveying the correct clinical information.","This output correctly uses ""duration"" but fails to capture the ""time to onset,"" which is more precise for the context of adverse event reporting.","This translation accurately uses ""time to onset,"" aligning well with the expected clinical terminology for adverse event timing.","This output is similar to S3-base but capitalizes ""Adrenal,"" which is unnecessary but does not detract from the overall accuracy.","This translation is identical to S3-base, correctly using ""time to onset"" and maintaining consistency with clinical terminology.","This output mirrors S3-ft, with the same unnecessary capitalization of ""Adrenal,"" but maintains accuracy in terminology.","The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which misrepresents the clinical data.","The critical distinction in this segment is the use of ""time to onset"" versus ""incidence."" The former is the correct clinical term for describing when an adverse event begins, while ""incidence"" refers to the rate of occurrence, which is not applicable here.","BEST_SYSTEM: S3-ft
+
+RANKING: S3-ft,S5-ft,S3-base,S5-base,S2,S1,S6,HUMAN
+
+S1_VERDICT: The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which is a critical error in conveying the correct clinical information.
+
+S2_VERDICT: This output correctly uses ""duration"" but fails to capture the ""time to onset,"" which is more precise for the context of adverse event reporting.
+
+S3_BASE_VERDICT: This translation accurately uses ""time to onset,"" aligning well with the expected clinical terminology for adverse event timing.
+
+S3_FT_VERDICT: This output is similar to S3-base but capitalizes ""Adrenal,"" which is unnecessary but does not detract from the overall accuracy.
+
+S5_BASE_VERDICT: This translation is identical to S3-base, correctly using ""time to onset"" and maintaining consistency with clinical terminology.
+
+S5_FT_VERDICT: This output mirrors S3-ft, with the same unnecessary capitalization of ""Adrenal,"" but maintains accuracy in terminology.
+
+S6_VERDICT: The translation incorrectly uses ""incidence"" instead of ""time to onset,"" which misrepresents the clinical data.
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produce equally accurate translations in terms of terminology.
+
+KEY_OBSERVATION: The critical distinction in this segment is the use of ""time to onset"" versus ""incidence."" The former is the correct clinical term for describing when an adverse event begins, while ""incidence"" refers to the rate of occurrence, which is not applicable here."
+48_125,"Déclaration des effets indésirables suspectés
+La déclaration des effets indésirables suspectés après autorisation du médicament est importante.","172
+Intravenous formulation
+The safety of pembrolizumab as monotherapy has been evaluated in 161 paediatric patients aged
+9 months to 17 years with advanced melanoma, lymphoma, or PD-L1 positive advan",HUMAN,"HUMAN,S6,S3-ft,S5-ft,S1,S3-base,S5-base,S2",finetuned,"The translation is accurate but lacks the specificity and formality expected in EMA submissions, particularly in the use of ""after authorisation of the medicinal product.""","This output is overly concise and omits the critical phrase ""after authorisation of the medicinal product,"" which is essential for regulatory context.","While the translation is mostly accurate, it introduces an irrelevant MedDRA term error, which is a significant flaw in regulatory translation.","This translation is accurate and maintains the necessary regulatory context, though it slightly lacks the formal tone of the human reference.","Similar to S3-base, this translation is marred by an incorrect MedDRA term, which undermines its reliability for regulatory purposes.","The translation is accurate and contextually appropriate, aligning well with the regulatory requirements, though slightly less formal than the human reference.","This output closely mirrors the human reference, maintaining both accuracy and the formal tone required for EMA submissions.","The critical observation is the importance of maintaining precise regulatory language, particularly the phrase ""after authorisation of the medicinal product,"" which is crucial for the context and is best preserved in the human and S6 translations.","BEST_SYSTEM: HUMAN
+RANKING: HUMAN,S6,S3-ft,S5-ft,S1,S3-base,S5-base,S2
+S1_VERDICT: The translation is accurate but lacks the specificity and formality expected in EMA submissions, particularly in the use of ""after authorisation of the medicinal product.""
+S2_VERDICT: This output is overly concise and omits the critical phrase ""after authorisation of the medicinal product,"" which is essential for regulatory context.
+S3_BASE_VERDICT: While the translation is mostly accurate, it introduces an irrelevant MedDRA term error, which is a significant flaw in regulatory translation.
+S3_FT_VERDICT: This translation is accurate and maintains the necessary regulatory context, though it slightly lacks the formal tone of the human reference.
+S5_BASE_VERDICT: Similar to S3-base, this translation is marred by an incorrect MedDRA term, which undermines its reliability for regulatory purposes.
+S5_FT_VERDICT: The translation is accurate and contextually appropriate, aligning well with the regulatory requirements, though slightly less formal than the human reference.
+S6_VERDICT: This output closely mirrors the human reference, maintaining both accuracy and the formal tone required for EMA submissions.
+NER_WINNER: finetuned
+NER_REASON: The fine-tuned NER condition provides more accurate and contextually appropriate translations, avoiding the introduction of irrelevant MedDRA terms.
+KEY_OBSERVATION: The critical observation is the importance of maintaining precise regulatory language, particularly the phrase ""after authorisation of the medicinal product,"" which is crucial for the context and is best preserved in the human and S6 translations."
+48_054,"Le délai d’apparition médian de
+l’hépatite a été de 3,5 mois (de 8 jours à 26,3 mois) et la durée médiane a été de 1,3 mois (de 1 jour à
+29,0+ mois).","In patients with CRC treated with pembrolizumab as monotherapy
+(n=153), the incidence of colitis was 6.5% (all Grades) with 2.0% Grade 3 and 1.3% Grade 4.",S3-FT,"HUMAN,S3-ft,S5-ft,S3-base,S5-base,S6,S1,S2",finetuned,The translation is accurate but lacks the precision and slight clinical nuance expected in professional SmPC prose.,"This output incorrectly interprets the phrase, suggesting a misunderstanding of the source text's meaning.","The translation is accurate and uses appropriate clinical language, closely aligning with the human reference.","This output is precise and uses appropriate capitalization for ""Hepatitis,"" aligning well with professional standards.","The translation is accurate but lacks the capitalization of ""Hepatitis,"" which is a minor deviation from professional standards.","This output is precise and uses appropriate capitalization for ""Hepatitis,"" aligning well with professional standards.","The translation is accurate but slightly less fluid than other outputs, with a minor deviation in phrasing.","The use of capitalization for ""Hepatitis"" in S3-ft and S5-ft reflects a more professional and precise approach, aligning with the expectations for clinical terminology in SmPCs.","BEST_SYSTEM: S3-ft
+
+RANKING: HUMAN,S3-ft,S5-ft,S3-base,S5-base,S6,S1,S2
+
+S1_VERDICT: The translation is accurate but lacks the precision and slight clinical nuance expected in professional SmPC prose.
+
+S2_VERDICT: This output incorrectly interprets the phrase, suggesting a misunderstanding of the source text's meaning.
+
+S3_BASE_VERDICT: The translation is accurate and uses appropriate clinical language, closely aligning with the human reference.
+
+S3_FT_VERDICT: This output is precise and uses appropriate capitalization for ""Hepatitis,"" aligning well with professional standards.
+
+S5_BASE_VERDICT: The translation is accurate but lacks the capitalization of ""Hepatitis,"" which is a minor deviation from professional standards.
+
+S5_FT_VERDICT: This output is precise and uses appropriate capitalization for ""Hepatitis,"" aligning well with professional standards.
+
+S6_VERDICT: The translation is accurate but slightly less fluid than other outputs, with a minor deviation in phrasing.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition produces outputs with more precise terminology and appropriate capitalization.
+
+KEY_OBSERVATION: The use of capitalization for ""Hepatitis"" in S3-ft and S5-ft reflects a more professional and precise approach, aligning with the expectations for clinical terminology in SmPCs."
+48_093,"Un patient a
+présenté un syndrome de prise de greffe après transplantation.","Immune-mediated skin adverse reactions
+Immune-mediated severe skin reactions occurred in 130 (1.7%) patients, including Grade 2, 3, 4 or 5
+cases in 11 (0.1%), 103 (1.3%), 1 (< 0.1%) and 1 (< 0.1%) pat",S3-FT,"HUMAN,S3-ft,S5-ft,S2,S3-base,S5-base,S6,S1",finetuned,"The translation ""transplant syndrome"" is inaccurate and lacks specificity, failing to capture the clinical nuance of ""engraftment syndrome.""","""Graft rejection syndrome"" is incorrect as it implies a different clinical condition than ""engraftment syndrome.""","""Graft reaction"" is vague and does not accurately convey the specific condition of ""engraftment syndrome.""","""Engraftment syndrome"" is the correct term, accurately reflecting the clinical condition described in the source.","Similar to S3-base, ""graft reaction"" is too vague and does not capture the specific clinical condition.","""Engraftment syndrome"" is correctly used, aligning with the precise clinical terminology required.","""Transplant syndrome"" is too broad and does not accurately reflect the specific condition of ""engraftment syndrome.""","The term ""engraftment syndrome"" is crucial for accurately conveying the specific adverse event described, and only the fine-tuned systems (S3-ft and S5-ft) correctly identify and use this term, demonstrating the importance of precise terminology in medical translations.","BEST_SYSTEM: S3-ft
+
+RANKING: HUMAN,S3-ft,S5-ft,S2,S3-base,S5-base,S6,S1
+
+S1_VERDICT: The translation ""transplant syndrome"" is inaccurate and lacks specificity, failing to capture the clinical nuance of ""engraftment syndrome.""
+
+S2_VERDICT: ""Graft rejection syndrome"" is incorrect as it implies a different clinical condition than ""engraftment syndrome.""
+
+S3_BASE_VERDICT: ""Graft reaction"" is vague and does not accurately convey the specific condition of ""engraftment syndrome.""
+
+S3_FT_VERDICT: ""Engraftment syndrome"" is the correct term, accurately reflecting the clinical condition described in the source.
+
+S5_BASE_VERDICT: Similar to S3-base, ""graft reaction"" is too vague and does not capture the specific clinical condition.
+
+S5_FT_VERDICT: ""Engraftment syndrome"" is correctly used, aligning with the precise clinical terminology required.
+
+S6_VERDICT: ""Transplant syndrome"" is too broad and does not accurately reflect the specific condition of ""engraftment syndrome.""
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems consistently produce more accurate and specific clinical terminology.
+
+KEY_OBSERVATION: The term ""engraftment syndrome"" is crucial for accurately conveying the specific adverse event described, and only the fine-tuned systems (S3-ft and S5-ft) correctly identify and use this term, demonstrating the importance of precise terminology in medical translations."
+48_079,"Chez les patients atteints
+d’un LHc (n = 389), l’incidence de l’hypothyroïdie était de 17 %, toutes étant de Grade 1 ou 2.","Hyperthyroidism led to discontinuation of pembrolizumab in
+4 (0.1%) patients.",S1,"S1,HUMAN,S2,S3-ft,S5-ft,S3-base,S5-base,S6",finetuned,"S1 accurately translates the French source text, maintaining the correct medical terminology and structure expected in an EMA SmPC.",S2 provides a correct translation but lacks the precision and consistency in terminology expected in professional medical translations.,"S3-base correctly translates the text but includes unnecessary commentary on ""Hypercarotenaemia,"" which is irrelevant to the context.","S3-ft accurately translates the text but capitalizes ""Hypothyroidism,"" which is inconsistent with standard EMA style guidelines.","S5-base mirrors S3-base's translation, including irrelevant commentary on ""Hypercarotenaemia,"" detracting from its precision.","S5-ft provides a correct translation but incorrectly capitalizes ""Hypothyroidism,"" which is not in line with EMA style.","S6 incorrectly translates ""hypothyroidism"" as ""hyperthyroidism,"" which is a critical error in medical terminology.","The most critical observation is the consistent use of ""hypothyroidism"" across most systems, except S6, which incorrectly uses ""hyperthyroidism,"" highlighting the importance of precise medical terminology in regulatory documents.","BEST_SYSTEM: S1
+RANKING: S1,HUMAN,S2,S3-ft,S5-ft,S3-base,S5-base,S6
+S1_VERDICT: S1 accurately translates the French source text, maintaining the correct medical terminology and structure expected in an EMA SmPC.
+S2_VERDICT: S2 provides a correct translation but lacks the precision and consistency in terminology expected in professional medical translations.
+S3_BASE_VERDICT: S3-base correctly translates the text but includes unnecessary commentary on ""Hypercarotenaemia,"" which is irrelevant to the context.
+S3_FT_VERDICT: S3-ft accurately translates the text but capitalizes ""Hypothyroidism,"" which is inconsistent with standard EMA style guidelines.
+S5_BASE_VERDICT: S5-base mirrors S3-base's translation, including irrelevant commentary on ""Hypercarotenaemia,"" detracting from its precision.
+S5_FT_VERDICT: S5-ft provides a correct translation but incorrectly capitalizes ""Hypothyroidism,"" which is not in line with EMA style.
+S6_VERDICT: S6 incorrectly translates ""hypothyroidism"" as ""hyperthyroidism,"" which is a critical error in medical terminology.
+NER_WINNER: finetuned
+NER_REASON: The fine-tuned NER condition avoids irrelevant commentary and focuses on translating the relevant medical terms accurately.
+KEY_OBSERVATION: The most critical observation is the consistent use of ""hypothyroidism"" across most systems, except S6, which incorrectly uses ""hyperthyroidism,"" highlighting the importance of precise medical terminology in regulatory documents."
+48_076,"Le délai d’apparition médian de
+l’hypothyroïdie a été de 3,4 mois (de 1 jour à 25,9 mois) et la durée médiane n’a pas été atteinte (de 2 jours à
+63,0+ mois).","Hyperthyroidism occurred in 394 (5.2%) patients, including Grade 2 or 3 cases in 108 (1.4%) and
+9 (0.1%) patients, respectively, receiving pembrolizumab.",S3-FT,"S3-ft,HUMAN,S5-ft,S1,S2,S6,S3-base,S5-base",finetuned,"S1 accurately translates the source text but uses ""time of onset"" instead of ""time to onset,"" which is slightly less precise in clinical context.","S2 incorrectly translates ""time of onset"" as ""duration,"" which changes the meaning of the sentence and introduces a critical error.","S3-base incorrectly translates ""hypothyroidism"" as ""Hypercarotinaemia,"" which is a significant error in medical terminology.","S3-ft correctly translates the term ""hypothyroidism"" and maintains the intended meaning, making it the closest to the certified human reference.","S5-base also incorrectly translates ""hypothyroidism"" as ""Hypercarotinaemia,"" similar to S3-base, which is a critical error.","S5-ft correctly translates ""hypothyroidism"" and maintains the intended meaning, similar to S3-ft.","S6 repeats the error of translating ""time of onset"" as ""duration,"" which alters the clinical meaning of the sentence.","The most critical observation is the incorrect translation of ""hypothyroidism"" as ""Hypercarotinaemia"" in some systems, which highlights the importance of accurate medical terminology. The fine-tuned systems (S3-ft and S5-ft) correctly maintain the term ""hypothyroidism,"" demonstrating the effectiveness of fine-tuning in preserving precise medical language.","BEST_SYSTEM: S3-ft
+
+RANKING: S3-ft,HUMAN,S5-ft,S1,S2,S6,S3-base,S5-base
+
+S1_VERDICT: S1 accurately translates the source text but uses ""time of onset"" instead of ""time to onset,"" which is slightly less precise in clinical context.
+
+S2_VERDICT: S2 incorrectly translates ""time of onset"" as ""duration,"" which changes the meaning of the sentence and introduces a critical error.
+
+S3_BASE_VERDICT: S3-base incorrectly translates ""hypothyroidism"" as ""Hypercarotinaemia,"" which is a significant error in medical terminology.
+
+S3_FT_VERDICT: S3-ft correctly translates the term ""hypothyroidism"" and maintains the intended meaning, making it the closest to the certified human reference.
+
+S5_BASE_VERDICT: S5-base also incorrectly translates ""hypothyroidism"" as ""Hypercarotinaemia,"" similar to S3-base, which is a critical error.
+
+S5_FT_VERDICT: S5-ft correctly translates ""hypothyroidism"" and maintains the intended meaning, similar to S3-ft.
+
+S6_VERDICT: S6 repeats the error of translating ""time of onset"" as ""duration,"" which alters the clinical meaning of the sentence.
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER systems correctly identify and translate ""hypothyroidism,"" avoiding the critical errors seen in baseline systems.
+
+KEY_OBSERVATION: The most critical observation is the incorrect translation of ""hypothyroidism"" as ""Hypercarotinaemia"" in some systems, which highlights the importance of accurate medical terminology. The fine-tuned systems (S3-ft and S5-ft) correctly maintain the term ""hypothyroidism,"" demonstrating the effectiveness of fine-tuning in preserving precise medical language."

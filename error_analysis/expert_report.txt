@@ -1,0 +1,83 @@
+TERMPLANMT EXPERT EVALUATION REPORT
+25 segments · GPT-4o expert (EMA medical translator persona) · seed=99
+======================================================================
+
+BEST SYSTEM VOTES
+  S3-FT          9/25 = 36%
+  HUMAN          9/25 = 36%
+  S2             3/25 = 12%
+  S6             2/25 = 8%
+  S5-FT          1/25 = 4%
+  S1             1/25 = 4%
+
+AVERAGE RANK (1 = best, lower is better)
+  HUMAN          avg rank 2.44  (n=25)
+  S3-FT          avg rank 3.40  (n=25)
+  S2             avg rank 3.96  (n=25)
+  S5-FT          avg rank 4.44  (n=25)
+  S1             avg rank 4.88  (n=25)
+  S6             avg rank 5.28  (n=25)
+  S3-BASE        avg rank 5.28  (n=25)
+  S5-BASE        avg rank 6.32  (n=25)
+
+NER CONDITION: BASELINE vs FINE-TUNED
+  finetuned    16/25 = 64%
+  tied         6/25 = 24%
+  baseline     3/25 = 12%
+
+======================================================================
+EXPERT SYNTHESIS
+======================================================================
+
+OVERALL_VERDICT:
+The system I would recommend for regulatory MT work is S3-FT (GraphRAG fine-tuned). It consistently aligns with MedDRA terminology and EMA style guidelines, as evidenced by its equal number of best system votes with the human reference and its strong performance in maintaining precise clinical language. Its ability to accurately translate critical terms like "colitis" and "Hypothyroidism" demonstrates its reliability for adverse event sections, making it a suitable choice for regulatory submissions.
+
+SYSTEM_BY_SYSTEM:
+S1 (NLLB baseline): This system struggles with maintaining precise terminology and often deviates from standard EMA language, as seen with errors like "daxitinib" instead of "axitinib." It may be useful for general comprehension but is not recommended for regulatory submissions where precision is paramount.
+
+S2 (Mistral full-doc): S2 shows strength in using correct terms like "combination therapy," indicating a good grasp of context. However, it occasionally misinterprets key distinctions, such as "time to onset" versus "incidence." It can be considered for tasks where context understanding is crucial, but careful review is necessary.
+
+S3 (GraphRAG): The fine-tuned version of this system excels in maintaining MedDRA alignment and precise terminology, making it ideal for regulatory work. Its baseline version, however, ranks lower, indicating that fine-tuning significantly enhances its performance. Use the fine-tuned version for high-stakes translations.
+
+S5 (logit boosting): While S5-FT occasionally aligns well with MedDRA terms, its overall performance is inconsistent, as shown by its low ranking. It may be beneficial for specific terminology tasks but requires further refinement for consistent regulatory use.
+
+S6 (oracle glossary): This system shows potential with its glossary-based approach but suffers from significant terminology errors, such as incorrect drug names. It might be useful in scenarios where a glossary can be strictly controlled, but it is not reliable for comprehensive regulatory translations.
+
+NER_MODEL_VERDICT:
+The fine-tuned NER model produces better results for the graph-augmented pipeline. It demonstrates superior ability to correctly identify and apply MedDRA terms, which is crucial for maintaining the integrity of adverse event reporting in regulatory documents.
+
+ONTOLOGY_GROUNDING_VERDICT:
+MedDRA ontology grounding generally helps translation quality by ensuring that translations adhere to standardized medical terminology, which is essential for regulatory accuracy. However, it requires careful implementation to avoid rigid adherence that may overlook necessary clinical nuances in professional prose.
+
+PRACTICAL_RECOMMENDATION:
+For an EMA translation team, I would recommend adopting the S3-FT system for its strong alignment with regulatory standards and precise terminology use. However, it is crucial to implement a robust quality assurance process, including human review, to catch any residual errors. Additionally, investing in ongoing fine-tuning and updates to the system will ensure it remains aligned with evolving medical and regulatory language.
+
+======================================================================
+SAMPLE KEY OBSERVATIONS (individual segments)
+======================================================================
+
+[48_052] The critical observation is the use of the term "colitis" versus "gastrointestinal inflammation." The fine-tuned systems (S3-ft and S5-ft) correctly use "colitis," aligning with MedDRA terminology and
+[48_049] The critical distinction between "time to onset" and "incidence" is crucial; several systems incorrectly used "incidence," which changes the clinical meaning significantly.
+[48_026] The most critical aspect of terminology quality in this segment is the use of "combination therapy" versus "therapeutic association." The human reference and S2 correctly use "combination therapy," wh
+[48_077] The critical observation is the accurate use of "Hypothyroidism" in S3-ft and S5-ft, which aligns with the MedDRA PT and is crucial for maintaining the integrity of adverse event reporting.
+[48_023] The critical issue in these translations is the handling of "system organ class," a standard term in EMA documentation. Most systems deviate from this precise terminology, with variations like "organ 
+[48_030] The use of "related to" versus "relating to" is a critical distinction in maintaining the precision required in EMA submissions, with "related to" being the preferred choice for clarity and adherence 
+[48_032] The most critical observation is the consistent misuse or omission of specific MedDRA terms, such as "drug hypersensitivity," which is crucial for maintaining the precision required in regulatory docu
+[48_018] The most critical issue in these translations is the incorrect use of "daxitinib" instead of "axitinib" in S1 and S6, which is a significant error in pharmacovigilance terminology. Additionally, the o
+[48_098] The term "MVO hépatique" should be translated as "hepatic veno-occlusive disease" to maintain consistency with MedDRA terminology and ensure clarity in medical communication. The use of "Microvascular
+[48_012] The most critical observation is the consistent use of "tumour types" in the human reference, which aligns with standard EMA terminology, whereas some systems incorrectly use "Neoplasm types," demonst
+[48_033] The distinction between "urothelial" and "urethral" carcinoma is critical, as they refer to different anatomical sites and clinical conditions; systems that maintain "urothelial carcinoma" demonstrate
+[48_094] The translations vary in their handling of "GCSH" and "GVH"; the best systems correctly expand "GVH" to "graft-versus-host disease" and maintain the correct treatment terminology, which is crucial for
+[48_050] The translations that omit the article before "colitis" (S3-ft and S5-ft) are more aligned with the professional register expected in SmPCs, where precision and adherence to standard medical terminolo
+[48_068] The most critical observation is the use of the term "hypophysitis," which is the correct MedDRA PT and aligns with professional SmPC prose, whereas "hypophysite" in S6 is incorrect and not standard t
+[48_088] The use of "cutaneous reactions" instead of "skin reactions" is crucial for aligning with the professional and precise language expected in SmPCs, as it reflects the clinical terminology more accurate
+[48_090] The most critical aspect of terminology quality in this segment is the correct expansion of the acronyms SSJ and TEN to "Stevens-Johnson Syndrome" and "Toxic Epidermal Necrosis," respectively. This pr
+[48_069] The machine translations consistently use the term "hypophysitis," which is accurate, but they fail to capture the professional nuance and style of the human reference, particularly in the phrase "res
+[48_118] The critical issue in this segment is the incorrect interpretation of "LHc" by several systems, leading to significant deviations from the source meaning. The best system, S6, avoids this by maintaini
+[48_080] The key observation is that the introduction of extraneous terms like "Hypercarotinaemia" in some outputs significantly detracts from the accuracy and quality of the translation, highlighting the impo
+[48_063] The critical distinction in this segment is the use of "time to onset" versus "incidence." The former is the correct clinical term for describing when an adverse event begins, while "incidence" refers
+[48_125] The critical observation is the importance of maintaining precise regulatory language, particularly the phrase "after authorisation of the medicinal product," which is crucial for the context and is b
+[48_054] The use of capitalization for "Hepatitis" in S3-ft and S5-ft reflects a more professional and precise approach, aligning with the expectations for clinical terminology in SmPCs.
+[48_093] The term "engraftment syndrome" is crucial for accurately conveying the specific adverse event described, and only the fine-tuned systems (S3-ft and S5-ft) correctly identify and use this term, demons
+[48_079] The most critical observation is the consistent use of "hypothyroidism" across most systems, except S6, which incorrectly uses "hyperthyroidism," highlighting the importance of precise medical termino
+[48_076] The most critical observation is the incorrect translation of "hypothyroidism" as "Hypercarotinaemia" in some systems, which highlights the importance of accurate medical terminology. The fine-tuned s
