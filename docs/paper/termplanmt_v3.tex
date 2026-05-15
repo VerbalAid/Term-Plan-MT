@@ -22,6 +22,7 @@
 \tcbuselibrary{skins,breakable}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{listings}
 \usepackage{mdframed}
 \usepackage{enumitem}
 
@@ -75,14 +76,14 @@ for French--English Regulatory Medical Document Translation\\[4pt]
 \twocolumn[{%
   \maketitle
   \thispagestyle{fancy}
-  \vspace{-4pt}
   \begin{tcolorbox}[
-    enhanced,
     colback=gray!5,
-    colframe=gray!50,
+    colframe=gray!35,
     boxrule=0.5pt,
-    arc=2pt,
-    left=10pt, right=10pt, top=7pt, bottom=7pt,
+    arc=4pt,
+    left=10pt, right=10pt, top=8pt, bottom=8pt,
+    before skip=6pt,
+    after skip=10pt,
     fontupper=\small
   ]
   \noindent\textbf{Abstract.}\enspace
@@ -240,19 +241,20 @@ glossary extracted from the reference translations.
 
 \begin{table}[!ht]
 \centering
+\resizebox{\columnwidth}{!}{%
 \small
-\begin{tabular}{lp{1.9cm}ll}
+\begin{tabular}{llllp{1.5cm}}
 \toprule
-ID & Model & Graph & Enforce. \\
+\textbf{ID} & \textbf{Model} & \textbf{Graph} & \textbf{Enforce.} \\
 \midrule
-S1 & NLLB-200 600M    & No  & None \\
-S2 & Mistral-7B (doc) & No  & None \\
-S3 & Mistral + GraphRAG & Yes & None \\
-S4 & S3 + reranking     & Yes & Soft \\
-S5 & NLLB/Mistral + logit & Yes & Hard \\
-S6 & NLLB + glossary     & Oracle & Hard \\
+S1 & NLLB-200 600M      & No     & None   \\
+S2 & Mistral-7B (doc)   & No     & None   \\
+S3 & Mistral+GraphRAG   & Yes    & None   \\
+S4 & S3 + reranking     & Yes    & Soft   \\
+S5 & NLLB/Mistral+logit & Yes    & Hard   \\
+S6 & NLLB + glossary    & Oracle & Hard   \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \caption{Ablation ladder. S1 = NMT lower bound; S2 = LLM with full document
 context; S3 is the key novel condition; S6 isolates term-source quality from
 graph retrieval.}
@@ -274,50 +276,49 @@ $\text{HP} = |\hat{d} - d_{\text{src}}|$ penalises wrong specificity level
 (\S\ref{sec:consistency}).
 
 \begin{algorithm}[t]
-\caption{Global Terminology Planning (\texttt{compute\_global\_locks})}
+\caption{Global Terminology Planning -- \texttt{compute\_global\_locks}}
 \label{alg:planning}
-\begin{tcolorbox}[
-  colback=gray!6,
-  colframe=gray!40,
-  boxrule=0.4pt,
-  arc=3pt,
-  left=4pt, right=4pt, top=4pt, bottom=4pt]
-\begin{algorithmic}[1]
-\small
-\Require Segments $\mathcal{S}$, graph $\mathcal{G}$,
-         $\alpha{=}0.5$, $\beta{=}0.3$, $\gamma{=}0.2$
-\Ensure Lock map $\mathcal{L}$: fr\_term $\to$ en\_rendering
-\State $\mathcal{L} \leftarrow \{\}$
-\For{each unique French NER term $w$ in $\mathcal{S}$}
-    \State $c^{*} \leftarrow \mathcal{G}.\texttt{ground}(w)$
-    \Comment{Exact match, then RapidFuzz ${\geq}90\%$}
-    \If{$c^{*}$ is \texttt{None} \textbf{or}
-        $\mathcal{G}.\texttt{is\_ambiguous}(w)$}
-        \State \textbf{continue}
-        \Comment{Abstain: wrong lock propagates document-wide}
-    \EndIf
-    \State $\mathcal{C} \leftarrow
-           \{c^{*}\texttt{.name}\} \cup
-           \mathcal{G}.\texttt{neighbours}(c^{*})$
-    \For{each candidate $r \in \mathcal{C}$}
-        \State $\mathrm{Ctx}(r) \leftarrow
-               \cos\!\bigl(\mathrm{emb}(\mathrm{segs}_w),\,
-                            \mathrm{emb}(r)\bigr)$
-        \State $\mathrm{Nbr}(r) \leftarrow
-               \cos\!\bigl(\mathrm{emb}(r),\,
-                            \mathrm{emb}(\mathcal{G}.\texttt{nbrs})\bigr)$
-        \State $\mathrm{HP}(r)  \leftarrow
-               |\mathrm{level}(r) - \mathrm{level}(c^{*})|$
-        \State $\mathrm{Score}(r) \leftarrow
-               \alpha\,\mathrm{Ctx}(r)
-               + \beta\,\mathrm{Nbr}(r)
-               - \gamma\,\mathrm{HP}(r)$
-    \EndFor
-    \State $\mathcal{L}[w] \leftarrow
-           \arg\max_{r \in \mathcal{C}}\,\mathrm{Score}(r)$
-\EndFor
-\State \Return $\mathcal{L}$
-\end{algorithmic}
+\begin{tcolorbox}[colback=gray!6, colframe=gray!35, boxrule=0.4pt,
+  arc=3pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+\begin{lstlisting}[
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=4pt,
+  xleftmargin=10pt,
+  frame=none,
+  showstringspaces=false,
+  breaklines=true,
+  columns=flexible
+]
+# Inputs: segments S, MedDRA graph G
+# Weights: alpha=0.5, beta=0.3, gamma=0.2
+# Output: lock map {fr_term -> en_rendering}
+
+locks = {}
+for fr_term in unique_ner_terms(S):
+    concept = G.ground(fr_term)
+    # exact match first, then fuzzy >= 90%
+
+    if concept is None or G.is_ambiguous(fr_term):
+        continue  # abstain: wrong lock propagates document-wide
+
+    candidates = [concept.name] + G.neighbours(concept)
+    best, best_score = None, -inf
+    for r in candidates:
+        ctx   = cosine(embed(segs), embed(r))
+        nbr   = cosine(embed(r), embed(G.neighbours(concept)))
+        hp    = abs(level(r) - level(concept))
+        score = alpha*ctx + beta*nbr - gamma*hp
+        if score > best_score:
+            best, best_score = r, score
+    locks[fr_term] = best
+
+return locks
+\end{lstlisting}
 \end{tcolorbox}
 \end{algorithm}
 
@@ -348,7 +349,8 @@ degradation under strict constraints.
 
 \begin{mdframed}[backgroundcolor=gray!6, linewidth=0.4pt,
                  innerleftmargin=6pt, innerrightmargin=6pt,
-                 innertopmargin=5pt, innerbottommargin=5pt]
+                 innertopmargin=5pt, innerbottommargin=5pt,
+                 skipabove=4pt, skipbelow=4pt]
 \textbf{Metric definitions.}
 \begin{itemize}[noitemsep, topsep=3pt, leftmargin=*]
   \item \textbf{HTM} (Hierarchy-Aware Terminology Metric): per grounded
@@ -438,6 +440,17 @@ CCR~=~36.4\%; 126 segments, 48\_028 excluded).
 \textsuperscript{$\star$}S6 uses a glossary oracle from the reference.}
 \label{tab:finetuned}
 \end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{comparison_metrics_grouped_finetuned.png}
+\caption{System comparison under fine-tuned NER (\texttt{ner\_biollm\_ft},
+CCR~=~36.4\%). Top panel: BLEU and chrF\texttt{++}; bottom panel: HTM.
+Graph-augmented Mistral systems (S3--S5-Mistral) close the fluency gap
+substantially relative to baseline NER (Fig.~\ref{fig:comparison}),
+confirming NER quality as the binding constraint.}
+\label{fig:finetuned_metrics}
+\end{figure*}
 
 \paragraph{HTM is recall-dependent on NER quality.}
 BLEU and chrF scores for S1 and S2 are identical across both NER conditions
@@ -587,6 +600,15 @@ graph-augmented systems score consistently \emph{lower} on HRA than S2
 Table~\ref{tab:finetuned}: S3~=~0.440 vs.\ S2~=~0.476): the graph pushes
 outputs toward MedDRA labels that professional translators avoid.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{comparison_tradeoff_chrF_vs_HTM.png}
+\caption{Fluency--terminology trade-off (chrF\texttt{++} vs.\ HTM) under baseline NER.
+S2 leads on chrF; S4 leads on HTM; no system dominates both axes, confirming
+the structural tension between MedDRA-proximity and professional translation practice.}
+\label{fig:tradeoff}
+\end{figure*}
+
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Consistency Failure Analysis}
 \label{sec:consistency}
@@ -618,6 +640,20 @@ Systems scoring well on HTM therefore use formal ontology labels that certified
 translators avoid, explaining the HTM--BLEU divergence. The appropriate
 evaluation lens is \textbf{HRA}, which measures agreement with professional
 translation practice rather than raw ontology proximity.
+
+\paragraph{Register mismatch -- qualitative audit.}
+To quantify the HTM--BLEU divergence, we sampled 30 segments and compared
+S5-Mistral output against the professional reference, labelling each case
+as \emph{technical} (system uses a MedDRA PT label the reference avoids)
+or \emph{descriptive} (system matches the reference register). In the
+majority of cases where S5 scores higher on HTM than the reference, the
+system produces a formally correct MedDRA label -- \textsc{Pneumonitis},
+\textsc{Arthralgia} -- that the certified translator replaces with descriptive
+prose (\textit{``immune-related pneumonitis''}, \textit{``joint pain''}).
+This confirms that the HTM--BLEU inversion is not a system failure but a
+\emph{register mismatch}: graph-augmented systems are pulled toward
+pharmacovigilance coding language while professional translators write
+for a clinical reader. HRA captures this distinction; HTM alone does not.
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
@@ -682,6 +718,16 @@ is only interpretable relatively.
 14.2\% prompt contamination; filtered scores are used throughout.
 \textit{S6 oracle.} The glossary is extracted from reference translations via
 Ollama; genuine oracle quality depends on extraction recall.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{comparison_inference_time.png}
+\caption{Mean inference time per segment (s); error bar shows upper tail to p95.
+S1-NLLB and S6 are fastest; Mistral variants are substantially slower due to
+7B-parameter LLM decoding. Graph-augmented systems add minimal overhead over
+their base model.}
+\label{fig:inference}
+\end{figure}
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
