@@ -13,6 +13,7 @@
 \usepackage{array}
 \usepackage{caption}
 \usepackage{graphicx}
+\graphicspath{{figures/}{../figures/}}
 \usepackage{titlesec}
 \usepackage{dblfloatfix}
 \usepackage{natbib}
@@ -83,45 +84,39 @@ for French--English Regulatory Medical Document Translation\\[4pt]
 
 %% ── Abstract ───────────────────────────────────────────────────────────────
 \begin{abstract}
-Terminology consistency is a critical quality dimension in the machine translation
-of regulatory medical documents, where mistranslated adverse event terms carry
-direct patient-safety consequences. We present \textbf{TermPlanMT}, a
-graph-augmented terminology-planning framework evaluated on a 126-segment
-French--English corpus drawn from a European Medicines Agency (EMA) Summary of
-Product Characteristics (SmPC). Six systems form an ablation ladder isolating
-the contributions of NER recall, MedDRA ontology grounding, and constrained
-decoding. Our central finding
-is that Concept Coverage Rate (CCR), the fraction of source spans grounded in
-a MedDRA ontology graph, is the binding constraint on terminology-aware MT: at
-39\% CCR, graph-free systems (S1--S2) outperform all graph-augmented systems
-on fluency---S1 leads on BLEU, S2 on chrF and Hypothesis--Reference Agreement (HRA)---while improving NER quality
-yields $\approx$7~BLEU gains for graph-augmented Mistral systems (S3--S5-Mistral)
-but not for NLLB systems or S2, whose inference is shared across both NER
-conditions (Table~\ref{tab:delta}). We
-further show that our Hierarchy-Aware Terminology Metric (HTM) scores the
-certified human reference at about 0.15--0.18 depending on NER manifest, a
-score unchanged by full MedDRA ancestor alias expansion, confirming a
-structural mismatch between MedDRA nomenclature and professional translation
-practice. Finally, ambiguous MedDRA grounding causes the planning stage to
-abstain from locking critical terms, explaining a paradox in which
-graph-augmented systems produce \emph{lower} cross-document consistency than
-graph-free baselines. We complement aggregate scores with a glossary-oracle
-ablation (S6) and segment-level qualitative analysis (missing-term rates,
-drift, modal agreement) exported under \texttt{error\_analysis/} in the
-project repository.
+Terminology consistency is a critical quality dimension in the machine
+translation of regulatory medical documents, where mistranslated adverse
+event terms carry direct patient-safety consequences. We present
+\textbf{TermPlanMT}, a graph-augmented terminology-planning framework
+evaluated on a 126-segment French--English corpus drawn from a European
+Medicines Agency (EMA) Summary of Product Characteristics (SmPC). Six
+systems form an ablation ladder isolating the contributions of NER recall,
+MedDRA ontology grounding, and constrained decoding. Our central finding
+is that Concept Coverage Rate (CCR), the fraction of source spans grounded
+in a MedDRA ontology graph, is the binding constraint on terminology-aware
+MT: at 39\% CCR, graph-free systems (S1--S2) outperform all
+graph-augmented systems on fluency---S1 leads on BLEU, S2 on chrF and
+Hypothesis--Reference Agreement (HRA)---while improving NER quality yields
+$\approx$7~BLEU gains for graph-augmented Mistral systems (S3--S5-Mistral)
+but not for NLLB or S2. HTM scores the certified human reference at
+0.15--0.18, unchanged by full MedDRA alias expansion, confirming a
+structural mismatch between MedDRA nomenclature and professional
+translation practice. Ambiguous grounding causes the planning stage to
+abstain from locking critical terms, explaining why graph-augmented systems
+produce lower cross-document consistency than graph-free baselines.
 \end{abstract}
 
 %% ── Visual overview (systems + metric) ─────────────────────────────────────
 \begin{figure*}[!t]
   \centering
-  \includegraphics[width=\textwidth]{../figures/figure_pipeline_four_stage.png}
+  \includegraphics[width=\textwidth]{figure_pipeline_four_stage.png}
   \caption{Four-stage TermPlanMT pipeline (NER $\rightarrow$ grounding $\rightarrow$ planning $\rightarrow$ decoding).}
   \label{fig:pipeline}
 \end{figure*}
 
 \begin{figure*}[!t]
   \centering
-  \includegraphics[width=0.92\textwidth]{../figures/figure_htm_metric.png}
+  \includegraphics[width=0.92\textwidth]{figure_htm_metric.png}
   \phantomcaption\label{fig:htm}
 \end{figure*}
 
@@ -283,28 +278,49 @@ $\text{HP} = |\hat{d} - d_{\text{src}}|$ penalises wrong specificity level
 \begin{algorithm}[t]
 \caption{Global Terminology Planning (\texttt{compute\_global\_locks})}
 \label{alg:planning}
+\begin{tcolorbox}[
+  colback=gray!6,
+  colframe=gray!40,
+  boxrule=0.4pt,
+  arc=3pt,
+  left=4pt, right=4pt, top=4pt, bottom=4pt]
 \begin{algorithmic}[1]
-\Require Segments $\mathcal{S}$, MedDRA graph $\mathcal{G}$, weights $\alpha{=}0.5$, $\beta{=}0.3$, $\gamma{=}0.2$
-\Ensure Lock map $\mathcal{L}: \text{fr\_term} \to \text{en\_rendering}$
+\small
+\Require Segments $\mathcal{S}$, graph $\mathcal{G}$,
+         $\alpha{=}0.5$, $\beta{=}0.3$, $\gamma{=}0.2$
+\Ensure Lock map $\mathcal{L}$: fr\_term $\to$ en\_rendering
 \State $\mathcal{L} \leftarrow \{\}$
 \For{each unique French NER term $w$ in $\mathcal{S}$}
-    \State $c^* \leftarrow \mathcal{G}.\texttt{ground}(w)$ \Comment{Exact match, then RapidFuzz $\geq 90\%$}
-    \If{$c^*$ is \texttt{None} \textbf{or} $\mathcal{G}.\texttt{is\_ambiguous}(w)$}
-        \State \textbf{continue} \Comment{Abstain: ambiguous grounding risks locking wrong concept}
+    \State $c^{*} \leftarrow \mathcal{G}.\texttt{ground}(w)$
+    \Comment{Exact match, then RapidFuzz ${\geq}90\%$}
+    \If{$c^{*}$ is \texttt{None} \textbf{or}
+        $\mathcal{G}.\texttt{is\_ambiguous}(w)$}
+        \State \textbf{continue}
+        \Comment{Abstain: wrong lock propagates document-wide}
     \EndIf
-    \State $\mathcal{C} \leftarrow \{c^*.\text{name}\} \cup \mathcal{G}.\texttt{neighbours}(c^*)$
-    \Comment{Candidate English renderings}
-    \State $\text{segs}_w \leftarrow$ all source segments containing $w$
-    \For{each candidate rendering $r \in \mathcal{C}$}
-        \State $\text{Ctx}(r) \leftarrow \cos(\text{embed}(\text{segs}_w),\ \text{embed}(r))$
-        \State $\text{Nbr}(r) \leftarrow \cos(\text{embed}(r),\ \text{embed}(\mathcal{G}.\texttt{neighbours}(c^*)))$
-        \State $\text{HP}(r) \leftarrow |{\text{level}(r) - \text{level}(c^*)}|$
-        \State $\text{Score}(r) \leftarrow \alpha \cdot \text{Ctx}(r) + \beta \cdot \text{Nbr}(r) - \gamma \cdot \text{HP}(r)$
+    \State $\mathcal{C} \leftarrow
+           \{c^{*}\texttt{.name}\} \cup
+           \mathcal{G}.\texttt{neighbours}(c^{*})$
+    \For{each candidate $r \in \mathcal{C}$}
+        \State $\mathrm{Ctx}(r) \leftarrow
+               \cos\!\bigl(\mathrm{emb}(\mathrm{segs}_w),\,
+                            \mathrm{emb}(r)\bigr)$
+        \State $\mathrm{Nbr}(r) \leftarrow
+               \cos\!\bigl(\mathrm{emb}(r),\,
+                            \mathrm{emb}(\mathcal{G}.\texttt{nbrs})\bigr)$
+        \State $\mathrm{HP}(r)  \leftarrow
+               |\mathrm{level}(r) - \mathrm{level}(c^{*})|$
+        \State $\mathrm{Score}(r) \leftarrow
+               \alpha\,\mathrm{Ctx}(r)
+               + \beta\,\mathrm{Nbr}(r)
+               - \gamma\,\mathrm{HP}(r)$
     \EndFor
-    \State $\mathcal{L}[w] \leftarrow \arg\max_{r \in \mathcal{C}}\ \text{Score}(r)$
+    \State $\mathcal{L}[w] \leftarrow
+           \arg\max_{r \in \mathcal{C}}\,\mathrm{Score}(r)$
 \EndFor
-\Return $\mathcal{L}$
+\State \Return $\mathcal{L}$
 \end{algorithmic}
+\end{tcolorbox}
 \end{algorithm}
 
 The abstain-on-ambiguity policy (line 4) is a deliberate safety choice: when a French
@@ -332,35 +348,28 @@ degradation under strict constraints.
 \section{Metrics}
 \label{sec:metrics}
 
-\begin{mdframed}[backgroundcolor=gray!8, linewidth=0.4pt]
-\textbf{Metric definitions (used consistently throughout).}
-\begin{itemize}[noitemsep, topsep=2pt]
-  \item \textbf{HTM} (Hierarchy-Aware Terminology Metric): for each grounded NER
-  span in the \emph{hypothesis}, checks whether the system output contains a
-  MedDRA-aligned English rendering. Score per span: $1.0$ (exact level match),
-  $0.5$ (same ontology branch), $0.0$ (miss). Macro-averaged across all spans.
-
-  \item \textbf{rHTM} (Reference HTM): HTM evaluated on the certified human
-  \emph{reference} translation rather than the system hypothesis. This is a
-  \emph{dataset-level ceiling}, not a per-system score. Values of $0.15$--$0.18$
-  confirm that professional translators systematically prefer descriptive phrasings
-  outside the MedDRA preferred-term vocabulary.
-
-  \item \textbf{HRA} (Hypothesis--Reference Agreement): for each grounded span,
-  measures agreement between hypothesis and reference on their respective HTM
-  scores: $\text{HRA} = 1 - |\text{HTM}_\text{hyp} - \text{HTM}_\text{ref}|$,
-  macro-averaged. A score of $1.0$ means the system and the human translator
-  agree perfectly on ontology placement; $0.0$ means maximum disagreement.
-
-  \item \textbf{HTM-A} (Alias-Expanded HTM): relaxes the match condition to accept
-  any term in the ancestor chain up to the System Organ Class (SOC). Invariance
-  of scores under this expansion (T1$\approx$T2$\approx$T3 in
-  Table~\ref{tab:aliases}) confirms that failures are conceptual, not surface-level.
-
-  \item \textbf{CCR} (Concept Coverage Rate): fraction of extracted NER spans that
-  the Neo4j MedDRA graph successfully grounds to a concept. CCR is the primary
-  diagnostic for NER quality as the binding constraint on all graph-augmented
-  systems.
+\begin{mdframed}[backgroundcolor=gray!6, linewidth=0.4pt,
+                 innerleftmargin=6pt, innerrightmargin=6pt,
+                 innertopmargin=5pt, innerbottommargin=5pt]
+\textbf{Metric definitions.}
+\begin{itemize}[noitemsep, topsep=3pt, leftmargin=*]
+  \item \textbf{HTM} (Hierarchy-Aware Terminology Metric): per grounded
+  NER span, score $= 1.0$ (exact MedDRA level), $0.5$ (same branch),
+  $0.0$ (miss); macro-averaged.
+  \item \textbf{rHTM} (Reference HTM): HTM applied to the certified human
+  reference, not a system hypothesis. A dataset-level ceiling;
+  values of $0.15$--$0.18$ confirm translators prefer phrasings outside
+  the MedDRA preferred-term vocabulary.
+  \item \textbf{HRA} (Hypothesis--Reference Agreement):
+  $1 - |\mathrm{HTM}_\mathrm{hyp} - \mathrm{HTM}_\mathrm{ref}|$,
+  macro-averaged. Measures agreement with professional translation
+  practice rather than raw ontology proximity.
+  \item \textbf{HTM-A} (Alias-Expanded HTM): accepts any ancestor up to
+  SOC. Score invariance across tiers T1--T3 confirms failures are
+  conceptual, not surface-level.
+  \item \textbf{CCR} (Concept Coverage Rate): grounded spans / extracted
+  spans. Identical across S1--S6 for a given NER condition; the primary
+  diagnostic for NER quality.
 \end{itemize}
 \end{mdframed}
 
@@ -605,28 +614,23 @@ Professional translators systematically prefer descriptive phrasings that fall
 outside the MedDRA preferred-term vocabulary. We identify three categories of
 translator deviation from ontology labels:
 
-\begin{enumerate}[leftmargin=*, itemsep=3pt]
-
-  \item \textbf{Descriptive expansion.} The MedDRA Preferred Term (PT)
-  \textsc{Pneumonitis} (L4) is rendered as \textit{``immune-related pneumonitis''}
-  or \textit{``inflammatory lung disease''} --- phrasings that match no MedDRA
-  level and therefore score $0.0$ under HTM regardless of alias expansion
-  (T1--T3). This explains why rHTM $\approx 0.15$--$0.18$ for certified human
-  references.
-
-  \item \textbf{Hypernym substitution.} Translators sometimes ascend the
-  hierarchy deliberately, using a High Level Term (HLT) or System Organ Class
-  (SOC) label where clinical context makes the broader term more readable.
-  HTM penalises this as a specificity error even when it is a deliberate
-  stylistic choice.
-
-  \item \textbf{Compound paraphrase.} Multi-token MedDRA labels
-  (e.g.\ \textsc{Palmar-plantar erythrodysaesthesia syndrome}) are paraphrased
-  as shorter clinical shorthand (\textit{``hand-foot syndrome''}), which
-  lies outside the MedDRA branch entirely. The vector HTM variant at cosine
-  threshold $\tau{=}0.75$ partially recovers these cases through semantic
-  similarity, but the surface HTM miss remains.
-
+\begin{enumerate}[leftmargin=*, itemsep=4pt, topsep=4pt]
+  \item \textbf{Descriptive expansion.} The MedDRA PT
+  \textsc{Pneumonitis} (L4) appears in the reference as
+  \textit{``immune-related pneumonitis''} or
+  \textit{``inflammatory lung disease''}---phrasings absent from the
+  MedDRA tree at any level, scoring $0.0$ under HTM regardless of alias
+  tier (T1--T3). This is the primary cause of the low rHTM ceiling.
+  \item \textbf{Hypernym substitution.} Translators deliberately ascend
+  the hierarchy, selecting an HLT or SOC label where the broader term
+  improves readability. HTM treats this as a specificity error even when
+  it reflects a deliberate stylistic choice.
+  \item \textbf{Compound paraphrase.} Long MedDRA labels
+  (e.g.\ \textsc{Palmar-plantar erythrodysaesthesia syndrome}) are
+  shortened to clinical shorthand (\textit{``hand-foot syndrome''}),
+  which falls outside the MedDRA branch entirely. Vector HTM at
+  $\tau{=}0.75$ partially recovers these cases; surface HTM misses them
+  entirely.
 \end{enumerate}
 
 This taxonomy explains both the rHTM ceiling and the HTM--BLEU divergence:
@@ -635,6 +639,28 @@ references avoid, producing lower BLEU against the descriptive reference while
 appearing more ontology-compliant. The appropriate evaluation lens is therefore
 \textbf{HRA}, which measures agreement with professional translation practice
 rather than raw ontology proximity.
+
+\begin{table}[h]
+\small
+\centering
+\setlength{\tabcolsep}{4pt}
+\caption{Register contrast: human translators vs.\ MT systems for
+         the same adverse-event source spans.}
+\label{tab:taxonomy}
+\begin{tabular}{lp{2.2cm}p{1.4cm}p{2cm}}
+\toprule
+\textbf{System} & \textbf{Register} & \textbf{HTM} &
+\textbf{Consistency} \\
+\midrule
+Human ref   & Descriptive prose     & 0.15--0.18 & Deliberate variation \\
+S1 NLLB     & Rigid hypernym        & 0.32--0.55 & High (vocabulary artefact) \\
+S2 Mistral  & Contextual prose      & 0.41--0.74 & Moderate \\
+S3/S4 Graph & Technical PT label    & 0.40--0.66 & Lower (ambiguity) \\
+S5 Boost    & Forced PT label       & 0.35--0.67 & Stochastic \\
+S6 Oracle   & Reference-anchored    & 0.32--0.54 & Higher \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
