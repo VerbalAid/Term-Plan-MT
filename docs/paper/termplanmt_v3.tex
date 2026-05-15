@@ -176,12 +176,16 @@ the source text.
 Lexically constrained decoding \citep{hokamp2017lexically,post2018fast} and
 terminology-aware training \citep{dinu2019training} enforce surface-level term
 appearance but ignore ontological hierarchy and do not address candidate
-selection when multiple levels are valid. \citet{herold2023improving} show
-that extending NMT context windows can degrade fluency, motivating document-level
-LLMs as a consistency baseline. \citet{labrak2024biomistral} release
+selection when multiple levels are valid. \citet{herold2023improving} show that feeding long context directly into NMT
+degrades output quality due to attention mechanism limitations, motivating our
+pre-translation planning stage: rather than exposing the full document at decoding
+time, we distil relevant terminology into a compact, structured prompt. \citet{labrak2024biomistral} release
 BioMistral, the medically adapted LLM used for NER here.
-\citet{neves2022evaluation} identify adverse-event terminology as a
-high-priority MT failure mode. GraphRAG-style retrieval
+\citet{neves2022evaluation} identify biomedical named entities broadly---diseases,
+drugs, and procedures---as a persistent failure mode in biomedical MT. Our work
+narrows this to the specific subtype of adverse event (AE) terminology as defined
+by the MedDRA ontology, a distinction with direct regulatory consequences given
+that AE terminology is legally standardised across EMA submissions. GraphRAG-style retrieval
 \citep{edge2024local} into LLM prompts provides the template for our S3
 system, adapting knowledge-grounded MT \citep{moussallem2019augmenting} to
 a Neo4j MedDRA backend.
@@ -596,6 +600,42 @@ Mean modal agreement (\S\ref{sec:results}) shows the same pattern at corpus
 level: graph-free systems rank highest under baseline NER; graph-augmented
 systems recover partially under fine-tuned NER but do not overtake S2.
 
+\paragraph{Translator language outside MedDRA.}
+Professional translators systematically prefer descriptive phrasings that fall
+outside the MedDRA preferred-term vocabulary. We identify three categories of
+translator deviation from ontology labels:
+
+\begin{enumerate}[leftmargin=*, itemsep=3pt]
+
+  \item \textbf{Descriptive expansion.} The MedDRA Preferred Term (PT)
+  \textsc{Pneumonitis} (L4) is rendered as \textit{``immune-related pneumonitis''}
+  or \textit{``inflammatory lung disease''} --- phrasings that match no MedDRA
+  level and therefore score $0.0$ under HTM regardless of alias expansion
+  (T1--T3). This explains why rHTM $\approx 0.15$--$0.18$ for certified human
+  references.
+
+  \item \textbf{Hypernym substitution.} Translators sometimes ascend the
+  hierarchy deliberately, using a High Level Term (HLT) or System Organ Class
+  (SOC) label where clinical context makes the broader term more readable.
+  HTM penalises this as a specificity error even when it is a deliberate
+  stylistic choice.
+
+  \item \textbf{Compound paraphrase.} Multi-token MedDRA labels
+  (e.g.\ \textsc{Palmar-plantar erythrodysaesthesia syndrome}) are paraphrased
+  as shorter clinical shorthand (\textit{``hand-foot syndrome''}), which
+  lies outside the MedDRA branch entirely. The vector HTM variant at cosine
+  threshold $\tau{=}0.75$ partially recovers these cases through semantic
+  similarity, but the surface HTM miss remains.
+
+\end{enumerate}
+
+This taxonomy explains both the rHTM ceiling and the HTM--BLEU divergence:
+systems that score well on HTM tend to use technical ontology labels that human
+references avoid, producing lower BLEU against the descriptive reference while
+appearing more ontology-compliant. The appropriate evaluation lens is therefore
+\textbf{HRA}, which measures agreement with professional translation practice
+rather than raw ontology proximity.
+
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
 in the string cache (one of 7,679 ambiguous normalised keys). The planning
@@ -659,6 +699,19 @@ is only interpretable relatively.
 14.2\% prompt contamination; filtered scores are used throughout.
 \textit{S6 oracle.} The glossary is extracted from reference translations via
 Ollama; genuine oracle quality depends on extraction recall.
+
+\paragraph{Boost success rate.}
+S5 applies logit boosting to locked MedDRA renderings at each decoding step, but
+we do not directly verify whether the boosted term surfaces in the final
+hypothesis. A term can fail to appear in two ways: the model generates a
+competing token with a stronger contextual signal, or \texttt{force\_words\_ids}
+triggers a beam failure and falls back to soft-only decoding. Measuring the
+fraction of segments where the intended locked term appears verbatim in the
+hypothesis---the \emph{boost success rate}---would directly link the planning
+mechanism to observed HTM scores and is an important diagnostic for future work.
+We expect boost success rate to correlate negatively with term specificity: broad
+SOC-level terms (short, common) are more likely to surface than precise LLT-level
+multi-token phrases.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
