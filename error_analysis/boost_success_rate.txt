@@ -1,0 +1,27 @@
+PROXY BOOST / GLOSSARY SURFACE RATE ANALYSIS
+============================================================
+
+S5 — NER TERM VERBATIM SURFACE RATE
+(does the NER-extracted source term appear verbatim in S5's English hypothesis?)
+Note: language-neutral tokens (drug names, acronyms) dominate hits.
+Multi-token French medical phrases require translation so verbatim match is not expected.
+
+  Overall          159/472 = 34%
+  1-token terms    153/387 = 40%   (drug names, cognates)
+  2-token terms    6/52 = 12%   (partial cognate pairs)
+  3+ token terms   0/33 = 0%   (French medical phrases — translation required)
+
+S6 — ORACLE GLOSSARY ENGLISH TERM SURFACE RATE
+(does the oracle English gloss appear verbatim in S6's NLLB hypothesis?)
+This is a direct measure of glossary injection effectiveness.
+
+  Overall          142/397 = 36%
+  1-token terms    125/353 = 35%
+  2-token terms    17/38 = 45%
+  3+ token terms   0/6 = 0%   (e.g. "palmar-plantar erythrodysaesthesia syndrome")
+
+KEY FINDING:
+Term length is the primary predictor of surface success. All 3+ token
+MedDRA labels fail to appear verbatim in S6 output regardless of oracle
+injection. Even 2-token S5 NER terms drop from 40% to 12%. This
+explains a significant share of missing-term rate and HTM misses.
