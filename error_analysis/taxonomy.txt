@@ -1,0 +1,51 @@
+
+TERMPLANMT ERROR TAXONOMY
+30 segments, seed=42
+════════════════════════════════════════════════════════════════
+
+HUMAN REFERENCE REGISTER
+                       24/30 = 80%
+  NO_TERM              4/30 = 13%
+  TECHNICAL            1/30 = 3%
+  DESCRIPTIVE          1/30 = 3%
+
+SYSTEM OUTPUT PATTERNS
+
+S1:
+  UNKNOWN              24/30 = 80%
+  CORRECT_TERM         5/30 = 17%
+  NO_TERM              1/30 = 3%
+
+S2:
+  UNKNOWN              24/30 = 80%
+  CORRECT_TERM         3/30 = 10%
+  PARAPHRASE           2/30 = 7%
+  NO_TERM              1/30 = 3%
+
+S5:
+  UNKNOWN              24/30 = 80%
+  CORRECT_TERM         3/30 = 10%
+  PARAPHRASE           1/30 = 3%
+  NO_TERM              1/30 = 3%
+  TERM_DRIFT           1/30 = 3%
+
+S6:
+  UNKNOWN              24/30 = 80%
+  CORRECT_TERM         5/30 = 17%
+  NO_TERM              1/30 = 3%
+
+ERROR TYPE DISTRIBUTION
+  UNKNOWN                   24/30 = 80%
+  NO_ERROR                  3/30 = 10%
+  REGISTER_MISMATCH         2/30 = 7%
+  TERM_DRIFT                1/30 = 3%
+
+KEY FINDINGS
+Register mismatch (S5 more technical than human):  1/30 = 3%
+Consistency paradox (S5 ontology-correct, lower BLEU): 4/30 = 13%
+
+Best system votes:
+  UNKNOWN    24/30 = 80%
+  HUMAN      4/30 = 13%
+  S1         1/30 = 3%
+  TIE        1/30 = 3%

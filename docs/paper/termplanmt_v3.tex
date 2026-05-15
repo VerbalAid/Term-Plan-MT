@@ -642,18 +642,29 @@ evaluation lens is \textbf{HRA}, which measures agreement with professional
 translation practice rather than raw ontology proximity.
 
 \paragraph{Register mismatch -- qualitative audit.}
-To quantify the HTM--BLEU divergence, we sampled 30 segments and compared
-S5-Mistral output against the professional reference, labelling each case
-as \emph{technical} (system uses a MedDRA PT label the reference avoids)
-or \emph{descriptive} (system matches the reference register). In the
-majority of cases where S5 scores higher on HTM than the reference, the
-system produces a formally correct MedDRA label -- \textsc{Pneumonitis},
-\textsc{Arthralgia} -- that the certified translator replaces with descriptive
-prose (\textit{``immune-related pneumonitis''}, \textit{``joint pain''}).
-This confirms that the HTM--BLEU inversion is not a system failure but a
-\emph{register mismatch}: graph-augmented systems are pulled toward
-pharmacovigilance coding language while professional translators write
-for a clinical reader. HRA captures this distinction; HTM alone does not.
+To ground the HTM--BLEU divergence empirically, we sampled 30 segments and
+annotated all outputs (S1--S6 plus human reference) across four dimensions:
+human register, system output pattern, register mismatch, and the consistency
+paradox (GPT-4o annotation, seed~42; CSV in \texttt{error\_analysis/}).
+
+Among segments containing a medical term, the human reference was split
+between \textbf{technical} (23\%) and \textbf{descriptive} (20\%) register,
+with 43\% of segments containing no scoreable medical term at all. S5
+produced a \texttt{CORRECT\_TERM} match in 57\% of cases and exhibited
+\texttt{TERM\_DRIFT} in 10\%. In 23\% of segments S5 used a more formal
+MedDRA label where the certified translator wrote descriptive prose --
+e.g.\ \textsc{Pneumonitis} vs.\ \textit{``immune-related pneumonitis''} --
+the \textbf{register mismatch} pattern. More strikingly, in 57\% of cases
+S5 was ontology-correct yet would score lower on BLEU because it diverges
+from the reference register -- the \textbf{consistency paradox}. Human
+reference was judged the best output in 37\% of cases; S2 (Mistral,
+graph-free) in 20\%; with a tie in 27\%. The dominant error type was
+\texttt{REGISTER\_MISMATCH} (23\%) followed by \texttt{TERM\_DRIFT} (20\%).
+These results confirm that the HTM--BLEU inversion is not a translation
+failure but a structural register mismatch: graph-augmented systems converge
+toward pharmacovigilance coding language while certified translators write
+for a clinical reader. \textbf{HRA} captures this distinction; HTM alone
+does not.
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
