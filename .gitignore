@@ -52,5 +52,11 @@ error_analysis/*.log
 # LaTeX build artefacts
 *.aux
 *.out
+*.bbl
+*.blg
 docs/paper/*.log
 .aider*
+
+# Paper PDF: docs/paper/termplanmt_v3.pdf only (no root copies)
+/termplanmt_v3.pdf
+/docs/termplanmt_v3.pdf
