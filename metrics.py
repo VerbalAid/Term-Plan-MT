@@ -325,19 +325,22 @@ def _rendering_strings(graph: Any, concept: dict) -> list[str]:
     return out
 
 
-def _score_htm_alignment(found_render: str | None, ref: dict, graph: Any) -> float:
-    """HTM score for one span: 1.0 / 0.5 / 0.0."""
-    if not found_render:
+def _htm_span_score(found: str | None, label_name: str, level: Any, graph: Any) -> float:
+    """Shared HTM scorer: 1.0 exact level, 0.5 same branch, 0.0 miss."""
+    if not found:
         return 0.0
-    node = graph.get_by_name(ref["en_label"]) or graph.get_by_name(found_render)
+    node = graph.get_by_name(label_name) or graph.get_by_name(found)
     if not node:
         return 0.0
-    gl = ref.get("level")
-    if gl is not None and node.get("level") == gl:
+    if level is not None and node.get("level") == level:
         return 1.0
-    if graph.same_branch(found_render, ref["en_label"]):
+    if graph.same_branch(found, label_name):
         return 0.5
     return 0.0
+
+
+def _score_htm_alignment(found_render: str | None, ref: dict, graph: Any) -> float:
+    return _htm_span_score(found_render, ref["en_label"], ref.get("level"), graph)
 
 
 def _scores_htm_on_english(
@@ -369,16 +372,7 @@ def _scores_htm_on_english(
 # Internal scoring helpers used by compute_htm and compute_hra.
 
 def _score(found: str | None, concept: dict, graph: Any) -> float:
-    if not found:
-        return 0.0
-    node = graph.get_by_name(str(concept.get("name") or "")) or graph.get_by_name(found)
-    if not node:
-        return 0.0
-    if node.get("level") == concept.get("level"):
-        return 1.0
-    if graph.same_branch(found, str(concept.get("name") or "")):
-        return 0.5
-    return 0.0
+    return _htm_span_score(found, str(concept.get("name") or ""), concept.get("level"), graph)
 
 
 def _renderings(concept: dict, graph: Any) -> list[str]:

@@ -745,4 +745,27 @@ via MSSO/UPV/EHU, supervised by Gorka Labaka.
 \bibliographystyle{plainnat}
 \bibliography{termplanmt_refs_v3}
 
+%% ── Supplementary figures ─────────────────────────────────────────────────
+\appendix
+\section*{Supplementary Figures}
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.88\textwidth]{comparison_metrics_grouped_baseline.png}
+\caption{Full system comparison under baseline NER (\texttt{ner\_biollm},
+CCR~=~39.0\%). Top panel: BLEU and chrF\texttt{++}; bottom panel: HTM.
+S1/S2 lead on fluency; graph-augmented systems lead on HTM at the cost
+of BLEU, confirming the register mismatch.}
+\label{fig:app_baseline}
+\end{figure*}
+
+\begin{figure*}[h]
+\centering
+\includegraphics[width=0.88\textwidth]{comparison_metrics_grouped_finetuned.png}
+\caption{Full system comparison under fine-tuned NER (\texttt{ner\_biollm\_ft},
+CCR~=~36.4\%). Graph-augmented Mistral systems (S3--S5-Mistral) close the
+fluency gap substantially, confirming NER quality as the binding constraint.}
+\label{fig:app_finetuned}
+\end{figure*}
+
 \end{document}
