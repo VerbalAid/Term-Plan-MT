@@ -1,0 +1,779 @@
+id,fr,human_ref,best_system,ranking,ner_winner,ner_reason,s1_verdict,s2_verdict,s3base_verdict,s3ft_verdict,s5base_verdict,s5ft_verdict,s6_verdict,key_observation,raw_response
+48_082,"Chez les patients atteints d’un CETEC localement avancé résécable traités par
+pembrolizumab en traitement néoadjuvant et en association à une radiothérapie avec ou sans cisplatine
+concomitant en trait","170
+Hypothyroidism occurred in 939 (12.3%) patients, including Grade 2 or 3 cases in 687 (9.0%) and
+8 (0.1%) patients, respectively, receiving pembrolizumab.",UNKNOWN,,,,,,,,,,,,"BEST_SYSTEM [S1|S2|S3-base|S3-FT|S5-base|S5-FT|S6|HUMAN|TIE]: HUMAN
+
+RANKING [comma-separated best to worst, all 8 options including HUMAN]: HUMAN, S2, S1, S6, S3-base, S5-base, S3-FT, S5-FT
+
+NER_WINNER [baseline|finetuned|tied]: baseline
+
+NER_REASON [1 sentence]: The baseline NER systems provided more complete and coherent translations compared to the fine-tuned systems, which were contaminated or incomplete.
+
+S1_VERDICT [1 sentence]: S1 provides a reasonably accurate translation but lacks the specificity of the certified human reference and omits the mention of radiotherapy.
+
+S2_VERDICT [1 sentence]: S2 is the most accurate machine translation, closely following the structure and content of the French source, though it still lacks the precision of the human reference.
+
+S3_BASE_VERDICT [1 sentence]: S3-base attempts to provide additional context with expanded CETEC definitions but is incomplete and less coherent.
+
+S3_FT_VERDICT [1 sentence]: S3-FT is contaminated and fails to deliver a coherent or complete translation.
+
+S5_BASE_VERDICT [1 sentence]: S5-base similarly provides expanded CETEC definitions but is incomplete and lacks coherence.
+
+S5_FT_VERDICT [1 sentence]: S5-FT is contaminated and does not provide a usable translation.
+
+S6_VERDICT [1 sentence]: S6 incorrectly translates ""hypothyroidism"" as ""hyperthyroidism,"" which is a critical error despite otherwise following the source structure.
+
+KEY_OBSERVATION [2 sentences max]: The most significant terminology issue is the incorrect translation of ""hypothyroidism"" as ""hyperthyroidism"" in S6, which is a critical error. Additionally, the expanded CETEC definitions in S3-base and S5-base are unnecessary and detract from the clarity and precision required in an SmPC."
+48_015,"Pembrolizumab en association à un inhibiteur de tyrosine kinase (ITK) (voir rubrique 4.2)
+Lorsque pembrolizumab est administré en association à l'axitinib ou au lenvatinib, reportez-vous au RCP de
+l'a","Pembrolizumab in combination with tyrosine kinase inhibitor (TKI) (see section 4.2)
+When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the SmPC
+for axitinib or len",HUMAN,"HUMAN, S3-FT, S5-FT, S3-base, S5-base, S1, S2, S6",tied,Both baseline and fine-tuned NER conditions produced identical outputs for the graph systems.,"The translation is mostly accurate but uses ""RCP"" instead of the preferred ""SmPC"" terminology.","This translation incorrectly places the reference to product information before the combination context and uses ""product information"" instead of ""SmPC"".","This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.","This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.","This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.","This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.","The translation is mostly accurate but uses ""RCP"" instead of the preferred ""SmPC"" terminology and omits the combination context.","The use of ""SmPC"" instead of ""RCP"" is crucial for consistency with EMA guidelines, and only some systems correctly implemented this terminology. The systems that used ""SmPC"" aligned more closely with the certified human reference, highlighting the importance of precise regulatory terminology.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S3-FT, S5-FT, S3-base, S5-base, S1, S2, S6
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs for the graph systems.
+
+S1_VERDICT: The translation is mostly accurate but uses ""RCP"" instead of the preferred ""SmPC"" terminology.
+
+S2_VERDICT: This translation incorrectly places the reference to product information before the combination context and uses ""product information"" instead of ""SmPC"".
+
+S3_BASE_VERDICT: This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.
+
+S3_FT_VERDICT: This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.
+
+S5_BASE_VERDICT: This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.
+
+S5_FT_VERDICT: This translation is accurate and uses the correct ""SmPC"" terminology, closely matching the human reference.
+
+S6_VERDICT: The translation is mostly accurate but uses ""RCP"" instead of the preferred ""SmPC"" terminology and omits the combination context.
+
+KEY_OBSERVATION: The use of ""SmPC"" instead of ""RCP"" is crucial for consistency with EMA guidelines, and only some systems correctly implemented this terminology. The systems that used ""SmPC"" aligned more closely with the certified human reference, highlighting the importance of precise regulatory terminology."
+48_004,"Formulation sous-cutanée
+Le profil de sécurité de KEYTRUDA solution injectable en association avec un doublet de chimiothérapie à
+base de platine (évalué chez 126 et 251 patients traités avec les form","Subcutaneous formulation
+The safety profile of KEYTRUDA solution for injection in combination with platinum doublet
+163
+chemotherapy (evaluated in 126 and 251 patients treated with the intravenous and",HUMAN,"HUMAN, S6, S2, S1, S3-base, S5-base, S3-FT, S5-FT",baseline,"Baseline NER systems produced more coherent and complete translations compared to fine-tuned NER systems, which were contaminated.","S1 provides a reasonably accurate translation but incorrectly translates ""platinum doublet"" as ""double platinum-based chemotherapy.""","S2 offers a clear translation but uses ""adverse effect"" instead of ""adverse reaction,"" which is less precise.","S3-base has a coherent structure but incorrectly translates ""platinum doublet"" as ""platine-based chemotherapy.""","S3-FT is marked as contaminated, indicating significant translation issues.","S5-base mirrors S3-base's errors, with ""platine-based chemotherapy"" and incomplete translation.","S5-FT is marked as contaminated, indicating significant translation issues.","S6 closely follows the human reference but uses ""adverse effect"" instead of ""adverse reaction,"" which slightly reduces precision.","The human reference remains the gold standard due to its precise use of ""adverse reaction"" and correct terminology like ""platinum doublet,"" which most machine translations struggled to replicate accurately.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S6, S2, S1, S3-base, S5-base, S3-FT, S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: Baseline NER systems produced more coherent and complete translations compared to fine-tuned NER systems, which were contaminated.
+
+S1_VERDICT: S1 provides a reasonably accurate translation but incorrectly translates ""platinum doublet"" as ""double platinum-based chemotherapy.""
+
+S2_VERDICT: S2 offers a clear translation but uses ""adverse effect"" instead of ""adverse reaction,"" which is less precise.
+
+S3_BASE_VERDICT: S3-base has a coherent structure but incorrectly translates ""platinum doublet"" as ""platine-based chemotherapy.""
+
+S3_FT_VERDICT: S3-FT is marked as contaminated, indicating significant translation issues.
+
+S5_BASE_VERDICT: S5-base mirrors S3-base's errors, with ""platine-based chemotherapy"" and incomplete translation.
+
+S5_FT_VERDICT: S5-FT is marked as contaminated, indicating significant translation issues.
+
+S6_VERDICT: S6 closely follows the human reference but uses ""adverse effect"" instead of ""adverse reaction,"" which slightly reduces precision.
+
+KEY_OBSERVATION: The human reference remains the gold standard due to its precise use of ""adverse reaction"" and correct terminology like ""platinum doublet,"" which most machine translations struggled to replicate accurately."
+48_095,Aucun patient n’a présenté de MVO hépatique.,The median duration was 1.9 months (range: 1 day to 47.1+ months).,UNKNOWN,,,,,,,,,,,,"BEST_SYSTEM [S1|S2|S3-base|S3-FT|S5-base|S5-FT|S6|HUMAN|TIE]: S2
+
+RANKING [comma-separated best to worst, all 8 options including HUMAN]: HUMAN, S2, S3-FT, S5-FT, S1, S6, S3-base, S5-base
+
+NER_WINNER [baseline|finetuned|tied]: finetuned
+
+NER_REASON [1 sentence]: Fine-tuned NER systems (S3-FT, S5-FT) more accurately capture the intended clinical terminology, as evidenced by their correct use of ""hepatic MVO (Microvascular Obstruction)"".
+
+S1_VERDICT [1 sentence]: S1 uses the MedDRA term ""hepatic MVO"" correctly but lacks the more descriptive clinical language expected in professional SmPC prose.
+
+S2_VERDICT [1 sentence]: S2 provides the most accurate and clinically descriptive translation by using ""hepatic veno-occlusive disease,"" aligning closely with the certified human reference.
+
+S3_BASE_VERDICT [1 sentence]: S3-base incorrectly translates the term, resulting in ""hepatic morphological abnormalities,"" which is not synonymous with the intended condition.
+
+S3_FT_VERDICT [1 sentence]: S3-FT correctly identifies ""hepatic MVO"" and provides a parenthetical explanation, enhancing clarity and aligning with professional standards.
+
+S5_BASE_VERDICT [1 sentence]: S5-base repeats the error of S3-base, misidentifying the condition as ""hepatic morphological abnormalities.""
+
+S5_FT_VERDICT [1 sentence]: S5-FT accurately translates the term as ""hepatic MVO (Microvascular Obstruction),"" providing both precision and clarity.
+
+S6_VERDICT [1 sentence]: S6's translation is slightly awkward with ""were presented with,"" and lacks the descriptive clarity of the human reference.
+
+KEY_OBSERVATION [2 sentences max]: The most important terminology quality finding is that systems using fine-tuned NER with MedDRA context (S3-FT, S5-FT) provide translations that are both precise and clinically descriptive, closely aligning with professional standards. The use of ""hepatic veno-occlusive disease"" in S2 demonstrates the importance of using clinically accepted terminology over bare MedDRA labels."
+48_036,"L'incidence de l’éruption cutanée maculo-
+papuleuse était de 36 % tous Grades (10 % de Grades 3-4), ce qui est plus élevé que celle observée avec
+pembrolizumab en monothérapie.","The incidence of rash maculo-papular was 36% all Grades (10%
+Grades 3-4), which is higher than observed in pembrolizumab monotherapy.",HUMAN,"HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT",tied,"Both baseline and fine-tuned NER conditions produced similar outputs, with no significant difference in terminology accuracy.","S1 uses ""macular-papular skin rash,"" which is slightly less precise than the human reference but maintains acceptable clinical language.","S2 closely matches the human reference, using ""maculo-papular rash"" and omitting unnecessary words, making it the most concise and accurate machine translation.","S3-base accurately uses ""maculo-papular rash"" and includes ""across all Grades,"" aligning well with the human reference.","S3-FT uses ""monotherapy pembrolizumab,"" which is less natural than the human reference's phrasing.","S5-base mirrors S3-base in accuracy and phrasing, maintaining consistency with the human reference.","S5-FT repeats the awkward phrasing ""monotherapy pembrolizumab,"" detracting from its overall quality.","S6 uses ""macular-papular skin rashes,"" which is less precise and slightly deviates from the preferred clinical language.","The most important terminology quality finding is that the use of ""maculo-papular rash"" aligns best with the human reference, while variations like ""macular-papular skin rash"" or awkward phrasing like ""monotherapy pembrolizumab"" detract from the translation's precision and fluency.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced similar outputs, with no significant difference in terminology accuracy.
+
+S1_VERDICT: S1 uses ""macular-papular skin rash,"" which is slightly less precise than the human reference but maintains acceptable clinical language.
+
+S2_VERDICT: S2 closely matches the human reference, using ""maculo-papular rash"" and omitting unnecessary words, making it the most concise and accurate machine translation.
+
+S3_BASE_VERDICT: S3-base accurately uses ""maculo-papular rash"" and includes ""across all Grades,"" aligning well with the human reference.
+
+S3_FT_VERDICT: S3-FT uses ""monotherapy pembrolizumab,"" which is less natural than the human reference's phrasing.
+
+S5_BASE_VERDICT: S5-base mirrors S3-base in accuracy and phrasing, maintaining consistency with the human reference.
+
+S5_FT_VERDICT: S5-FT repeats the awkward phrasing ""monotherapy pembrolizumab,"" detracting from its overall quality.
+
+S6_VERDICT: S6 uses ""macular-papular skin rashes,"" which is less precise and slightly deviates from the preferred clinical language.
+
+KEY_OBSERVATION: The most important terminology quality finding is that the use of ""maculo-papular rash"" aligns best with the human reference, while variations like ""macular-papular skin rash"" or awkward phrasing like ""monotherapy pembrolizumab"" detract from the translation's precision and fluency."
+48_032,"⁎ Les termes suivants représentent un groupe d’évènements liés qui décrivent un état pathologique plutôt qu’un évènement isolé :
+• anémie hémolytique (anémie hémolytique auto-immune et anémie hémolyti","⁎ The following terms represent a group of related events that describe a medical condition rather than a single event:
+•
+haemolytic anaemia (autoimmune haemolytic anaemia and Coombs negative haemolyt",HUMAN,"HUMAN, S2, S3-FT, S5-FT, S3-base, S5-base, S1, S6",finetuned,"Fine-tuned NER systems provide cleaner and more accurate spans, improving the overall translation quality.","S1 contains repetitive terms and lacks clarity, making it less precise than the human reference.","S2 closely follows the human reference with accurate terminology and structure, though it slightly truncates the final term.","S3-base includes extraneous information and has minor terminology errors, reducing its accuracy.",S3-FT improves on S3-base by removing extraneous information and providing cleaner terminology.,"S5-base suffers from similar issues as S3-base, with extraneous information and less precise terminology.",S5-FT offers a slight improvement over S5-base with cleaner terminology and structure.,"S6 has repetitive terms and lacks precision, resulting in a less accurate translation.","The human reference remains the gold standard due to its precise use of MedDRA terms and clear clinical language, while machine translations often struggle with repetition and extraneous information.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S3-FT, S5-FT, S3-base, S5-base, S1, S6
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems provide cleaner and more accurate spans, improving the overall translation quality.
+
+S1_VERDICT: S1 contains repetitive terms and lacks clarity, making it less precise than the human reference.
+
+S2_VERDICT: S2 closely follows the human reference with accurate terminology and structure, though it slightly truncates the final term.
+
+S3_BASE_VERDICT: S3-base includes extraneous information and has minor terminology errors, reducing its accuracy.
+
+S3_FT_VERDICT: S3-FT improves on S3-base by removing extraneous information and providing cleaner terminology.
+
+S5_BASE_VERDICT: S5-base suffers from similar issues as S3-base, with extraneous information and less precise terminology.
+
+S5_FT_VERDICT: S5-FT offers a slight improvement over S5-base with cleaner terminology and structure.
+
+S6_VERDICT: S6 has repetitive terms and lacks precision, resulting in a less accurate translation.
+
+KEY_OBSERVATION: The human reference remains the gold standard due to its precise use of MedDRA terms and clear clinical language, while machine translations often struggle with repetition and extraneous information."
+48_029,‡ Sur la base d’une requête standard incluant bradyarythmie et tachyarythmie.,‡Based upon a standard query including bradyarrhythmias and tachyarrhythmias.,HUMAN,"HUMAN,S1,S2,S3-base,S5-base,S3-FT,S5-FT,S6",baseline,The baseline NER condition produced more accurate terminology alignment with MedDRA terms.,"S1 uses ""brady arrhythmia"" and ""tachyarythmia,"" which are close to the reference but misspell ""tachyarrhythmias.""","S2 capitalizes the terms incorrectly and misspells ""tachyarrhythmia.""","S3-base uses ""bradyarrhythmia"" and ""tachyarrhythmia,"" which are close but not fully aligned with the reference.","S3-FT capitalizes the terms incorrectly and uses ""request"" instead of ""query.""","S5-base uses ""bradyarrhythmia"" and ""tachyarrhythmia,"" which are close but not fully aligned with the reference.","S5-FT capitalizes the terms incorrectly and uses ""request"" instead of ""query.""","S6 retains the French terms, which is incorrect for an English SmPC.","The certified human reference provides the most precise and contextually appropriate terminology. Machine translations struggle with capitalization and exact MedDRA term alignment, impacting their suitability for regulatory submissions.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S1,S2,S3-base,S5-base,S3-FT,S5-FT,S6
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produced more accurate terminology alignment with MedDRA terms.
+
+S1_VERDICT: S1 uses ""brady arrhythmia"" and ""tachyarythmia,"" which are close to the reference but misspell ""tachyarrhythmias.""
+
+S2_VERDICT: S2 capitalizes the terms incorrectly and misspells ""tachyarrhythmia.""
+
+S3_BASE_VERDICT: S3-base uses ""bradyarrhythmia"" and ""tachyarrhythmia,"" which are close but not fully aligned with the reference.
+
+S3_FT_VERDICT: S3-FT capitalizes the terms incorrectly and uses ""request"" instead of ""query.""
+
+S5_BASE_VERDICT: S5-base uses ""bradyarrhythmia"" and ""tachyarrhythmia,"" which are close but not fully aligned with the reference.
+
+S5_FT_VERDICT: S5-FT capitalizes the terms incorrectly and uses ""request"" instead of ""query.""
+
+S6_VERDICT: S6 retains the French terms, which is incorrect for an English SmPC.
+
+KEY_OBSERVATION: The certified human reference provides the most precise and contextually appropriate terminology. Machine translations struggle with capitalization and exact MedDRA term alignment, impacting their suitability for regulatory submissions."
+48_018,"La sécurité de pembrolizumab intraveineux en association à l'axitinib ou au lenvatinib dans le CCR avancé,
+et en association au lenvatinib dans le CE avancé, a été évaluée chez un total de 1 456 patie","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced RCC,
+and in combination with lenvatinib in advanced EC has been evaluated in a total of 1 456 patients wi",HUMAN,"HUMAN, S2, S3-FT, S5-FT, S3-base, S5-base, S6, S1",tied,Both baseline and fine-tuned NER conditions produce similar outputs in terms of terminology accuracy and span cleanliness.,"S1 contains a critical error with ""daxitinib"" instead of ""axitinib,"" and the translation is incomplete.","S2 closely mirrors the human reference but omits the phrase ""as appropriate,"" affecting the precision of the context.","S3-base provides accurate dosing information but lacks the phrase ""as appropriate,"" which is important for context.","S3-FT is similar to S3-base, with accurate dosing information but missing the phrase ""as appropriate.""","S5-base is accurate in dosing but also lacks the phrase ""as appropriate,"" similar to S3-base.","S5-FT matches S5-base in accuracy but also omits ""as appropriate.""","S6 contains a critical error with ""daxitinib"" instead of ""axitinib,"" and the translation is incomplete.","The most critical terminology issue is the incorrect translation of ""axitinib"" as ""daxitinib"" in S1 and S6, which significantly impacts the accuracy of the translation. Additionally, the omission of the phrase ""as appropriate"" in several systems affects the contextual precision of the translation.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S3-FT, S5-FT, S3-base, S5-base, S6, S1
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produce similar outputs in terms of terminology accuracy and span cleanliness.
+
+S1_VERDICT: S1 contains a critical error with ""daxitinib"" instead of ""axitinib,"" and the translation is incomplete.
+
+S2_VERDICT: S2 closely mirrors the human reference but omits the phrase ""as appropriate,"" affecting the precision of the context.
+
+S3_BASE_VERDICT: S3-base provides accurate dosing information but lacks the phrase ""as appropriate,"" which is important for context.
+
+S3_FT_VERDICT: S3-FT is similar to S3-base, with accurate dosing information but missing the phrase ""as appropriate.""
+
+S5_BASE_VERDICT: S5-base is accurate in dosing but also lacks the phrase ""as appropriate,"" similar to S3-base.
+
+S5_FT_VERDICT: S5-FT matches S5-base in accuracy but also omits ""as appropriate.""
+
+S6_VERDICT: S6 contains a critical error with ""daxitinib"" instead of ""axitinib,"" and the translation is incomplete.
+
+KEY_OBSERVATION: The most critical terminology issue is the incorrect translation of ""axitinib"" as ""daxitinib"" in S1 and S6, which significantly impacts the accuracy of the translation. Additionally, the omission of the phrase ""as appropriate"" in several systems affects the contextual precision of the translation."
+48_124,"Les données de sécurité à long
+terme du pembrolizumab chez les adolescents atteints de mélanome de stade IIB, IIC et III traités au stade
+adjuvant sont actuellement indisponibles.","Paediatric population
+Subcutaneous formulation
+The safety of pembrolizumab solution for injection in paediatric patients has not been established in
+clinical studies.",HUMAN,"HUMAN, S6, S1, S2, S3-FT, S5-FT, S3-base, S5-base",finetuned,"The fine-tuned NER condition produces cleaner spans, leading to more precise translations.","S1 provides a clear and accurate translation, closely matching the source but lacks the specificity of the certified human reference.","S2 is accurate and maintains the clinical context, but the phrasing is slightly less precise than the human reference.","S3-base is accurate but slightly awkward in phrasing, with unnecessary commas affecting readability.","S3-FT improves on S3-base by providing a more concise and readable translation, though it still lacks the human reference's specificity.","S5-base is similar to S3-base, with accurate content but awkward phrasing and unnecessary commas.","S5-FT offers a clearer translation than S5-base, but it still does not match the human reference's precision.","S6 closely mirrors the human reference, providing an accurate and well-phrased translation.","The human reference remains the gold standard due to its precise and clinically appropriate language, while S6 demonstrates the best machine translation performance by closely aligning with the human reference's terminology and style.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S6, S1, S2, S3-FT, S5-FT, S3-base, S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition produces cleaner spans, leading to more precise translations.
+
+S1_VERDICT: S1 provides a clear and accurate translation, closely matching the source but lacks the specificity of the certified human reference.
+
+S2_VERDICT: S2 is accurate and maintains the clinical context, but the phrasing is slightly less precise than the human reference.
+
+S3_BASE_VERDICT: S3-base is accurate but slightly awkward in phrasing, with unnecessary commas affecting readability.
+
+S3_FT_VERDICT: S3-FT improves on S3-base by providing a more concise and readable translation, though it still lacks the human reference's specificity.
+
+S5_BASE_VERDICT: S5-base is similar to S3-base, with accurate content but awkward phrasing and unnecessary commas.
+
+S5_FT_VERDICT: S5-FT offers a clearer translation than S5-base, but it still does not match the human reference's precision.
+
+S6_VERDICT: S6 closely mirrors the human reference, providing an accurate and well-phrased translation.
+
+KEY_OBSERVATION: The human reference remains the gold standard due to its precise and clinically appropriate language, while S6 demonstrates the best machine translation performance by closely aligning with the human reference's terminology and style."
+48_014,"Les incidences des effets
+indésirables de Grades 3-5 chez les patients avec un CBNPC étaient de 69 % pour le traitement par
+pembrolizumab en association et de 61 % pour la chimiothérapie seule, chez l","Incidences of
+Grades 3-5 adverse reactions in patients with NSCLC were 69% for pembrolizumab combination
+therapy and 61% for chemotherapy alone, in patients with HNSCC were 80% for pembrolizumab
+combi",HUMAN,"HUMAN, S3-base, S5-base, S2, S3-FT, S5-FT, S1, S6",baseline,Baseline NER systems maintain more consistent terminology and structure compared to fine-tuned versions.,"S1 introduces errors in terminology and structure, such as ""CBNPC"" and ""CETEC,"" and lacks clarity in the chemotherapy description.","S2 has improved structure but still uses incorrect terms like ""CBNPC"" and ""CETEC,"" and lacks precision in chemotherapy descriptions.","S3-base closely follows the human reference with accurate terminology and structure, though it omits the TNBC data.",S3-FT improves sentence separation but introduces errors in cetuximab placement and omits TNBC data.,"S5-base mirrors S3-base in accuracy and structure, maintaining correct terminology but also omits TNBC data.",S5-FT improves sentence separation but introduces errors in cetuximab placement and omits TNBC data.,"S6 contains significant errors in terminology and structure, such as incorrect drug associations and incomplete sentences.","The human reference maintains precise and consistent use of MedDRA terminology, which is crucial for clarity and accuracy in adverse event reporting. Machine translations often struggle with maintaining this precision, particularly in drug and condition terminology.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S3-base, S5-base, S2, S3-FT, S5-FT, S1, S6
+
+NER_WINNER: baseline
+
+NER_REASON: Baseline NER systems maintain more consistent terminology and structure compared to fine-tuned versions.
+
+S1_VERDICT: S1 introduces errors in terminology and structure, such as ""CBNPC"" and ""CETEC,"" and lacks clarity in the chemotherapy description.
+
+S2_VERDICT: S2 has improved structure but still uses incorrect terms like ""CBNPC"" and ""CETEC,"" and lacks precision in chemotherapy descriptions.
+
+S3_BASE_VERDICT: S3-base closely follows the human reference with accurate terminology and structure, though it omits the TNBC data.
+
+S3_FT_VERDICT: S3-FT improves sentence separation but introduces errors in cetuximab placement and omits TNBC data.
+
+S5_BASE_VERDICT: S5-base mirrors S3-base in accuracy and structure, maintaining correct terminology but also omits TNBC data.
+
+S5_FT_VERDICT: S5-FT improves sentence separation but introduces errors in cetuximab placement and omits TNBC data.
+
+S6_VERDICT: S6 contains significant errors in terminology and structure, such as incorrect drug associations and incomplete sentences.
+
+KEY_OBSERVATION: The human reference maintains precise and consistent use of MedDRA terminology, which is crucial for clarity and accuracy in adverse event reporting. Machine translations often struggle with maintaining this precision, particularly in drug and condition terminology."
+48_087,"La durée médiane a été de 1,9 mois (de 1 jour à 47,1+ mois).","In patients with cHL
+(n=389) the incidence of hypothyroidism was 17%, all of which were Grade 1 or 2.",HUMAN,"HUMAN,S1,S2,S6,S3-base,S3-FT,S5-base,S5-FT",tied,Both baseline and fine-tuned NER conditions produced identical outputs for the graph systems.,The translation is accurate and matches the certified human reference in terms of content and format.,This translation is also accurate and consistent with the certified human reference.,"The translation is correct but lacks the ""+"" symbol after ""47.1"" which is present in the certified human reference.","Similar to S3-base, this translation is correct but omits the ""+"" symbol after ""47.1"".","This translation is accurate but also misses the ""+"" symbol after ""47.1"".","Like S5-base, this translation is correct but does not include the ""+"" symbol after ""47.1"".",The translation is accurate and consistent with the certified human reference.,"All machine translations accurately convey the median duration information, but several omit the ""+"" symbol after ""47.1"", which is a minor but notable deviation from the certified human reference. The human reference remains the gold standard for precision and completeness.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S1,S2,S6,S3-base,S3-FT,S5-base,S5-FT
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced identical outputs for the graph systems.
+
+S1_VERDICT: The translation is accurate and matches the certified human reference in terms of content and format.
+
+S2_VERDICT: This translation is also accurate and consistent with the certified human reference.
+
+S3_BASE_VERDICT: The translation is correct but lacks the ""+"" symbol after ""47.1"" which is present in the certified human reference.
+
+S3_FT_VERDICT: Similar to S3-base, this translation is correct but omits the ""+"" symbol after ""47.1"".
+
+S5_BASE_VERDICT: This translation is accurate but also misses the ""+"" symbol after ""47.1"".
+
+S5_FT_VERDICT: Like S5-base, this translation is correct but does not include the ""+"" symbol after ""47.1"".
+
+S6_VERDICT: The translation is accurate and consistent with the certified human reference.
+
+KEY_OBSERVATION: All machine translations accurately convey the median duration information, but several omit the ""+"" symbol after ""47.1"", which is a minor but notable deviation from the certified human reference. The human reference remains the gold standard for precision and completeness."
+48_119,"Le profil de sécurité chez les patients pédiatriques était généralement similaire à celui observé chez
+les adultes traités par pembrolizumab.","In the intravenous
+pembrolizumab arm, 0.9% (1/114) of patients developed treatment-emergent anti-pembrolizumab
+antibodies and 0% (0/114) developed neutralising antibodies.",HUMAN,"HUMAN,S2,S6,S1,S3-base,S5-base,S3-FT,S5-FT",baseline,The baseline NER condition produced slightly more accurate and consistent translations across systems.,"The translation is accurate and maintains the intended meaning, though it lacks the clinical specificity of the certified human reference.","This translation is precise and closely aligns with the certified human reference, making it one of the better machine translations.","The translation is accurate but slightly verbose compared to the certified human reference, adding unnecessary detail.","The translation is similar to S3-base but does not improve on the verbosity issue, making it less optimal.","This translation is accurate but suffers from the same verbosity issue as S3-base, adding unnecessary detail.","The translation is similar to S5-base and does not resolve the verbosity issue, making it less optimal.","The translation is accurate and aligns well with the certified human reference, though it is slightly less precise than S2.","The machine translations generally maintain the intended meaning but vary in clinical specificity and verbosity, with S2 providing the closest match to the certified human reference. The baseline NER condition appears to produce more consistent results across different systems.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S2,S6,S1,S3-base,S5-base,S3-FT,S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produced slightly more accurate and consistent translations across systems.
+
+S1_VERDICT: The translation is accurate and maintains the intended meaning, though it lacks the clinical specificity of the certified human reference.
+
+S2_VERDICT: This translation is precise and closely aligns with the certified human reference, making it one of the better machine translations.
+
+S3_BASE_VERDICT: The translation is accurate but slightly verbose compared to the certified human reference, adding unnecessary detail.
+
+S3_FT_VERDICT: The translation is similar to S3-base but does not improve on the verbosity issue, making it less optimal.
+
+S5_BASE_VERDICT: This translation is accurate but suffers from the same verbosity issue as S3-base, adding unnecessary detail.
+
+S5_FT_VERDICT: The translation is similar to S5-base and does not resolve the verbosity issue, making it less optimal.
+
+S6_VERDICT: The translation is accurate and aligns well with the certified human reference, though it is slightly less precise than S2.
+
+KEY_OBSERVATION: The machine translations generally maintain the intended meaning but vary in clinical specificity and verbosity, with S2 providing the closest match to the certified human reference. The baseline NER condition appears to produce more consistent results across different systems."
+48_115,"La pertinence clinique du développement
+d’anticorps anti-berahyaluronidase alfa recombinante après traitement par pembrolizumab sous-cutané est
+inconnue.","171
+Laboratory abnormalities
+In patients treated with pembrolizumab monotherapy, the proportion of patients who experienced a
+shift from baseline to a Grade 3 or 4 laboratory abnormality was as follow",S6,"S6, S1, S2, HUMAN, S3-base, S5-base, S3-FT, S5-FT",baseline,"The baseline NER condition produced cleaner and more accurate translations compared to the fine-tuned NER, which resulted in contamination.","S1 provides a clear and accurate translation, closely aligning with the certified human reference.","S2 is similar to S1 but uses slightly different phrasing, maintaining accuracy and clarity.","S3-base fails to translate ""anticorps anti-berahyaluronidase alfa recombinant"" correctly, leaving it in French.",S3-FT is contaminated and does not provide a usable translation.,"S5-base also fails to translate ""anticorps anti-berahyaluronidase alfa recombinant"" correctly, leaving it in French.",S5-FT is contaminated and does not provide a usable translation.,"S6 accurately translates the segment, closely matching the certified human reference and using appropriate terminology.","The most significant issue observed is the failure of some systems to translate specific terms from French to English, particularly ""anticorps anti-berahyaluronidase alfa recombinant,"" which impacts the overall quality and usability of the translation. The baseline NER systems generally performed better than the fine-tuned versions, which were contaminated.","BEST_SYSTEM: S6
+
+RANKING: S6, S1, S2, HUMAN, S3-base, S5-base, S3-FT, S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produced cleaner and more accurate translations compared to the fine-tuned NER, which resulted in contamination.
+
+S1_VERDICT: S1 provides a clear and accurate translation, closely aligning with the certified human reference.
+
+S2_VERDICT: S2 is similar to S1 but uses slightly different phrasing, maintaining accuracy and clarity.
+
+S3_BASE_VERDICT: S3-base fails to translate ""anticorps anti-berahyaluronidase alfa recombinant"" correctly, leaving it in French.
+
+S3_FT_VERDICT: S3-FT is contaminated and does not provide a usable translation.
+
+S5_BASE_VERDICT: S5-base also fails to translate ""anticorps anti-berahyaluronidase alfa recombinant"" correctly, leaving it in French.
+
+S5_FT_VERDICT: S5-FT is contaminated and does not provide a usable translation.
+
+S6_VERDICT: S6 accurately translates the segment, closely matching the certified human reference and using appropriate terminology.
+
+KEY_OBSERVATION: The most significant issue observed is the failure of some systems to translate specific terms from French to English, particularly ""anticorps anti-berahyaluronidase alfa recombinant,"" which impacts the overall quality and usability of the translation. The baseline NER systems generally performed better than the fine-tuned versions, which were contaminated."
+48_070,"Une hyperthyroïdie est survenue chez 394 (5,2 %) patients recevant pembrolizumab, y compris des cas de
+Grade 2 ou 3 chez 108 (1,4 %) et 9 (0,1 %) patients, respectivement.","Adrenal insufficiency resolved in 28 patients, 11 with sequelae.",S1,"S1,S2,S6,HUMAN,S3-base,S5-base,S3-FT,S5-FT",baseline,The baseline NER condition produced translations that were more consistent with the certified human reference and maintained the correct structure and terminology.,"S1 provides a precise and clear translation that aligns well with the certified human reference, maintaining the correct terminology and structure.","S2 offers a translation identical to S1, maintaining accuracy and clarity in line with the certified human reference.","S3-base introduces unnecessary wording with ""a hyperthyroidism event,"" which deviates from the preferred clinical language.","S3-FT alters the structure and introduces redundancy by stating ""5.2 % cases of Hyperthyroidism,"" which is incorrect and less clear.","S5-base repeats the same issue as S3-base with unnecessary wording, affecting the clinical clarity.","S5-FT mirrors the structural and redundancy issues of S3-FT, making it less precise.","S6 provides a translation identical to S1 and S2, maintaining accuracy and clarity in line with the certified human reference.","The translations that adhered closely to the certified human reference used precise clinical language without unnecessary embellishments, demonstrating the importance of maintaining clarity and consistency in adverse event terminology. The baseline NER systems generally produced more accurate translations compared to the fine-tuned versions, which introduced errors in structure and terminology.","BEST_SYSTEM: S1
+
+RANKING: S1,S2,S6,HUMAN,S3-base,S5-base,S3-FT,S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produced translations that were more consistent with the certified human reference and maintained the correct structure and terminology.
+
+S1_VERDICT: S1 provides a precise and clear translation that aligns well with the certified human reference, maintaining the correct terminology and structure.
+
+S2_VERDICT: S2 offers a translation identical to S1, maintaining accuracy and clarity in line with the certified human reference.
+
+S3_BASE_VERDICT: S3-base introduces unnecessary wording with ""a hyperthyroidism event,"" which deviates from the preferred clinical language.
+
+S3_FT_VERDICT: S3-FT alters the structure and introduces redundancy by stating ""5.2 % cases of Hyperthyroidism,"" which is incorrect and less clear.
+
+S5_BASE_VERDICT: S5-base repeats the same issue as S3-base with unnecessary wording, affecting the clinical clarity.
+
+S5_FT_VERDICT: S5-FT mirrors the structural and redundancy issues of S3-FT, making it less precise.
+
+S6_VERDICT: S6 provides a translation identical to S1 and S2, maintaining accuracy and clarity in line with the certified human reference.
+
+KEY_OBSERVATION: The translations that adhered closely to the certified human reference used precise clinical language without unnecessary embellishments, demonstrating the importance of maintaining clarity and consistency in adverse event terminology. The baseline NER systems generally produced more accurate translations compared to the fine-tuned versions, which introduced errors in structure and terminology."
+48_012,"La sécurité de pembrolizumab intraveineux en association à une chimiothérapie, une RT ou une RCT a été
+évaluée dans des études cliniques chez 7 015 patients dans différents types de tumeurs recevant 2","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CRT has been
+evaluated in 6 695 patients across tumour types receiving 200 mg, 2 mg/kg bw or 10 mg/kg bw
+pembrolizumab e",HUMAN,"HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT",baseline,Baseline NER systems provided more consistent and accurate terminology compared to fine-tuned systems.,"S1 accurately translates the content but uses ""CT"" instead of ""CRT,"" which is less precise.",S2 provides a clear and accurate translation with correct terminology and structure.,"S3-base offers a precise translation with correct terminology and structure, closely matching the human reference.","S3-FT introduces unnecessary complexity with ""Neoplasm types"" and slightly deviates from standard terminology.","S5-base provides an accurate translation with correct terminology and structure, similar to S3-base.","S5-FT, like S3-FT, uses ""Neoplasm types,"" which is less standard and introduces unnecessary complexity.","S6 is mostly accurate but omits ""body weight"" after dosage, which affects clarity.","The human reference remains the gold standard due to its precise and consistent use of terminology; machine translations often struggle with maintaining standard terminology, particularly with the use of ""Neoplasm types"" and inconsistent dosage descriptions.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: Baseline NER systems provided more consistent and accurate terminology compared to fine-tuned systems.
+
+S1_VERDICT: S1 accurately translates the content but uses ""CT"" instead of ""CRT,"" which is less precise.
+
+S2_VERDICT: S2 provides a clear and accurate translation with correct terminology and structure.
+
+S3_BASE_VERDICT: S3-base offers a precise translation with correct terminology and structure, closely matching the human reference.
+
+S3_FT_VERDICT: S3-FT introduces unnecessary complexity with ""Neoplasm types"" and slightly deviates from standard terminology.
+
+S5_BASE_VERDICT: S5-base provides an accurate translation with correct terminology and structure, similar to S3-base.
+
+S5_FT_VERDICT: S5-FT, like S3-FT, uses ""Neoplasm types,"" which is less standard and introduces unnecessary complexity.
+
+S6_VERDICT: S6 is mostly accurate but omits ""body weight"" after dosage, which affects clarity.
+
+KEY_OBSERVATION: The human reference remains the gold standard due to its precise and consistent use of terminology; machine translations often struggle with maintaining standard terminology, particularly with the use of ""Neoplasm types"" and inconsistent dosage descriptions."
+48_076,"Le délai d’apparition médian de
+l’hypothyroïdie a été de 3,4 mois (de 1 jour à 25,9 mois) et la durée médiane n’a pas été atteinte (de 2 jours à
+63,0+ mois).","Hyperthyroidism occurred in 394 (5.2%) patients, including Grade 2 or 3 cases in 108 (1.4%) and
+9 (0.1%) patients, respectively, receiving pembrolizumab.",S3-FT,"S3-FT, S5-FT, S1, S6, HUMAN, S2, S3-base, S5-base",finetuned,"Fine-tuned NER systems correctly identified ""Hypothyroidism"" and improved accuracy over baseline systems.","S1 accurately translates the onset time but incorrectly uses ""time of onset"" instead of ""time to onset.""","S2 incorrectly translates ""duration"" instead of ""time to onset,"" which alters the meaning.","S3-base incorrectly translates ""Hypothyroidism"" as ""Hypercarotinaemia,"" which is a significant error.",S3-FT correctly translates the medical term and maintains the correct structure of the sentence.,"S5-base also incorrectly translates ""Hypothyroidism"" as ""Hypercarotinaemia,"" leading to a critical error.","S5-FT correctly identifies ""Hypothyroidism"" and maintains the correct sentence structure.","S6 incorrectly uses ""duration"" instead of ""time to onset,"" which changes the intended meaning.","The fine-tuned NER systems (S3-FT and S5-FT) demonstrated superior accuracy in identifying the correct medical term ""Hypothyroidism,"" highlighting the importance of precise terminology in medical translations. The use of ""duration"" instead of ""time to onset"" in some translations significantly altered the intended clinical meaning.","BEST_SYSTEM: S3-FT
+
+RANKING: S3-FT, S5-FT, S1, S6, HUMAN, S2, S3-base, S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems correctly identified ""Hypothyroidism"" and improved accuracy over baseline systems.
+
+S1_VERDICT: S1 accurately translates the onset time but incorrectly uses ""time of onset"" instead of ""time to onset.""
+
+S2_VERDICT: S2 incorrectly translates ""duration"" instead of ""time to onset,"" which alters the meaning.
+
+S3_BASE_VERDICT: S3-base incorrectly translates ""Hypothyroidism"" as ""Hypercarotinaemia,"" which is a significant error.
+
+S3_FT_VERDICT: S3-FT correctly translates the medical term and maintains the correct structure of the sentence.
+
+S5_BASE_VERDICT: S5-base also incorrectly translates ""Hypothyroidism"" as ""Hypercarotinaemia,"" leading to a critical error.
+
+S5_FT_VERDICT: S5-FT correctly identifies ""Hypothyroidism"" and maintains the correct sentence structure.
+
+S6_VERDICT: S6 incorrectly uses ""duration"" instead of ""time to onset,"" which changes the intended meaning.
+
+KEY_OBSERVATION: The fine-tuned NER systems (S3-FT and S5-FT) demonstrated superior accuracy in identifying the correct medical term ""Hypothyroidism,"" highlighting the importance of precise terminology in medical translations. The use of ""duration"" instead of ""time to onset"" in some translations significantly altered the intended clinical meaning."
+48_055,"Une hépatite a conduit à un arrêt de pembrolizumab chez 37 (0,5 %) patients.","Immune-mediated hepatitis
+Hepatitis occurred in 80 (1.0%) patients, including Grade 2, 3 or 4 cases in 12 (0.2%), 55 (0.7%) and
+8 (0.1%) patients, respectively, receiving pembrolizumab.",HUMAN,"HUMAN, S2, S1, S3-FT, S5-FT, S3-base, S5-base, S6",tied,Both baseline and fine-tuned NER systems produced similar outputs with no significant advantage observed.,S1 provides a clear and accurate translation but lacks the specificity of immune-mediated hepatitis.,"S2 offers a concise and accurate translation, closely aligning with the certified human reference.","S3-base introduces an unnecessary article ""A,"" which is not typical in professional SmPC language.",S3-FT corrects the article issue but still lacks the specificity of immune-mediated hepatitis.,"S5-base repeats the article error seen in S3-base, affecting the professional tone.",S5-FT corrects the article issue but does not enhance specificity or clinical detail.,"S6 uses ""cessation"" instead of ""discontinuation,"" which is less precise in this context.","The machine translations generally lack the specificity and clinical detail of the certified human reference, particularly in failing to specify ""immune-mediated hepatitis,"" which is crucial for accurate pharmacovigilance reporting.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S1, S3-FT, S5-FT, S3-base, S5-base, S6
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER systems produced similar outputs with no significant advantage observed.
+
+S1_VERDICT: S1 provides a clear and accurate translation but lacks the specificity of immune-mediated hepatitis.
+
+S2_VERDICT: S2 offers a concise and accurate translation, closely aligning with the certified human reference.
+
+S3_BASE_VERDICT: S3-base introduces an unnecessary article ""A,"" which is not typical in professional SmPC language.
+
+S3_FT_VERDICT: S3-FT corrects the article issue but still lacks the specificity of immune-mediated hepatitis.
+
+S5_BASE_VERDICT: S5-base repeats the article error seen in S3-base, affecting the professional tone.
+
+S5_FT_VERDICT: S5-FT corrects the article issue but does not enhance specificity or clinical detail.
+
+S6_VERDICT: S6 uses ""cessation"" instead of ""discontinuation,"" which is less precise in this context.
+
+KEY_OBSERVATION: The machine translations generally lack the specificity and clinical detail of the certified human reference, particularly in failing to specify ""immune-mediated hepatitis,"" which is crucial for accurate pharmacovigilance reporting."
+48_005,"Pembrolizumab en monothérapie (voir rubrique 4.2)
+La sécurité de pembrolizumab intraveineux en monothérapie a été évaluée dans des études cliniques chez
+7 631 patients dans différents types de tumeurs","Pembrolizumab in monotherapy (see section 4.2)
+The safety of intravenous pembrolizumab as monotherapy has been evaluated in 7 631 patients across
+tumour types and across four doses (2 mg/kg bw every 3",HUMAN,"HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT",baseline,"The baseline NER condition produces clearer and more accurate translations compared to the fine-tuned versions, which are contaminated.","S1 provides a generally accurate translation but uses ""intravenous pembrolizumab"" in a slightly awkward manner.",S2 offers a clear and precise translation with appropriate clinical language and correct dosing regimen terminology.,"S3-base delivers a translation similar to S2, maintaining clarity and correct terminology.",S3-FT is contaminated and thus not suitable for evaluation.,"S5-base matches S3-base in quality, providing a clear and accurate translation.",S5-FT is contaminated and thus not suitable for evaluation.,"S6 contains a redundancy error with ""pembrolizumab intravenous pembrolizumab,"" affecting its clarity.","The human reference remains the gold standard due to its precise use of clinical language and adherence to EMA guidelines. Machine translations, while improving, still occasionally struggle with redundancy and awkward phrasing, particularly when fine-tuned NER models are contaminated.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S3-base, S5-base, S1, S6, S3-FT, S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition produces clearer and more accurate translations compared to the fine-tuned versions, which are contaminated.
+
+S1_VERDICT: S1 provides a generally accurate translation but uses ""intravenous pembrolizumab"" in a slightly awkward manner.
+
+S2_VERDICT: S2 offers a clear and precise translation with appropriate clinical language and correct dosing regimen terminology.
+
+S3_BASE_VERDICT: S3-base delivers a translation similar to S2, maintaining clarity and correct terminology.
+
+S3_FT_VERDICT: S3-FT is contaminated and thus not suitable for evaluation.
+
+S5_BASE_VERDICT: S5-base matches S3-base in quality, providing a clear and accurate translation.
+
+S5_FT_VERDICT: S5-FT is contaminated and thus not suitable for evaluation.
+
+S6_VERDICT: S6 contains a redundancy error with ""pembrolizumab intravenous pembrolizumab,"" affecting its clarity.
+
+KEY_OBSERVATION: The human reference remains the gold standard due to its precise use of clinical language and adherence to EMA guidelines. Machine translations, while improving, still occasionally struggle with redundancy and awkward phrasing, particularly when fine-tuned NER models are contaminated."
+48_125,"Déclaration des effets indésirables suspectés
+La déclaration des effets indésirables suspectés après autorisation du médicament est importante.","172
+Intravenous formulation
+The safety of pembrolizumab as monotherapy has been evaluated in 161 paediatric patients aged
+9 months to 17 years with advanced melanoma, lymphoma, or PD-L1 positive advan",HUMAN,"HUMAN, S6, S3-base, S5-base, S3-FT, S5-FT, S1, S2",baseline,Baseline NER systems produced more accurate translations in this context.,"S1 provides a correct translation but lacks the specificity of ""marketing authorization.""","S2 omits the critical context of ""after marketing authorization,"" making it less precise.","S3-base accurately captures the context and uses appropriate terminology, aligning well with the human reference.","S3-FT is similar to S3-base but slightly less precise in phrasing, affecting clarity.","S5-base provides a correct translation with appropriate terminology, similar to S3-base.",S5-FT is accurate but less precise in phrasing compared to its baseline counterpart.,"S6 closely mirrors the human reference, providing a precise and contextually accurate translation.","The translations that include ""after marketing authorization"" align better with the certified human reference, highlighting the importance of maintaining specific regulatory context in adverse event reporting.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S6, S3-base, S5-base, S3-FT, S5-FT, S1, S2
+
+NER_WINNER: baseline
+
+NER_REASON: Baseline NER systems produced more accurate translations in this context.
+
+S1_VERDICT: S1 provides a correct translation but lacks the specificity of ""marketing authorization.""
+
+S2_VERDICT: S2 omits the critical context of ""after marketing authorization,"" making it less precise.
+
+S3_BASE_VERDICT: S3-base accurately captures the context and uses appropriate terminology, aligning well with the human reference.
+
+S3_FT_VERDICT: S3-FT is similar to S3-base but slightly less precise in phrasing, affecting clarity.
+
+S5_BASE_VERDICT: S5-base provides a correct translation with appropriate terminology, similar to S3-base.
+
+S5_FT_VERDICT: S5-FT is accurate but less precise in phrasing compared to its baseline counterpart.
+
+S6_VERDICT: S6 closely mirrors the human reference, providing a precise and contextually accurate translation.
+
+KEY_OBSERVATION: The translations that include ""after marketing authorization"" align better with the certified human reference, highlighting the importance of maintaining specific regulatory context in adverse event reporting."
+48_113,"Le profil d’immunogénicité de
+pembrolizumab sous-cutané était cohérent avec le profil d’immunogénicité connu de pembrolizumab
+intraveineux.","Of these patients, 55% had
+no recurrence of ALT > 3 times ULN, and of those patients with recurrence of ALT > 3 times ULN,
+all recovered.",S2,"S2,HUMAN,S3-FT,S5-FT,S1,S6,S3-base,S5-base",finetuned,Fine-tuned NER systems produce cleaner spans and more precise terminology alignment with MedDRA standards.,S1 provides a correct translation but lacks the specificity of administration route phrasing.,S2 offers a precise and contextually appropriate translation with clear administration route phrasing.,S3-base is accurate but uses less natural phrasing for the administration route.,S3-FT provides a precise translation with improved phrasing over the baseline.,S5-base is accurate but lacks the natural phrasing of the administration route.,S5-FT offers a precise translation with improved phrasing over the baseline.,S6 is accurate but uses less natural phrasing for the administration route.,"The translations vary in their handling of administration route phrasing, with S2 providing the most natural and contextually appropriate language. Fine-tuned NER systems generally produce better phrasing and alignment with MedDRA standards.","BEST_SYSTEM: S2
+
+RANKING: S2,HUMAN,S3-FT,S5-FT,S1,S6,S3-base,S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems produce cleaner spans and more precise terminology alignment with MedDRA standards.
+
+S1_VERDICT: S1 provides a correct translation but lacks the specificity of administration route phrasing.
+
+S2_VERDICT: S2 offers a precise and contextually appropriate translation with clear administration route phrasing.
+
+S3_BASE_VERDICT: S3-base is accurate but uses less natural phrasing for the administration route.
+
+S3_FT_VERDICT: S3-FT provides a precise translation with improved phrasing over the baseline.
+
+S5_BASE_VERDICT: S5-base is accurate but lacks the natural phrasing of the administration route.
+
+S5_FT_VERDICT: S5-FT offers a precise translation with improved phrasing over the baseline.
+
+S6_VERDICT: S6 is accurate but uses less natural phrasing for the administration route.
+
+KEY_OBSERVATION: The translations vary in their handling of administration route phrasing, with S2 providing the most natural and contextually appropriate language. Fine-tuned NER systems generally produce better phrasing and alignment with MedDRA standards."
+48_028,"182
+Tableau 2 : Effets indésirables chez les patients traités par pembrolizumab†
+Classification Monothérapie En association avec En association
+MedDRA une chimiothérapie, avec axitinib ou
+par organe e","†
+Table 2: Adverse reactions in patients treated with pembrolizumab
+MedDRA SOC Monotherapy In combination with In combination with
+and frequency chemotherapy, axitinib or lenvatinib
+category radiation",HUMAN,"HUMAN, S3-FT, S5-FT, S3-base, S5-base, S2, S1, S6",tied,Both baseline and fine-tuned NER conditions produced similar outputs in terms of terminology accuracy.,"The translation is inaccurate and lacks coherence, with incorrect terms such as ""thyroid pneumonia"" and ""peripheral thrombosis.""","The translation is generally accurate but lacks specificity in the classification section and repeats ""pneumonia"" unnecessarily.","The translation is accurate and closely follows the certified human reference, though it omits some details in the hematologic section.","This translation is accurate and consistent with the certified human reference, maintaining appropriate terminology and structure.","The translation is accurate and aligns well with the certified human reference, though it lacks some detail in the hematologic section.","This translation is accurate and consistent with the certified human reference, maintaining appropriate terminology and structure.",No translation was provided for evaluation.,"The human reference remains the gold standard for precise and consistent terminology, particularly in maintaining the nuanced clinical language required for SmPCs. Machine translations, while improving, still struggle with maintaining the specificity and consistency of MedDRA terms and clinical context.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S3-FT, S5-FT, S3-base, S5-base, S2, S1, S6
+
+NER_WINNER: tied
+
+NER_REASON: Both baseline and fine-tuned NER conditions produced similar outputs in terms of terminology accuracy.
+
+S1_VERDICT: The translation is inaccurate and lacks coherence, with incorrect terms such as ""thyroid pneumonia"" and ""peripheral thrombosis.""
+
+S2_VERDICT: The translation is generally accurate but lacks specificity in the classification section and repeats ""pneumonia"" unnecessarily.
+
+S3_BASE_VERDICT: The translation is accurate and closely follows the certified human reference, though it omits some details in the hematologic section.
+
+S3_FT_VERDICT: This translation is accurate and consistent with the certified human reference, maintaining appropriate terminology and structure.
+
+S5_BASE_VERDICT: The translation is accurate and aligns well with the certified human reference, though it lacks some detail in the hematologic section.
+
+S5_FT_VERDICT: This translation is accurate and consistent with the certified human reference, maintaining appropriate terminology and structure.
+
+S6_VERDICT: No translation was provided for evaluation.
+
+KEY_OBSERVATION: The human reference remains the gold standard for precise and consistent terminology, particularly in maintaining the nuanced clinical language required for SmPCs. Machine translations, while improving, still struggle with maintaining the specificity and consistency of MedDRA terms and clinical context."
+48_030,§Rapportée dans une étude en dehors des données poolées (liée à une injection sous-cutanée).,§Reported in a study outside of the pooled dataset (subcutaneous injection related).,HUMAN,"HUMAN,S6,S1,S3-FT,S5-FT,S2,S3-base,S5-base",finetuned,Fine-tuned NER systems produce cleaner spans and more accurate translations.,"S1 closely matches the certified human reference but lacks the article ""the"" before ""pooled data.""","S2 uses ""relating to"" instead of ""related to,"" which is less precise.","S3-base incorrectly uses ""out-of-pool study"" and includes an irrelevant note about ""hypothyroïdie.""","S3-FT improves on S3-base by using more accurate phrasing, though it still uses ""relating to.""","S5-base repeats the same error as S3-base with ""out-of-pool study"" and includes an irrelevant note.","S5-FT is similar to S3-FT, using ""relating to"" instead of ""related to.""","S6 matches the certified human reference closely, using precise language.","The systems that incorporate fine-tuned NER and oracle glossaries tend to produce translations closer to the certified human reference, highlighting the importance of precise terminology and context understanding in medical translations.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S6,S1,S3-FT,S5-FT,S2,S3-base,S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems produce cleaner spans and more accurate translations.
+
+S1_VERDICT: S1 closely matches the certified human reference but lacks the article ""the"" before ""pooled data.""
+
+S2_VERDICT: S2 uses ""relating to"" instead of ""related to,"" which is less precise.
+
+S3_BASE_VERDICT: S3-base incorrectly uses ""out-of-pool study"" and includes an irrelevant note about ""hypothyroïdie.""
+
+S3_FT_VERDICT: S3-FT improves on S3-base by using more accurate phrasing, though it still uses ""relating to.""
+
+S5_BASE_VERDICT: S5-base repeats the same error as S3-base with ""out-of-pool study"" and includes an irrelevant note.
+
+S5_FT_VERDICT: S5-FT is similar to S3-FT, using ""relating to"" instead of ""related to.""
+
+S6_VERDICT: S6 matches the certified human reference closely, using precise language.
+
+KEY_OBSERVATION: The systems that incorporate fine-tuned NER and oracle glossaries tend to produce translations closer to the certified human reference, highlighting the importance of precise terminology and context understanding in medical translations."
+48_065,"L’insuffisance surrénalienne s’est résolue chez 28 patients, 11 avec
+des séquelles.","In patients with non-squamous NSCLC
+treated with pembrolizumab in combination with pemetrexed and platinum chemotherapy (n=488), the
+incidence of nephritis was 1.4% (all Grades) with 0.8% Grade 3 and ",HUMAN,"HUMAN,S2,S3-FT,S5-FT,S6,S1,S3-base,S5-base",finetuned,"Fine-tuned NER systems produce more accurate translations of ""adrenal insufficiency"" compared to baseline systems.","S1 incorrectly translates ""insuffisance surrénalienne"" as ""renal insufficiency,"" which is a significant error.","S2 correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.","S3-base incorrectly translates ""insuffisance surrénalienne"" as ""adrenoleukodystrophy,"" which is a major error.","S3-FT accurately translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.","S5-base makes the same error as S3-base, translating ""insuffisance surrénalienne"" as ""adrenoleukodystrophy.""","S5-FT correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.","S6 correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" but lacks the capitalization of the initial letter.","The most critical terminology error observed is the incorrect translation of ""insuffisance surrénalienne"" as ""adrenoleukodystrophy"" in some systems, which significantly impacts the clinical accuracy of the translation. Fine-tuned NER systems generally provide better accuracy for medical terms in this context.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S2,S3-FT,S5-FT,S6,S1,S3-base,S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER systems produce more accurate translations of ""adrenal insufficiency"" compared to baseline systems.
+
+S1_VERDICT: S1 incorrectly translates ""insuffisance surrénalienne"" as ""renal insufficiency,"" which is a significant error.
+
+S2_VERDICT: S2 correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.
+
+S3_BASE_VERDICT: S3-base incorrectly translates ""insuffisance surrénalienne"" as ""adrenoleukodystrophy,"" which is a major error.
+
+S3_FT_VERDICT: S3-FT accurately translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.
+
+S5_BASE_VERDICT: S5-base makes the same error as S3-base, translating ""insuffisance surrénalienne"" as ""adrenoleukodystrophy.""
+
+S5_FT_VERDICT: S5-FT correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" and maintains the correct structure.
+
+S6_VERDICT: S6 correctly translates ""insuffisance surrénalienne"" as ""adrenal insufficiency"" but lacks the capitalization of the initial letter.
+
+KEY_OBSERVATION: The most critical terminology error observed is the incorrect translation of ""insuffisance surrénalienne"" as ""adrenoleukodystrophy"" in some systems, which significantly impacts the clinical accuracy of the translation. Fine-tuned NER systems generally provide better accuracy for medical terms in this context."
+48_078,"L’hypothyroïdie s’est résolue chez 216 (23,0 %) patients, 16 avec des séquelles.","The median duration was 1.6 months
+(range: 4 days to 43.1+ months).",HUMAN,"HUMAN,S2,S1,S3-FT,S5-FT,S6,S3-base,S5-base",finetuned,"Fine-tuned NER improves the accuracy of medical term recognition, as seen in S3-FT and S5-FT.",S1 provides a clear and accurate translation but lacks the clinical nuance of the human reference.,"S2 offers a precise and concise translation, closely aligning with the human reference.","S3-base incorrectly translates ""hypothyroidism"" as ""hypercarotinaemia,"" indicating a significant error.","S3-FT corrects the error from S3-base, accurately translating ""hypothyroidism.""","S5-base repeats the same error as S3-base, misidentifying ""hypothyroidism"" as ""hypercarotinaemia.""","S5-FT corrects the terminology error present in S5-base, accurately identifying ""hypothyroidism.""","S6 uses the term ""solved"" instead of ""resolved,"" which is less precise in medical context.","The critical issue in machine translations is the accurate identification and translation of medical terms, as demonstrated by the errors in S3-base and S5-base. Fine-tuning NER models significantly improves the accuracy of these translations.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN,S2,S1,S3-FT,S5-FT,S6,S3-base,S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER improves the accuracy of medical term recognition, as seen in S3-FT and S5-FT.
+
+S1_VERDICT: S1 provides a clear and accurate translation but lacks the clinical nuance of the human reference.
+
+S2_VERDICT: S2 offers a precise and concise translation, closely aligning with the human reference.
+
+S3_BASE_VERDICT: S3-base incorrectly translates ""hypothyroidism"" as ""hypercarotinaemia,"" indicating a significant error.
+
+S3_FT_VERDICT: S3-FT corrects the error from S3-base, accurately translating ""hypothyroidism.""
+
+S5_BASE_VERDICT: S5-base repeats the same error as S3-base, misidentifying ""hypothyroidism"" as ""hypercarotinaemia.""
+
+S5_FT_VERDICT: S5-FT corrects the terminology error present in S5-base, accurately identifying ""hypothyroidism.""
+
+S6_VERDICT: S6 uses the term ""solved"" instead of ""resolved,"" which is less precise in medical context.
+
+KEY_OBSERVATION: The critical issue in machine translations is the accurate identification and translation of medical terms, as demonstrated by the errors in S3-base and S5-base. Fine-tuning NER models significantly improves the accuracy of these translations."
+48_109,"Chez les patients traités par pembrolizumab en association à l’axitinib ou au lenvatinib, la proportion de
+patients ayant présenté une variation des paramètres biologiques vers des anomalies de Grade ","The median time to onset of ALT increased was 2.3 months (range:
+7 days to 19.8 months).",UNKNOWN,,,,,,,,,,,,"BEST_SYSTEM [S1|S2|S3-base|S3-FT|S5-base|S5-FT|S6|HUMAN|TIE]: HUMAN
+
+RANKING [comma-separated best to worst, all 8 options including HUMAN]: HUMAN, S2, S3-FT, S5-FT, S3-base, S5-base, S1, S6
+
+NER_WINNER [baseline|finetuned|tied]: finetuned
+
+NER_REASON [1 sentence]: The fine-tuned NER systems (S3-FT and S5-FT) produced cleaner and more precise spans compared to their baseline counterparts.
+
+S1_VERDICT [1 sentence]: S1 incorrectly uses ""laxitinib"" instead of ""axitinib"" and lacks precision in terminology.
+
+S2_VERDICT [1 sentence]: S2 provides a clear and accurate translation with appropriate clinical language, closely aligning with the human reference.
+
+S3_BASE_VERDICT [1 sentence]: S3-base uses ""biochemical parameter abnormalities,"" which is less precise than ""laboratory parameter abnormalities.""
+
+S3_FT_VERDICT [1 sentence]: S3-FT improves on S3-base by using ""laboratory parameter abnormalities,"" aligning better with clinical terminology.
+
+S5_BASE_VERDICT [1 sentence]: S5-base mirrors S3-base's terminology issues, using ""biochemical parameter abnormalities.""
+
+S5_FT_VERDICT [1 sentence]: S5-FT, like S3-FT, uses ""laboratory parameter abnormalities,"" offering a more precise translation.
+
+S6_VERDICT [1 sentence]: S6 incorrectly uses ""laxitinib"" and has awkward phrasing, reducing clarity and precision.
+
+KEY_OBSERVATION [2 sentences max]: The human reference remains the gold standard due to its precise and clinically appropriate language. Among the machine translations, S2 stands out for its accuracy and alignment with professional SmPC prose, while fine-tuned NER systems generally produce more precise terminology."
+48_072,"Une hyperthyroïdie a conduit à un arrêt de pembrolizumab chez 4 (0,1 %) patients.","The median time to onset of
+hypophysitis was 5.9 months (range: 1 day to 17.7 months).",HUMAN,"HUMAN, S1, S2, S3-FT, S5-FT, S6, S3-base, S5-base",finetuned,The fine-tuned NER systems (S3-FT and S5-FT) produce cleaner and more accurate translations compared to their baseline counterparts.,S1 provides a precise and accurate translation that aligns well with the certified human reference.,"S2 is concise and accurate, closely matching the certified human reference.","S3-base introduces unnecessary wording with ""A case of,"" which is not present in the source or the human reference.","S3-FT offers a clean and accurate translation, omitting unnecessary wording.","S5-base, like S3-base, adds ""A case of,"" which is not needed and deviates from the source.","S5-FT provides a precise translation without extraneous wording, similar to S3-FT.","S6 uses ""suspension"" instead of ""discontinuation,"" which is less precise in this context.","The use of ""discontinuation"" is critical for accurately conveying the cessation of treatment, as seen in the human reference; systems that deviate from this term, such as S6, are less precise. Fine-tuned NER systems generally produce translations closer to the human reference by avoiding unnecessary additions.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S1, S2, S3-FT, S5-FT, S6, S3-base, S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER systems (S3-FT and S5-FT) produce cleaner and more accurate translations compared to their baseline counterparts.
+
+S1_VERDICT: S1 provides a precise and accurate translation that aligns well with the certified human reference.
+
+S2_VERDICT: S2 is concise and accurate, closely matching the certified human reference.
+
+S3_BASE_VERDICT: S3-base introduces unnecessary wording with ""A case of,"" which is not present in the source or the human reference.
+
+S3_FT_VERDICT: S3-FT offers a clean and accurate translation, omitting unnecessary wording.
+
+S5_BASE_VERDICT: S5-base, like S3-base, adds ""A case of,"" which is not needed and deviates from the source.
+
+S5_FT_VERDICT: S5-FT provides a precise translation without extraneous wording, similar to S3-FT.
+
+S6_VERDICT: S6 uses ""suspension"" instead of ""discontinuation,"" which is less precise in this context.
+
+KEY_OBSERVATION: The use of ""discontinuation"" is critical for accurately conveying the cessation of treatment, as seen in the human reference; systems that deviate from this term, such as S6, are less precise. Fine-tuned NER systems generally produce translations closer to the human reference by avoiding unnecessary additions."
+48_026,"Les effets indésirables connus pour survenir avec pembrolizumab ou les médicaments du traitement
+en association administrés seuls peuvent apparaître pendant le traitement avec ces médicaments en
+assoc","Adverse reactions known to occur with
+pembrolizumab or combination therapy components given alone may occur during treatment with
+these medicinal products in combination, even if these reactions were ",UNKNOWN,,,,,,,,,,,,"BEST_SYSTEM [S1|S2|S3-base|S3-FT|S5-base|S5-FT|S6|HUMAN|TIE]: HUMAN
+
+RANKING [comma-separated best to worst, all 8 options including HUMAN]: HUMAN, S2, S1, S6, S3-base, S3-FT, S5-base, S5-FT
+
+NER_WINNER [baseline|finetuned|tied]: baseline
+
+NER_REASON [1 sentence]: The baseline NER condition consistently provides clearer and more accurate terminology alignment with the certified human reference.
+
+S1_VERDICT [1 sentence]: S1 provides a close translation but uses ""therapeutic association,"" which is less precise than ""combination therapy.""
+
+S2_VERDICT [1 sentence]: S2 offers a well-structured translation with appropriate terminology, closely matching the human reference.
+
+S3_BASE_VERDICT [1 sentence]: S3-base uses ""therapeutic association studies,"" which is less precise than ""clinical studies with combination therapy.""
+
+S3_FT_VERDICT [1 sentence]: S3-FT mirrors S3-base and does not improve on the terminology precision.
+
+S5_BASE_VERDICT [1 sentence]: S5-base repeats the same terminology issues as S3-base, lacking precision in describing clinical studies.
+
+S5_FT_VERDICT [1 sentence]: S5-FT does not enhance the precision of the translation compared to its baseline counterpart.
+
+S6_VERDICT [1 sentence]: S6 uses ""side effects"" instead of ""adverse reactions,"" which is less aligned with the preferred clinical terminology.
+
+KEY_OBSERVATION [2 sentences max]: The human reference remains the gold standard due to its precise use of ""adverse reactions"" and ""combination therapy,"" which are critical for regulatory clarity. Machine translations often struggle with maintaining this level of precision, particularly in differentiating between ""therapeutic association"" and ""combination therapy."""
+48_092,"Deux patients ont présenté une MVO hépatique, dont une d’issue fatale.","In patients with melanoma, NSCLC
+and RCC treated with pembrolizumab monotherapy in the adjuvant setting (n=2 060), the incidence of
+hypothyroidism was 18.5%, the majority of which were Grade 1 or 2.",S2,"HUMAN, S2, S1, S6, S3-FT, S5-FT, S3-base, S5-base",finetuned,The fine-tuned NER condition provides cleaner spans and more accurate terminology.,"S1 uses the term ""hepatic MVO,"" which is less precise than the certified human reference but still understandable.","S2 accurately translates the term as ""hepatic veno-occlusive disease,"" closely aligning with clinical language standards.",S3-base introduces unnecessary MedDRA coding details that are not suitable for SmPC prose.,S3-FT improves on S3-base by providing a more concise and clinically relevant translation.,"S5-base, like S3-base, includes excessive MedDRA coding details that detract from clarity.",S5-FT offers a clearer translation than S5-base but still lacks the precision of S2.,"S6 uses ""hepatic MVO,"" which is less precise than the certified human reference but still understandable.","The best translations use precise clinical terms like ""hepatic veno-occlusive disease"" rather than abbreviations like ""MVO,"" which can be ambiguous. Fine-tuning NER systems improves terminology accuracy by reducing unnecessary coding details.","BEST_SYSTEM: S2
+
+RANKING: HUMAN, S2, S1, S6, S3-FT, S5-FT, S3-base, S5-base
+
+NER_WINNER: finetuned
+
+NER_REASON: The fine-tuned NER condition provides cleaner spans and more accurate terminology.
+
+S1_VERDICT: S1 uses the term ""hepatic MVO,"" which is less precise than the certified human reference but still understandable.
+
+S2_VERDICT: S2 accurately translates the term as ""hepatic veno-occlusive disease,"" closely aligning with clinical language standards.
+
+S3_BASE_VERDICT: S3-base introduces unnecessary MedDRA coding details that are not suitable for SmPC prose.
+
+S3_FT_VERDICT: S3-FT improves on S3-base by providing a more concise and clinically relevant translation.
+
+S5_BASE_VERDICT: S5-base, like S3-base, includes excessive MedDRA coding details that detract from clarity.
+
+S5_FT_VERDICT: S5-FT offers a clearer translation than S5-base but still lacks the precision of S2.
+
+S6_VERDICT: S6 uses ""hepatic MVO,"" which is less precise than the certified human reference but still understandable.
+
+KEY_OBSERVATION: The best translations use precise clinical terms like ""hepatic veno-occlusive disease"" rather than abbreviations like ""MVO,"" which can be ambiguous. Fine-tuning NER systems improves terminology accuracy by reducing unnecessary coding details."
+48_084,"Chez
+les patients atteints d’un mélanome, d’un CBNPC et d’un CCR traités par pembrolizumab en monothérapie
+190
+au stade adjuvant (n = 2 060), l'incidence de l'hypothyroïdie était de 18,5 %, dont la ma","The median duration was not reached
+(range: 2 days to 63.0+ months).",HUMAN,"HUMAN, S2, S1, S6, S3-base, S5-base, S3-FT, S5-FT",baseline,"The baseline NER condition provides more accurate identification of medical terms, avoiding incorrect expansions.",S1 provides a clear translation but lacks the specificity of the full term for CBNPC and CCR.,"S2 offers a concise and accurate translation with appropriate clinical language, closely aligning with the human reference.","S3-base includes incorrect expansions for CBNPC and CCR, which detracts from the translation's accuracy.","S3-FT incorrectly expands CBNPC and CCR, leading to significant inaccuracies in the translation.","S5-base suffers from the same incorrect expansions as S3-base, affecting its accuracy.","S5-FT repeats the errors of S3-FT with incorrect expansions, compromising the translation's reliability.",S6 provides a translation similar to S1 but does not improve on the specificity of medical terms.,"The most critical issue across translations is the incorrect expansion of medical abbreviations, which can lead to significant misunderstandings in clinical contexts. Accurate identification and translation of medical terms are crucial for maintaining the integrity of adverse event reporting.","BEST_SYSTEM: HUMAN
+
+RANKING: HUMAN, S2, S1, S6, S3-base, S5-base, S3-FT, S5-FT
+
+NER_WINNER: baseline
+
+NER_REASON: The baseline NER condition provides more accurate identification of medical terms, avoiding incorrect expansions.
+
+S1_VERDICT: S1 provides a clear translation but lacks the specificity of the full term for CBNPC and CCR.
+
+S2_VERDICT: S2 offers a concise and accurate translation with appropriate clinical language, closely aligning with the human reference.
+
+S3_BASE_VERDICT: S3-base includes incorrect expansions for CBNPC and CCR, which detracts from the translation's accuracy.
+
+S3_FT_VERDICT: S3-FT incorrectly expands CBNPC and CCR, leading to significant inaccuracies in the translation.
+
+S5_BASE_VERDICT: S5-base suffers from the same incorrect expansions as S3-base, affecting its accuracy.
+
+S5_FT_VERDICT: S5-FT repeats the errors of S3-FT with incorrect expansions, compromising the translation's reliability.
+
+S6_VERDICT: S6 provides a translation similar to S1 but does not improve on the specificity of medical terms.
+
+KEY_OBSERVATION: The most critical issue across translations is the incorrect expansion of medical abbreviations, which can lead to significant misunderstandings in clinical contexts. Accurate identification and translation of medical terms are crucial for maintaining the integrity of adverse event reporting."
+48_090,"De rares cas de SSJ et de NET, dont certains d’issue fatale, ont été observés (voir rubriques 4.2 et 4.4).","In patients with
+resectable locally advanced HNSCC treated with pembrolizumab as neoadjuvant treatment and in
+combination with radiation therapy with or without concomitant cisplatin for adjuvant trea",S3-FT,"S3-FT, S5-FT, HUMAN, S2, S3-base, S5-base, S1, S6",finetuned,"Fine-tuned NER provides more accurate and cleaner terminology spans, improving translation quality.","The translation lacks specificity and uses incorrect terminology for NET, leading to potential misunderstanding.","This translation introduces incorrect expansions for SSJ and TEN, which are not standard or accurate.",The translation correctly identifies Stevens-Johnson Syndrome but incorrectly expands NET as Neutrophilic Dermatosis.,"This translation accurately uses MedDRA terms for both Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis, aligning well with EMA standards.","Similar to S3-base, it correctly identifies Stevens-Johnson Syndrome but incorrectly expands NET as Neutrophilic Dermatosis.","This translation accurately uses MedDRA terms for both Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis, aligning well with EMA standards.","The translation lacks specificity and uses incorrect terminology for NET, leading to potential misunderstanding.","The fine-tuned systems (S3-FT and S5-FT) demonstrate superior performance by accurately using MedDRA terms, which is crucial for maintaining consistency and precision in regulatory submissions. The correct identification and expansion of terms like Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis are essential for clear communication in SmPCs.","BEST_SYSTEM: S3-FT
+
+RANKING: S3-FT, S5-FT, HUMAN, S2, S3-base, S5-base, S1, S6
+
+NER_WINNER: finetuned
+
+NER_REASON: Fine-tuned NER provides more accurate and cleaner terminology spans, improving translation quality.
+
+S1_VERDICT: The translation lacks specificity and uses incorrect terminology for NET, leading to potential misunderstanding.
+
+S2_VERDICT: This translation introduces incorrect expansions for SSJ and TEN, which are not standard or accurate.
+
+S3_BASE_VERDICT: The translation correctly identifies Stevens-Johnson Syndrome but incorrectly expands NET as Neutrophilic Dermatosis.
+
+S3_FT_VERDICT: This translation accurately uses MedDRA terms for both Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis, aligning well with EMA standards.
+
+S5_BASE_VERDICT: Similar to S3-base, it correctly identifies Stevens-Johnson Syndrome but incorrectly expands NET as Neutrophilic Dermatosis.
+
+S5_FT_VERDICT: This translation accurately uses MedDRA terms for both Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis, aligning well with EMA standards.
+
+S6_VERDICT: The translation lacks specificity and uses incorrect terminology for NET, leading to potential misunderstanding.
+
+KEY_OBSERVATION: The fine-tuned systems (S3-FT and S5-FT) demonstrate superior performance by accurately using MedDRA terms, which is crucial for maintaining consistency and precision in regulatory submissions. The correct identification and expansion of terms like Stevens-Johnson Syndrome and Toxic Epidermal Necrolysis are essential for clear communication in SmPCs."

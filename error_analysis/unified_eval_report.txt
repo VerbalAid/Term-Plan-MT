@@ -1,0 +1,83 @@
+TERMPLANMT UNIFIED EXPERT EVALUATION
+30 segments (seed=42, same as audit_pipeline.py) · 8 systems · GPT-4o
+======================================================================
+
+BEST SYSTEM VOTES
+  HUMAN          20/30 = 67%
+  UNKNOWN        4/30 = 13%
+  S3-FT          2/30 = 7%
+  S2             2/30 = 7%
+  S6             1/30 = 3%
+  S1             1/30 = 3%
+
+AVERAGE RANK (1=best, 8=worst)
+  HUMAN          avg rank 1.50  (n=26)
+  S2             avg rank 3.27  (n=26)
+  S1             avg rank 4.35  (n=26)
+  S3-FT          avg rank 4.69  (n=26)
+  S3-BASE        avg rank 5.12  (n=26)
+  S6             avg rank 5.19  (n=26)
+  S5-FT          avg rank 5.73  (n=26)
+  S5-BASE        avg rank 6.15  (n=26)
+
+NER CONDITION: FINE-TUNED vs BASELINE
+  baseline     10/30 = 33%
+  finetuned    10/30 = 33%
+  tied         6/30 = 20%
+               4/30 = 13%
+
+======================================================================
+EXPERT SYNTHESIS
+======================================================================
+
+OVERALL_VERDICT:
+The human reference remains the recommended system for EMA regulatory submissions due to its consistent precision in using MedDRA terminology and its ability to maintain clear and clinically appropriate language. It consistently aligns with EMA guidelines, ensuring accurate and contextually suitable translations. While machine translation systems show potential, they frequently struggle with terminology precision and contextual nuances, which are critical in regulatory contexts.
+
+SYSTEM_BY_SYSTEM:
+- **S1**: Strengths include occasional accurate translations, but it suffers from significant terminology errors, such as incorrect drug names. Verdict: Needs improvement in terminology accuracy.
+- **S2**: Demonstrates relatively close alignment with the human reference in clinical specificity, but occasionally lacks precision. Verdict: Promising, but requires refinement.
+- **S3-base**: Lacks consistency and often fails to capture the precise clinical language required. Verdict: Not recommended without further development.
+- **S3-FT**: Shows improved accuracy in medical term identification compared to its baseline, but still falls short of the human reference. Verdict: Better than baseline, but not sufficient for regulatory use.
+- **S5-base**: Struggles with maintaining standard terminology and often lacks clinical detail. Verdict: Not suitable for regulatory submissions.
+- **S5-FT**: Demonstrates some improvement over the baseline but still lacks the precision needed for regulatory contexts. Verdict: Needs further enhancement.
+- **S6**: Shows the best performance among machine systems, closely aligning with the human reference in some instances, but still not consistently reliable. Verdict: Most promising machine system, yet not fully reliable.
+
+NER_MODEL_VERDICT:
+The fine-tuned BioMistral model demonstrates superior accuracy in identifying correct medical terms compared to the baseline zero-shot model. This improvement highlights the importance of domain-specific fine-tuning in enhancing the precision of medical translations, making the fine-tuned model more suitable for regulatory contexts.
+
+REGISTER_MISMATCH_VERDICT:
+MedDRA ontology grounding generally aids in maintaining consistent and precise terminology, which is crucial for regulatory submissions. However, it can sometimes lead to overly rigid translations that lack the necessary clinical nuance. Balancing MedDRA precision with professional prose is essential for effective communication in SmPCs.
+
+PRACTICAL_RECOMMENDATION:
+For an EMA translation team, deploying machine translation systems should be approached with caution. While systems like S6 show promise, they are not yet reliable enough to replace human translators. These systems can be used as supplementary tools to assist in initial drafts, but human oversight is essential to ensure compliance with EMA guidelines and the accuracy of medical terminology. Continuous refinement and domain-specific training of these systems are recommended to enhance their utility in regulatory contexts.
+
+======================================================================
+KEY OBSERVATIONS (per segment)
+======================================================================
+
+[48_015] The use of "SmPC" instead of "RCP" is crucial for consistency with EMA guidelines, and only some systems correctly implemented this terminology. The systems that used "SmPC" aligned more closely with 
+[48_004] The human reference remains the gold standard due to its precise use of "adverse reaction" and correct terminology like "platinum doublet," which most machine translations struggled to replicate accur
+[48_036] The most important terminology quality finding is that the use of "maculo-papular rash" aligns best with the human reference, while variations like "macular-papular skin rash" or awkward phrasing like
+[48_032] The human reference remains the gold standard due to its precise use of MedDRA terms and clear clinical language, while machine translations often struggle with repetition and extraneous information.
+[48_029] The certified human reference provides the most precise and contextually appropriate terminology. Machine translations struggle with capitalization and exact MedDRA term alignment, impacting their sui
+[48_018] The most critical terminology issue is the incorrect translation of "axitinib" as "daxitinib" in S1 and S6, which significantly impacts the accuracy of the translation. Additionally, the omission of t
+[48_124] The human reference remains the gold standard due to its precise and clinically appropriate language, while S6 demonstrates the best machine translation performance by closely aligning with the human 
+[48_014] The human reference maintains precise and consistent use of MedDRA terminology, which is crucial for clarity and accuracy in adverse event reporting. Machine translations often struggle with maintaini
+[48_087] All machine translations accurately convey the median duration information, but several omit the "+" symbol after "47.1", which is a minor but notable deviation from the certified human reference. The
+[48_119] The machine translations generally maintain the intended meaning but vary in clinical specificity and verbosity, with S2 providing the closest match to the certified human reference. The baseline NER 
+[48_115] The most significant issue observed is the failure of some systems to translate specific terms from French to English, particularly "anticorps anti-berahyaluronidase alfa recombinant," which impacts t
+[48_070] The translations that adhered closely to the certified human reference used precise clinical language without unnecessary embellishments, demonstrating the importance of maintaining clarity and consis
+[48_012] The human reference remains the gold standard due to its precise and consistent use of terminology; machine translations often struggle with maintaining standard terminology, particularly with the use
+[48_076] The fine-tuned NER systems (S3-FT and S5-FT) demonstrated superior accuracy in identifying the correct medical term "Hypothyroidism," highlighting the importance of precise terminology in medical tran
+[48_055] The machine translations generally lack the specificity and clinical detail of the certified human reference, particularly in failing to specify "immune-mediated hepatitis," which is crucial for accur
+[48_005] The human reference remains the gold standard due to its precise use of clinical language and adherence to EMA guidelines. Machine translations, while improving, still occasionally struggle with redun
+[48_125] The translations that include "after marketing authorization" align better with the certified human reference, highlighting the importance of maintaining specific regulatory context in adverse event r
+[48_113] The translations vary in their handling of administration route phrasing, with S2 providing the most natural and contextually appropriate language. Fine-tuned NER systems generally produce better phra
+[48_028] The human reference remains the gold standard for precise and consistent terminology, particularly in maintaining the nuanced clinical language required for SmPCs. Machine translations, while improvin
+[48_030] The systems that incorporate fine-tuned NER and oracle glossaries tend to produce translations closer to the certified human reference, highlighting the importance of precise terminology and context u
+[48_065] The most critical terminology error observed is the incorrect translation of "insuffisance surrénalienne" as "adrenoleukodystrophy" in some systems, which significantly impacts the clinical accuracy o
+[48_078] The critical issue in machine translations is the accurate identification and translation of medical terms, as demonstrated by the errors in S3-base and S5-base. Fine-tuning NER models significantly i
+[48_072] The use of "discontinuation" is critical for accurately conveying the cessation of treatment, as seen in the human reference; systems that deviate from this term, such as S6, are less precise. Fine-tu
+[48_092] The best translations use precise clinical terms like "hepatic veno-occlusive disease" rather than abbreviations like "MVO," which can be ambiguous. Fine-tuning NER systems improves terminology accura
+[48_084] The most critical issue across translations is the incorrect expansion of medical abbreviations, which can lead to significant misunderstandings in clinical contexts. Accurate identification and trans
+[48_090] The fine-tuned systems (S3-FT and S5-FT) demonstrate superior performance by accurately using MedDRA terms, which is crucial for maintaining consistency and precision in regulatory submissions. The co
