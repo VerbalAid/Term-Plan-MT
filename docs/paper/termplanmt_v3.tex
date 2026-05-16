@@ -24,7 +24,20 @@
 \usepackage{algpseudocode}
 \usepackage{listings}
 \usepackage{mdframed}
+\usepackage{float}
+\usepackage{needspace}
 \usepackage{enumitem}
+
+%% Algorithm listing box (matches Algorithm~1 style)
+\newtcolorbox{codealgobox}{
+  colback=gray!6, colframe=gray!35, boxrule=0.4pt,
+  arc=3pt, left=4pt, right=4pt, top=3pt, bottom=3pt
+}
+\newtcolorbox{metricbox}{
+  colback=gray!6, colframe=gray!35, boxrule=0.4pt,
+  arc=3pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
+  fontupper=\small
+}
 
 %% ── Layout ────────────────────────────────────────────────────────────────
 \setlength{\columnsep}{0.25in}
@@ -288,8 +301,7 @@ $\text{HP} = |\hat{d} - d_{\text{src}}|$ penalises wrong specificity level
 \begin{algorithm}[t]
 \caption{Global Terminology Planning -- \texttt{compute\_global\_locks}}
 \label{alg:planning}
-\begin{tcolorbox}[colback=gray!6, colframe=gray!35, boxrule=0.4pt,
-  arc=3pt, left=4pt, right=4pt, top=3pt, bottom=3pt]
+\begin{codealgobox}
 \begin{lstlisting}[
   language=Python,
   basicstyle=\scriptsize\ttfamily,
@@ -329,7 +341,7 @@ for fr_term in unique_ner_terms(S):
 
 return locks
 \end{lstlisting}
-\end{tcolorbox}
+\end{codealgobox}
 \end{algorithm}
 
 The abstain-on-ambiguity policy (line 4) is a deliberate safety choice: when a French
@@ -353,27 +365,80 @@ failure. The Mistral variant uses soft boosting only, since instruction-tuned
 LLMs are more sensitive to hard token forcing and exhibit greater fluency
 degradation under strict constraints.
 
+\subsection{MedDRA Knowledge Graph Construction}
+\label{sec:graph-construction}
+
+The grounding component $\mathcal{G}$ used throughout Algorithms~1--5 is a
+Neo4j property graph built from the MedDRA v28 flat-file release, obtained
+under academic licence via UPV/EHU.
+Construction proceeds in four stages.
+
+\paragraph{(1) Parsing the ASCII flat files.}
+MedDRA distributes five pipe-delimited \texttt{*.asc} files.
+The primary source is \texttt{mdhier.asc}, where each row encodes the
+full SOC\,$\to$\,HLGT\,$\to$\,HLT\,$\to$\,PT\,$\to$\,LLT lineage for one
+concept, together with English and French preferred labels.
+A custom parser handles both the pipe-separated format (v28+) and the legacy
+dollar-delimited format, with automatic encoding detection
+(UTF-8\,$\to$\,CP1252\,$\to$\,ISO-8859-1).
+This yields approximately 80,000 LLT records with complete five-level lineage.
+
+\paragraph{(2) Building the French label index.}
+The French MedDRA release is read in parallel to populate a
+\texttt{fr\_label} property on each concept node.
+After case-folding normalisation, 7{,}679 French surface forms are
+\emph{ambiguous} --- a single normalised string maps to two or more distinct
+MedDRA concepts (e.g., \textit{pneumopathie inflammatoire} resolves to both
+\textsc{Pneumonitis} and \textsc{Interstitial Lung Disease}).
+These keys are recorded in an \texttt{\_ambiguous} set and trigger the
+abstain-on-ambiguity policy in \texttt{compute\_global\_locks}
+(Algorithm~\ref{alg:planning}).
+
+\paragraph{(3) Loading into Neo4j.}
+Each MedDRA concept is stored as a \texttt{:Concept} node with properties
+\texttt{\{id, name, fr\_label, level, tier\}}.
+Parent--child relationships are represented as directed
+\texttt{BROADER\_THAN} edges, producing a five-level DAG.
+The graph is populated via batched Cypher \texttt{MERGE} transactions
+against a Neo4j~5 Community instance deployed via Docker Compose.
+The final graph contains \textbf{84{,}404 concept nodes} and
+\textbf{91{,}082 entries} in the PT/LLT fuzzy index.
+
+\paragraph{(4) Runtime API (\texttt{TermGraph}).}
+All French concept keys are loaded into memory on first call (lazy,
+cached).
+String grounding applies exact case-fold matching first; if that fails,
+RapidFuzz cosine similarity with a threshold of $\geq\!90\%$ is applied,
+restricted to PT- and LLT-level nodes only (higher levels produce
+over-generalised matches).
+The \texttt{neighbours()} method returns concepts reachable via one or two
+\texttt{BROADER\_THAN} hops; \texttt{same\_branch()} executes a
+\texttt{shortestPath} Cypher query bounded to five hops.
+A CCR diagnostic over the baseline NER condition confirms the grounding
+ceiling: 23\% \textsc{Exact-Hit}, 11\% \textsc{Fuzzy-Hit}, 6\%
+\textsc{Ambiguous}, and 60\% \textsc{Not-in-Graph} --- the last category
+dominated by drug names, grade annotations, and numeric tokens that lie
+outside the adverse-event subset of MedDRA indexed in the graph.
+
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Metrics}
 \label{sec:metrics}
 
-\begin{mdframed}[backgroundcolor=gray!6, linewidth=0.4pt,
-                 innerleftmargin=6pt, innerrightmargin=6pt,
-                 innertopmargin=5pt, innerbottommargin=5pt,
-                 skipabove=4pt, skipbelow=4pt]
-\textbf{Metric definitions.}
+\needspace{26\baselineskip}
+\begin{metricbox}
+\noindent\textbf{Metric definitions.}
 \begin{itemize}[noitemsep, topsep=3pt, leftmargin=*]
   \item \textbf{HTM} (Hierarchy-Aware Terminology Metric): per grounded
   NER span, score $= 1.0$ (exact MedDRA level), $0.5$ (same branch),
-  $0.0$ (miss); macro-averaged.
+  $0.0$ (miss); macro-averaged (Algorithm~2).
   \item \textbf{rHTM} (Reference HTM): HTM applied to the certified human
   reference, not a system hypothesis. A dataset-level ceiling;
   values of $0.15$--$0.18$ confirm translators prefer phrasings outside
   the MedDRA preferred-term vocabulary.
   \item \textbf{HRA} (Hypothesis--Reference Agreement):
   $1 - |\mathrm{HTM}_\mathrm{hyp} - \mathrm{HTM}_\mathrm{ref}|$,
-  macro-averaged. Measures agreement with professional translation
-  practice rather than raw ontology proximity.
+  macro-averaged (Algorithm~3). Measures agreement with professional
+  translation practice rather than raw ontology proximity.
   \item \textbf{HTM-A} (Alias-Expanded HTM): accepts any ancestor up to
   SOC. Score invariance across tiers T1--T3 confirms failures are
   conceptual, not surface-level.
@@ -381,7 +446,177 @@ degradation under strict constraints.
   spans. Identical across S1--S6 for a given NER condition; the primary
   diagnostic for NER quality.
 \end{itemize}
-\end{mdframed}
+\end{metricbox}
+
+\begin{algorithm}[H]
+\caption{HTM Scoring --- \texttt{compute\_htm}}
+\label{alg:htm}
+\begin{codealgobox}
+\begin{lstlisting}[
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=4pt,
+  xleftmargin=10pt,
+  frame=none,
+  showstringspaces=false,
+  breaklines=true,
+  columns=flexible
+]
+# Inputs: hypotheses H, segments S, graph G
+# Output: macro-averaged HTM in [0, 1]
+
+def htm_span(found, ref_label, ref_level, G):
+    if not found: return 0.0
+    node = G.get_by_name(found) or G.get_by_name(ref_label)
+    if not node: return 0.0
+    if node.level == ref_level: return 1.0      # exact tier
+    if G.same_branch(found, ref_label): return 0.5
+    return 0.0
+
+scores = []
+for row in H:
+    hyp = row.hyp
+    seg = S[row.id]
+    for term in unique_ner_terms(seg):
+        concept = G.ground(term, context=seg.fr)
+        if concept is None: continue
+        renderings = [concept.name] + G.candidates(concept)
+        found = first_phrase_in(hyp, renderings)
+        scores.append(htm_span(found, concept.name,
+                              concept.level, G))
+return mean(scores) if scores else 0.0
+\end{lstlisting}
+\end{codealgobox}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{HRA --- \texttt{compute\_htm\_hyp\_vs\_ref}}
+\label{alg:hra}
+\begin{codealgobox}
+\begin{lstlisting}[
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=4pt,
+  xleftmargin=10pt,
+  frame=none,
+  showstringspaces=false,
+  breaklines=true,
+  columns=flexible
+]
+# Inputs: hypotheses H, segments S, graph G
+# Output: mean agreement in [0, 1] (HRA)
+
+agreements = []
+for row in H:
+    hyp, ref = row.hyp, seg.en_ref
+    seg = S[row.id]
+    for term in unique_ner_terms(seg):
+        concept = G.ground(term, context=seg.fr)
+        if concept is None: continue
+        renderings = [concept.name] + G.candidates(concept)
+        found_hyp = first_phrase_in(hyp, renderings)
+        found_ref = first_phrase_in(ref, renderings)
+        s_hyp = htm_span(found_hyp, concept.name,
+                         concept.level, G)
+        s_ref = htm_span(found_ref, concept.name,
+                         concept.level, G)
+        agreements.append(1.0 - abs(s_hyp - s_ref))
+return mean(agreements) if agreements else nan
+\end{lstlisting}
+\end{codealgobox}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Soft Logit Boosting --- \texttt{PhraseLogitBoost}}
+\label{alg:logit-boost}
+\begin{codealgobox}
+\begin{lstlisting}[
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=4pt,
+  xleftmargin=10pt,
+  frame=none,
+  showstringspaces=false,
+  breaklines=true,
+  columns=flexible
+]
+# Inputs: tokenizer tok, locked phrases P, boost delta
+# Applied each decoding step to logits vector scores
+
+class PhraseLogitBoost(LogitsProcessor):
+    def __init__(self, tok, phrases, boost=1.75):
+        self.boost = boost
+        self.ids = set()
+        for p in phrases:
+            for tid in tok(p, add_special_tokens=False).input_ids:
+                self.ids.add(tid)
+
+    def __call__(self, input_ids, scores):
+        for tid in self.ids:
+            if 0 <= tid < scores.shape[-1]:
+                scores[:, tid] += self.boost
+        return scores
+# S5-NLLB: delta=1.75; S5-Mistral: delta=1.25
+\end{lstlisting}
+\end{codealgobox}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Hard Phrase Locking --- \texttt{force\_words\_ids} (NLLB S5/S6)}
+\label{alg:force-words}
+\begin{codealgobox}
+\begin{lstlisting}[
+  language=Python,
+  basicstyle=\scriptsize\ttfamily,
+  keywordstyle=\bfseries,
+  commentstyle=\color{gray}\itshape,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=4pt,
+  xleftmargin=10pt,
+  frame=none,
+  showstringspaces=false,
+  breaklines=true,
+  columns=flexible
+]
+# Inputs: segment seg, lock map L, graph G
+# Output: constrained NLLB translation
+
+phrases = []
+for term in seg.terms:
+    concept = G.ground(term, context=seg.fr)
+    if concept is None: continue
+    en = L.get(term) or concept.name
+    phrases.append(en)
+
+phrase_ids = [tok(p, add_special_tokens=False).input_ids
+              for p in phrases if p]
+beams = min(10, 5 + len(phrases))
+try:
+    out = model.generate(
+        **encode(seg.fr),
+        logits_processor=[PhraseLogitBoost(tok, phrases)],
+        force_words_ids=phrase_ids,
+        num_beams=beams, max_new_tokens=256)
+except BeamSearchFailure:
+    # fallback: soft boost only (no hard lock)
+    out = model.generate(..., logits_processor=[boost])
+return decode(out)
+\end{lstlisting}
+\end{codealgobox}
+\end{algorithm}
 
 \noindent Fluency: corpus BLEU \citep{papineni2002bleu} and chrF\texttt{++}
 \citep{popovic2017chrf} via SacreBLEU; neural: COMET \citep{rei2020comet}.
@@ -746,6 +981,16 @@ the risk of deploying low-quality NER in pharmacovigilance contexts.
 Substantially higher CCR with cleaner NER span boundaries is the necessary
 condition for graph-augmented systems to surpass S2; quantifying that
 threshold is left to future work with broader French biomedical NER.
+
+\paragraph{Future work.}
+Graph-aware fine-tuning is the compelling next step: rather than prompting
+and inference-time logit boosting, fine-tuning the LLM directly on
+serialised Neo4j subgraphs may teach it to embed MedDRA concepts naturally
+in clinical prose, bridging the register mismatch gap without hard token
+forcing. Substantially higher CCR ($\approx$60--70\%) with cleaner NER
+boundaries is a likely necessary condition for graph-augmented systems to
+surpass S2; quantifying that threshold with broader French biomedical NER
+is the direct next empirical step.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section*{Acknowledgements}

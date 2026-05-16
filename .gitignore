@@ -53,3 +53,4 @@ error_analysis/*.log
 *.aux
 *.out
 docs/paper/*.log
+.aider*
