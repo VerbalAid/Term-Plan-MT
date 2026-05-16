@@ -622,32 +622,34 @@ translators avoid, explaining the HTM--BLEU divergence. The appropriate
 evaluation lens is \textbf{HRA}, which measures agreement with professional
 translation practice rather than raw ontology proximity.
 
-\paragraph{Register mismatch -- qualitative audit.}
-To ground the HTM--BLEU divergence empirically, we sampled 30 segments and
-annotated all outputs (S1, S2, S5, S6 plus human reference) across four
-dimensions: human register, system output pattern, register mismatch, and
-the consistency paradox (GPT-4o annotation, seed~42; CSV in
-\texttt{error\_analysis/audit\_annotated.csv}).
+\paragraph{Unified expert evaluation.}
+To ground the system comparison empirically, we ran a unified expert
+evaluation across the same 30 segments as the register audit, covering
+all eight system variants (S1, S2, S3-base, S3-FT, S5-base, S5-FT, S6,
+human reference) using a GPT-4o senior EMA medical translator persona
+(seed~42; full results in \texttt{error\_analysis/unified\_eval.csv}).
 
-Among segments containing a medical term, the human reference was split
-between \textbf{technical} (23\%) and \textbf{descriptive} (20\%) register.
-In 23\% of segments S5 used a more formal MedDRA label where the certified
-translator wrote descriptive prose -- e.g.\ \textsc{Pneumonitis} vs.\
-\textit{``immune-related pneumonitis''}, \textsc{Adverse events} vs.\
-\textit{``adverse reactions''} -- the \textbf{register mismatch} pattern.
-In 57\% of segments S5 was ontology-correct yet would score lower on BLEU
-because it diverges from the reference register -- the
-\textbf{consistency paradox}. The sharpest finding is that
-\textbf{S5 was judged the best output in 0 of 30 segments (0\%)}, despite
-having the highest HTM score of any system. By contrast, the human reference
-was best in 37\% of cases and S2 (Mistral, graph-free, no ontology
-constraint) was the best MT system in 20\% -- confirming that fluent
-contextual prose, not MedDRA label enforcement, is what certified
-translators produce. The dominant annotated error type was
-\texttt{REGISTER\_MISMATCH} (23\%), followed by \texttt{TERM\_DRIFT} (20\%).
-\textbf{HRA} captures this alignment with professional translation practice;
-HTM measures ontology proximity and should not be used as a standalone
-quality metric for regulatory MT.
+The human reference dominated with 20/30 best-output votes (67\%,
+average rank 1.50). Among MT systems, S2 (Mistral, full document context,
+no graph) achieved the highest average rank (3.27) and tied S3-FT for
+best-output votes (2/30 = 7\% each), confirming that fluent contextual
+prose without ontology enforcement remains the closest MT approximation
+to certified translation practice. S5 received zero best-output votes in
+both NER conditions -- consistent with the register mismatch finding that
+logit-boosted MedDRA label enforcement diverges from the clinical prose
+register EMA translators produce. The NER condition split was balanced
+(fine-tuned preferred in 10/30 segments, baseline in 10/30, tied in 10/30),
+indicating that NER quality determines performance within graph systems but
+does not override system architecture when all variants compete together.
+The evaluator flagged S1's hallucination of \textit{daxitinib} for
+\textit{axitinib} as a critical pharmacovigilance error, and S3-base's
+substitution of \textit{Hypercarotinaemia} for \textit{hypothyroidism}
+as a recurring contamination artefact from the baseline NER condition --
+both confirming that NER quality is a patient-safety concern, not merely
+a metric artefact. A pilot annotation (30 segments, 4 baseline systems)
+and a pilot expert evaluation (25 segments, 8 systems, different sample)
+motivated this design; the unified evaluation on the canonical 30-segment
+sample is the definitive result.
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
@@ -675,16 +677,18 @@ context in their prompts.
 \label{sec:discussion}
 
 The central finding is a paradox. S5 is more technically correct than the
-human reference by ontology standards -- scoring higher on HTM -- yet was
-judged the best output in 0 of 30 sampled segments, while S2 (Mistral,
-no graph) was the best MT system in 20\% of cases. The human reference
-scores only 0.15--0.18 on HTM but produces better translations because
-MedDRA labels are designed for pharmacovigilance database coding, not for
-clinical prose written for a physician. A translator writing
-\textit{``immune-related pneumonitis''} is writing for a reader; S5
-writing \textsc{Pneumonitis} is writing for a database. Both are technically
-correct but serve different purposes, and optimising for HTM targets the
-wrong register.
+human reference by ontology standards -- scoring higher on HTM -- yet
+received zero best-output votes across 30 segments in the unified expert
+evaluation. The human reference dominated at 67\%; \textbf{S2 (Mistral,
+full document context, no graph) is the best MT system} with an average
+expert rank of 3.27, ahead of S3-FT (4.69). S3-FT was competitive in
+an earlier pilot on a different 25-segment sample but does not replicate
+that advantage on the canonical sample. MedDRA labels are designed for
+pharmacovigilance database coding, not clinical prose; a translator
+writing \textit{``immune-related pneumonitis''} is writing for a reader,
+while S5 writing \textsc{Pneumonitis} is writing for a database. Both
+are technically correct but serve different purposes, and optimising for
+HTM targets the wrong register.
 
 The graph works, but only upstream of a CCR threshold. At 39\% CCR the
 graph hurts fluency more than it helps terminology. Under fine-tuned NER
@@ -713,22 +717,25 @@ term length is the hard ceiling on any enforcement approach.
 \label{sec:conclusion}
 
 TermPlanMT demonstrates that CCR is the binding constraint on
-graph-augmented regulatory MT: at low coverage, graph-free systems (S1--S2,
-S5-NLLB) outperform all graph-augmented systems on fluency--S1 leading on
-BLEU, S2 on chrF and HRA--while improving NER quality yields $\approx$7-point
-corpus BLEU gains for Mistral graph systems with bootstrap intervals excluding
-zero. Three broader findings emerge: MedDRA nomenclature
-and professional translation practice are structurally misaligned in ways that
-alias expansion cannot fix; ambiguous grounding produces predictable term
-drift through a mechanism fully explained by the planning stage's
-abstain-on-ambiguity policy; and consistency metrics must control for system
-type, since NLLB's apparent consistency is an artefact of its fixed
-vocabulary. The glossary oracle (S6) shows that replacing the MedDRA graph
-with reference-extracted terms provides negligible benefit, pointing to NER
-coverage rather than term-source quality as the primary bottleneck.
-Substantially higher CCR with cleaner span boundaries would likely be required
-to reverse the S2/S3 fluency ordering; quantifying that threshold is left to
-future work with broader French biomedical NER.
+graph-augmented regulatory MT: at 39\% CCR, graph-free systems outperform
+all graph-augmented systems on fluency -- S1 leading on BLEU, S2 on chrF and
+HRA -- while improving NER quality yields $\approx$7-point corpus BLEU gains
+for Mistral graph systems with bootstrap intervals excluding zero. A unified
+expert evaluation (30 segments, 8 systems, GPT-4o EMA translator persona)
+confirms that \textbf{S2 is the best MT system} by average expert rank (3.27),
+with the human reference dominating at 67\% best-output votes. S5 received
+zero best-output votes in both NER conditions: the most ontology-correct
+system is never the preferred output, because MedDRA labels serve
+pharmacovigilance coding rather than clinical prose. Three broader findings
+emerge: MedDRA nomenclature and professional translation practice are
+structurally misaligned in ways alias expansion cannot fix; ambiguous
+grounding produces predictable term drift through the planning stage's
+abstain-on-ambiguity policy; and NER quality is a patient-safety concern --
+S1's hallucination of \textit{daxitinib} for \textit{axitinib} illustrates
+the risk of deploying low-quality NER in pharmacovigilance contexts.
+Substantially higher CCR with cleaner NER span boundaries is the necessary
+condition for graph-augmented systems to surpass S2; quantifying that
+threshold is left to future work with broader French biomedical NER.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section*{Acknowledgements}
