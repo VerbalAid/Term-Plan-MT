@@ -526,6 +526,16 @@ S5-NLLB versus large $\Delta$BLEU for S3--S5-Mistral isolates the bottleneck
 upstream of graph retrieval. Higher NER coverage would likely close the S2/S3
 fluency gap.
 
+A post-hoc CCR diagnostic (\texttt{tools/ccr\_diagnostic.py}) classifying the
+171 unique baseline NER terms against the Neo4j graph found that 60\% are absent
+from MedDRA entirely (\textsc{not\_in\_graph}), compared to 54\% of the 246
+fine-tuned terms; a further 6--8\% are ambiguous (multiple concept matches,
+triggering the planner's abstain policy), and only 23--32\% ground via exact
+string match. The dominant not-in-graph category is populated by non-medical
+tokens (\textit{pembrolizumab}, grade annotations, numeric ranges) that NER
+extracted as candidate spans but that have no MedDRA equivalent -- confirming
+that the CCR ceiling is set by NER precision, not by graph coverage gaps.
+
 \subsection{Missing Terms, Flattening, and Consistency}
 
 Under baseline NER, S5-Mistral achieves the lowest missing-term rate;

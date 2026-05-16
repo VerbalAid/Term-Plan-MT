@@ -88,12 +88,22 @@ def main() -> None:
     print(f"Loaded {len(segments)} segments from {segs_path}")
 
     # Collect unique terms and their frequencies.
+    # Guard against JSON-parsing artefacts: some word fields contain raw JSON
+    # strings (e.g. '"hypothyroïdie": ["hypothyroïdie"') from malformed JSONL.
+    # Skip any term that starts with '"' and contains '[' or '{'.
     term_freq: dict[str, int] = defaultdict(int)
+    n_skipped = 0
     for seg in segments:
         for t in seg.get("terms") or []:
             word = (t.get("word") or "").strip()
-            if word:
-                term_freq[word] += 1
+            if not word:
+                continue
+            if word.startswith('"') and ('[' in word or '{' in word):
+                n_skipped += 1
+                continue
+            term_freq[word] += 1
+    if n_skipped:
+        print(f"Skipped {n_skipped} malformed JSON artefact term(s)")
 
     unique_terms = sorted(term_freq.keys())
     print(f"Found {len(unique_terms)} unique NER terms across {sum(term_freq.values())} occurrences")
