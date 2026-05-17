@@ -3,37 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TermPlanMT · MedDRA Lookup</title>
+  <title>MedDRA Lookup Tool</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <div class="bg-glow" aria-hidden="true"></div>
   <header class="header">
     <div class="brand">
-      <span class="brand-mark">TP</span>
+      <span class="brand-mark">ML</span>
       <div>
         <h1>MedDRA Lookup</h1>
-        <p class="tagline">String match → fuzzy → semantic · TermPlanMT</p>
+        <p class="tagline">Standalone graph explorer · exact → fuzzy → semantic</p>
       </div>
     </div>
-    <a class="gh-link" href="https://github.com/VerbalAid/Term-Plan-MT" target="_blank" rel="noopener">GitHub</a>
+    <a class="gh-link" href="https://github.com/VerbalAid/Term-Plan-MT/tree/main/webapp" target="_blank" rel="noopener">GitHub</a>
   </header>
 
   <main class="main">
     <section class="search-panel">
       <form id="search-form" class="search-form" autocomplete="off">
         <div class="lang-toggle" role="group" aria-label="Search language">
-          <button type="button" class="lang-btn active" data-lang="fr">French</button>
+          <button type="button" class="lang-btn active" data-lang="auto">Auto</button>
+          <button type="button" class="lang-btn" data-lang="fr">French</button>
           <button type="button" class="lang-btn" data-lang="en">English</button>
         </div>
         <div class="search-row">
           <input
             id="term-input"
             type="search"
-            placeholder="e.g. pneumopathie inflammatoire, pembrolizumab…"
+            placeholder="French or English — e.g. pneumopathie inflammatoire, pembrolizumab…"
             spellcheck="false"
             autofocus
           />
@@ -43,7 +44,12 @@
           </button>
         </div>
       </form>
-      <p class="hint">Exact French label → fuzzy (PT/LLT) → multilingual embedding similarity</p>
+      <ol class="pipeline-steps" aria-label="Lookup order">
+        <li class="pipe-step" data-step="exact">1 · Exact</li>
+        <li class="pipe-step" data-step="fuzzy">2 · Fuzzy</li>
+        <li class="pipe-step" data-step="semantic">3 · Semantic</li>
+      </ol>
+      <p class="hint">Bidirectional FR ↔ EN · parents &amp; children via <code>BROADER_THAN</code></p>
     </section>
 
     <section id="status" class="status" hidden></section>
@@ -51,7 +57,7 @@
   </main>
 
   <footer class="footer">
-    <p>Requires Neo4j with MedDRA v28 graph · <span id="health-dot" class="health-dot"></span> <span id="health-text">checking…</span></p>
+    <p>MedDRA Lookup Tool (not the TermPlanMT MT pipeline) · Neo4j required · <span id="health-dot" class="health-dot"></span> <span id="health-text">checking…</span></p>
   </footer>
 
   <script src="/static/app.js" type="module"></script>

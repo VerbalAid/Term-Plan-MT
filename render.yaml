@@ -1,17 +1,20 @@
-# Render Blueprint — https://render.com/docs/blueprint-spec
-# Neo4j must be reachable (Aura or self-hosted). MedDRA graph loaded separately.
+# Render Blueprint — MedDRA Lookup Tool (standalone webapp/)
+# Neo4j must be reachable (Aura or self-hosted) with MedDRA graph loaded.
 
 services:
   - type: web
-    name: termplanmt-lookup
+    name: meddra-lookup
     runtime: python
-    plan: starter
-    buildCommand: pip install -r webapp/requirements.txt
-    startCommand: PYTHONPATH=. uvicorn webapp.main:app --host 0.0.0.0 --port $PORT
+    rootDir: webapp
+    plan: standard
+    buildCommand: pip install -r requirements.txt
+    startCommand: PYTHONPATH=.. uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.8"
+      - key: TERMPLAN_EMBED_MODEL
+        value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
       - key: NEO4J_URI
         sync: false
       - key: NEO4J_USER

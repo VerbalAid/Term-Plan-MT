@@ -1,4 +1,4 @@
-"""TermPlanMT MedDRA lookup — FastAPI app for Render / local dev."""
+"""MedDRA Lookup Tool — standalone FastAPI app (deploy on Render or run locally)."""
 
 from __future__ import annotations
 
@@ -14,25 +14,24 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-ROOT = Path(__file__).resolve().parent.parent
-load_dotenv(ROOT / ".env")
+WEBAPP_DIR = Path(__file__).resolve().parent
+REPO_ROOT = WEBAPP_DIR.parent
+load_dotenv(WEBAPP_DIR / ".env")
+load_dotenv(REPO_ROOT / ".env")
 
 from webapp.lookup import get_lookup_service
 
 log = logging.getLogger(__name__)
-STATIC = Path(__file__).resolve().parent / "static"
+STATIC = WEBAPP_DIR / "static"
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    svc = get_lookup_service()
     if os.environ.get("PREWARM_SEMANTIC", "").lower() in ("1", "true", "yes"):
-        try:
-            get_lookup_service()._ensure_semantic_index()
-        except Exception as exc:
-            log.warning("Semantic prewarm skipped: %s", exc)
+        svc.prewarm_semantic()
     yield
-    global _service  # noqa: PLW0603 — lifespan teardown
     from webapp import lookup as lookup_mod
 
     if lookup_mod._service is not None:
@@ -41,9 +40,12 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="TermPlanMT MedDRA Lookup",
-    description="French/English term → MedDRA concept with hierarchy (string, fuzzy, semantic).",
-    version="1.0.0",
+    title="MedDRA Lookup Tool",
+    description=(
+        "Standalone browser + API for MedDRA v28 concept search "
+        "(exact → fuzzy → semantic) with hierarchy navigation."
+    ),
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -58,7 +60,7 @@ app.add_middleware(
 
 class LookupRequest(BaseModel):
     term: str = Field(..., min_length=1, max_length=500)
-    lang: str = Field(default="fr")
+    lang: str = Field(default="auto", description="fr | en | auto")
 
 
 @app.get("/api/health")
@@ -78,7 +80,7 @@ def api_lookup(body: LookupRequest):
 @app.get("/api/lookup")
 def api_lookup_get(
     term: str = Query(..., min_length=1, max_length=500),
-    lang: str = Query("fr"),
+    lang: str = Query("auto"),
 ):
     try:
         return get_lookup_service().lookup(term, lang=lang).to_dict()

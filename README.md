@@ -133,16 +133,16 @@ PYTHONPATH=. python bootstrap_bleu_delta.py \
 
 ---
 
-## MedDRA lookup web app
+## MedDRA Lookup Tool (standalone)
 
-Browser UI + API: string match → fuzzy → semantic, with parent/child hierarchy.
+The **`webapp/`** directory is a **separate deployable product** — graph term search only, not part of the MT evaluation pipeline.
 
 ```bash
 pip install -r webapp/requirements.txt
 PYTHONPATH=. uvicorn webapp.main:app --reload --port 8000
 ```
 
-Deploy on [Render](https://render.com) via [`render.yaml`](render.yaml). See [`webapp/README.md`](webapp/README.md).
+Deploy on [Render](https://render.com) via [`render.yaml`](render.yaml) (`rootDir: webapp`). Full docs: [`webapp/README.md`](webapp/README.md).
 
 ---
 
