@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import os
+import re
 import unicodedata
 from collections import defaultdict
+from typing import Any
 
 from neo4j import Driver, GraphDatabase
 from rapidfuzz import fuzz, process
 
 _TIER_ORDER = {"SOC": 1, "HLGT": 2, "HLT": 3, "PT": 4, "LLT": 5}
+_MEDDRA_CODE = re.compile(r"^\d+$")
 
 
 def norm_key(text: str) -> str:
@@ -17,8 +20,16 @@ def norm_key(text: str) -> str:
     return " ".join(s.split())
 
 
+def is_meddra_code(value: str) -> bool:
+    return bool(_MEDDRA_CODE.match(str(value or "").strip()))
+
+
 class MeddraGraph:
-    """French-label cache + English-name index backed by Neo4j."""
+    """French-label cache + English-name index backed by Neo4j.
+
+    Hierarchy follows ``data/build_graph.py``:
+    ``(broader:Concept)-[:BROADER_THAN]->(narrower:Concept)`` (SOC → … → LLT).
+    """
 
     def __init__(self) -> None:
         uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
@@ -37,6 +48,26 @@ class MeddraGraph:
     def close(self) -> None:
         self._driver.close()
 
+    @staticmethod
+    def _row_to_concept(rec) -> dict:
+        return {
+            "id": rec["id"],
+            "name": rec["name"],
+            "level": rec["level"],
+            "tier": rec["tier"],
+            "fr_label": rec.get("fr_label"),
+        }
+
+    @staticmethod
+    def _node_props(node) -> dict[str, Any]:
+        if node is None:
+            return {}
+        if hasattr(node, "_properties"):
+            return dict(node._properties)
+        if hasattr(node, "items"):
+            return dict(node.items())
+        return dict(node)
+
     def _load(self) -> None:
         if self._fr_cache is not None:
             return
@@ -45,8 +76,8 @@ class MeddraGraph:
         q_fr = """
         MATCH (c:Concept)
         WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+          AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         """
         with self._driver.session() as s:
             for r in s.run(q_fr):
@@ -66,9 +97,8 @@ class MeddraGraph:
         q_fuzzy = """
         MATCH (c:Concept)
         WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
-          AND c.tier IN ['PT', 'LLT']
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+          AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         """
         with self._driver.session() as s:
             for r in s.run(q_fuzzy):
@@ -80,9 +110,8 @@ class MeddraGraph:
         q_en = """
         MATCH (c:Concept)
         WHERE c.name IS NOT NULL AND trim(c.name) <> ''
-          AND c.tier IN ['PT', 'LLT', 'HLT', 'SOC']
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+          AND c.tier IN ['PT', 'LLT', 'HLT', 'SOC'] AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         """
         with self._driver.session() as s:
             for r in s.run(q_en):
@@ -91,16 +120,6 @@ class MeddraGraph:
 
         self._fr_cache = cache
         self._label_count = len(cache)
-
-    @staticmethod
-    def _row_to_concept(rec) -> dict:
-        return {
-            "id": rec["id"],
-            "name": rec["name"],
-            "level": rec["level"],
-            "tier": rec["tier"],
-            "fr_label": rec.get("fr_label"),
-        }
 
     def label_count(self) -> int:
         self._load()
@@ -131,9 +150,9 @@ class MeddraGraph:
     def exact_en(self, en_term: str) -> dict | None:
         q = """
         MATCH (c:Concept)
-        WHERE toLower(trim(c.name)) = toLower(trim($n))
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        WHERE toLower(trim(c.name)) = toLower(trim($n)) AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        ORDER BY c.level DESC
         LIMIT 1
         """
         with self._driver.session() as s:
@@ -156,66 +175,120 @@ class MeddraGraph:
         q = """
         MATCH (c:Concept)
         WHERE c.fr_label IS NOT NULL AND toLower(trim(c.fr_label)) = $key
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+          AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         ORDER BY c.level
         """
         with self._driver.session() as s:
             return [self._row_to_concept(r) for r in s.run(q, key=key)]
 
-    def concept_by_id(self, concept_id: str) -> dict | None:
+    def resolve_concept(self, concept: dict) -> dict:
+        """Re-anchor to a canonical MedDRA-coded node with hierarchy edges when possible."""
+        cid = str(concept.get("id") or "").strip()
+        name = str(concept.get("name") or "").strip()
+        fr = str(concept.get("fr_label") or "").strip()
+
+        if is_meddra_code(cid):
+            row = self.concept_by_id(cid)
+            if row and self._has_hierarchy(row["id"]):
+                return row
+
         q = """
         MATCH (c:Concept)
-        WHERE coalesce(c.id, c.name) = $cid
-        RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-               c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        WHERE c.id =~ '^[0-9]+$'
+          AND (
+            ($cid <> '' AND c.id = $cid)
+            OR ($name <> '' AND toLower(c.name) = toLower($name))
+            OR ($fr <> '' AND toLower(trim(c.fr_label)) = toLower(trim($fr)))
+          )
+        OPTIONAL MATCH (p:Concept)-[:BROADER_THAN]->(c)
+        OPTIONAL MATCH (c)-[:BROADER_THAN]->(ch:Concept)
+        WITH c, count(DISTINCT p) + count(DISTINCT ch) AS rels
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label, rels
+        ORDER BY rels DESC, c.level DESC
+        LIMIT 1
+        """
+        with self._driver.session() as s:
+            rec = s.run(q, cid=cid, name=name, fr=fr).single()
+        if rec:
+            return self._row_to_concept(rec)
+        return dict(concept)
+
+    def concept_by_id(self, concept_id: str) -> dict | None:
+        if is_meddra_code(concept_id):
+            q = """
+            MATCH (c:Concept {id: $cid})
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+            """
+            with self._driver.session() as s:
+                rec = s.run(q, cid=concept_id).single()
+            return self._row_to_concept(rec) if rec else None
+        q = """
+        MATCH (c:Concept)
+        WHERE c.id = $cid OR toLower(c.name) = toLower($cid)
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         LIMIT 1
         """
         with self._driver.session() as s:
             rec = s.run(q, cid=concept_id).single()
         return self._row_to_concept(rec) if rec else None
 
-    def parents(self, concept_id: str) -> list[dict]:
-        """Immediate broader concepts (one BROADER_THAN hop)."""
+    def _has_hierarchy(self, concept_id: str) -> bool:
         q = """
-        MATCH (p:Concept)-[:BROADER_THAN]->(c:Concept)
-        WHERE coalesce(c.id, c.name) = $cid
-        RETURN coalesce(p.id, p.name) AS id, p.name AS name,
-               p.level AS level, p.tier AS tier, p.fr_label AS fr_label
+        MATCH (c:Concept {id: $cid})
+        OPTIONAL MATCH (p:Concept)-[:BROADER_THAN]->(c)
+        OPTIONAL MATCH (c)-[:BROADER_THAN]->(ch:Concept)
+        RETURN count(p) + count(ch) AS n
+        """
+        with self._driver.session() as s:
+            rec = s.run(q, cid=concept_id).single()
+        return bool(rec and rec["n"] and int(rec["n"]) > 0)
+
+    def _anchor_id(self, concept: dict) -> str:
+        resolved = self.resolve_concept(concept)
+        return str(resolved["id"])
+
+    def parents(self, concept: dict) -> list[dict]:
+        """Immediate broader concepts: (parent)-[:BROADER_THAN]->(child)."""
+        cid = self._anchor_id(concept)
+        q = """
+        MATCH (c:Concept {id: $cid})
+        MATCH (p:Concept)-[:BROADER_THAN]->(c)
+        RETURN p.id AS id, p.name AS name, p.level AS level, p.tier AS tier, p.fr_label AS fr_label
         ORDER BY p.level ASC
         """
         with self._driver.session() as s:
-            return [self._row_to_concept(r) for r in s.run(q, cid=concept_id)]
+            return [self._row_to_concept(r) for r in s.run(q, cid=cid)]
 
-    def children(self, concept_id: str) -> list[dict]:
-        """Immediate narrower concepts."""
+    def children(self, concept: dict) -> list[dict]:
+        """Immediate narrower concepts: (c)-[:BROADER_THAN]->(child)."""
+        cid = self._anchor_id(concept)
         q = """
-        MATCH (c:Concept)-[:BROADER_THAN]->(ch:Concept)
-        WHERE coalesce(c.id, c.name) = $cid
-        RETURN coalesce(ch.id, ch.name) AS id, ch.name AS name,
-               ch.level AS level, ch.tier AS tier, ch.fr_label AS fr_label
+        MATCH (c:Concept {id: $cid})
+        MATCH (c)-[:BROADER_THAN]->(ch:Concept)
+        RETURN ch.id AS id, ch.name AS name, ch.level AS level, ch.tier AS tier, ch.fr_label AS fr_label
         ORDER BY ch.level ASC
         """
         with self._driver.session() as s:
-            return [self._row_to_concept(r) for r in s.run(q, cid=concept_id)]
+            return [self._row_to_concept(r) for r in s.run(q, cid=cid)]
 
-    def ancestor_chain(self, concept_id: str) -> list[dict]:
-        """SOC → … → concept, broadest first. Works for SOC (empty) and LLT (full chain)."""
+    def ancestor_chain(self, concept: dict) -> list[dict]:
+        """SOC → … → concept (broadest first). Up to four hops covers SOC…LLT."""
+        cid = self._anchor_id(concept)
         q = """
-        MATCH (c:Concept)
-        WHERE coalesce(c.id, c.name) = $cid
-        OPTIONAL MATCH (ancestor:Concept)-[:BROADER_THAN*1..5]->(c)
-        WITH c, collect(DISTINCT ancestor) AS ancestors
+        MATCH (c:Concept {id: $cid})
+        OPTIONAL MATCH (ancestor:Concept)-[:BROADER_THAN*1..4]->(c)
+        WITH c, [a IN collect(DISTINCT ancestor) WHERE a IS NOT NULL] AS ancestors
         RETURN ancestors, c
         """
         nodes: list[dict] = []
         with self._driver.session() as s:
-            rec = s.run(q, cid=concept_id).single()
+            rec = s.run(q, cid=cid).single()
             if not rec:
                 return nodes
             for node in rec["ancestors"] or []:
-                if node:
-                    props = dict(node)
+                props = self._node_props(node)
+                if props.get("name"):
                     nodes.append(
                         {
                             "id": props.get("id") or props.get("name"),
@@ -225,9 +298,17 @@ class MeddraGraph:
                             "fr_label": props.get("fr_label"),
                         }
                     )
-            current = rec["c"]
-            if current:
-                nodes.append(self._row_to_concept(dict(current)))
+            current = self._node_props(rec["c"])
+            if current.get("name"):
+                nodes.append(
+                    {
+                        "id": current.get("id") or current.get("name"),
+                        "name": current.get("name"),
+                        "level": current.get("level"),
+                        "tier": current.get("tier"),
+                        "fr_label": current.get("fr_label"),
+                    }
+                )
 
         def sort_key(c: dict) -> tuple:
             tier = str(c.get("tier") or "")
@@ -244,23 +325,67 @@ class MeddraGraph:
                 out.append(n)
         return out
 
+    def neighborhood(self, concept: dict) -> dict[str, Any]:
+        """Debug: parents, children, rel types for a matched concept."""
+        resolved = self.resolve_concept(concept)
+        cid = str(resolved["id"])
+        q = """
+        MATCH (c:Concept {id: $cid})
+        OPTIONAL MATCH (p:Concept)-[rp:BROADER_THAN]->(c)
+        OPTIONAL MATCH (c)-[rc:BROADER_THAN]->(ch:Concept)
+        RETURN c.id AS id, c.name AS name, c.tier AS tier, c.fr_label AS fr_label,
+               collect(DISTINCT {id: p.id, name: p.name, tier: p.tier}) AS parents,
+               collect(DISTINCT {id: ch.id, name: ch.name, tier: ch.tier}) AS children
+        """
+        with self._driver.session() as s:
+            rec = s.run(q, cid=cid).single()
+        if not rec:
+            return {"resolved": resolved, "error": "node not found after resolve"}
+        return {
+            "resolved": resolved,
+            "parents": [x for x in rec["parents"] if x.get("id")],
+            "children": [x for x in rec["children"] if x.get("id")],
+        }
+
+    def schema_summary(self) -> dict[str, Any]:
+        q = """
+        MATCH ()-[r]->()
+        RETURN type(r) AS typ, count(r) AS n
+        ORDER BY n DESC
+        LIMIT 10
+        """
+        with self._driver.session() as s:
+            rels = [dict(r) for r in s.run(q)]
+        q2 = """
+        MATCH (c:Concept)
+        RETURN
+          count(c) AS total,
+          sum(CASE WHEN c.id =~ '^[0-9]+$' THEN 1 ELSE 0 END) AS meddra_coded,
+          sum(CASE WHEN NOT c.id =~ '^[0-9]+$' THEN 1 ELSE 0 END) AS legacy_name_ids
+        """
+        with self._driver.session() as s:
+            stats = dict(s.run(q2).single())
+        return {
+            "relationship_types": rels,
+            "concept_stats": stats,
+            "hierarchy": "(broader)-[:BROADER_THAN]->(narrower)",
+        }
+
     def semantic_corpus(self, lang: str) -> list[tuple[str, dict]]:
-        """PT/LLT rows for embedding index (built lazily by lookup service)."""
+        """PT/LLT rows with numeric MedDRA codes only (skips orphan seed nodes)."""
         if lang == "fr":
             q = """
             MATCH (c:Concept)
             WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
-              AND c.tier IN ['PT', 'LLT']
-            RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-                   c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+              AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
             """
         else:
             q = """
             MATCH (c:Concept)
             WHERE c.name IS NOT NULL AND trim(c.name) <> ''
-              AND c.tier IN ['PT', 'LLT']
-            RETURN coalesce(c.id, c.name) AS id, c.name AS name,
-                   c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+              AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
             """
         out: list[tuple[str, dict]] = []
         with self._driver.session() as s:

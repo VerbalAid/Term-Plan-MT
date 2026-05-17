@@ -68,6 +68,36 @@ def api_health():
     return get_lookup_service().health()
 
 
+@app.get("/api/graph/schema")
+def api_graph_schema():
+    try:
+        return get_lookup_service()._graph.schema_summary()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/debug/neighborhood")
+def api_debug_neighborhood(
+    term: str = Query(..., min_length=1),
+    lang: str = Query("auto"),
+):
+    """Inspect hierarchy edges for a term (debugging empty parents/children)."""
+    svc = get_lookup_service()
+    result = svc.lookup(term, lang=lang)
+    if not result.concept:
+        return {"lookup": result.to_dict(), "neighborhood": None}
+    return {
+        "lookup": result.to_dict(),
+        "neighborhood": svc._graph.neighborhood(
+            {
+                "id": result.concept.id,
+                "name": result.concept.name,
+                "fr_label": result.concept.fr_label,
+            }
+        ),
+    }
+
+
 @app.post("/api/lookup")
 def api_lookup(body: LookupRequest):
     try:

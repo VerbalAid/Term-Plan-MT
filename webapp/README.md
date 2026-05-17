@@ -44,7 +44,11 @@ Response fields: `match_type`, `query_lang`, `concept`, `parents`, `children`, `
 3. Set secrets: `NEO4J_URI` (e.g. Aura `neo4j+s://…`), `NEO4J_USER`, `NEO4J_PASS`.
 4. Keep `PREWARM_SEMANTIC=false` on Starter/Standard unless you need instant semantic (uses more RAM at boot).
 
-First **semantic** query may take 30–60s while the embedding model downloads and indexes PT/LLT labels.
+First **semantic** query may take 30–60s while the embedding model (~471 MB) downloads once into `~/.cache/huggingface`; later semantic queries are fast.
+
+### Hierarchy shows “None at this level”
+
+The graph uses `(broader)-[:BROADER_THAN]->(narrower)` from `data/build_graph.py`. The app re-anchors matches to **numeric MedDRA codes** and skips orphan seed nodes without edges. If hierarchy is still empty, open `/api/debug/neighborhood?term=toux&lang=fr` or check `/api/graph/schema`.
 
 ## Environment
 

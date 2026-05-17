@@ -253,11 +253,11 @@ class MeddraLookupService:
         kind: MatchKind,
         score: float,
     ) -> LookupResult:
-        cid = str(concept["id"])
-        view = self._concept_view(concept)
-        parents = [self._concept_view(c) for c in self._graph.parents(cid)]
-        children = [self._concept_view(c) for c in self._graph.children(cid)]
-        ancestors = [self._concept_view(c) for c in self._graph.ancestor_chain(cid)]
+        anchored = self._graph.resolve_concept(concept)
+        view = self._concept_view(anchored)
+        parents = [self._concept_view(c) for c in self._graph.parents(anchored)]
+        children = [self._concept_view(c) for c in self._graph.children(anchored)]
+        ancestors = [self._concept_view(c) for c in self._graph.ancestor_chain(anchored)]
         return LookupResult(
             query=query,
             query_lang=query_lang,
