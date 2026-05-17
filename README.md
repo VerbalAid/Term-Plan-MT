@@ -133,10 +133,24 @@ PYTHONPATH=. python bootstrap_bleu_delta.py \
 
 ---
 
+## MedDRA lookup web app
+
+Browser UI + API: string match → fuzzy → semantic, with parent/child hierarchy.
+
+```bash
+pip install -r webapp/requirements.txt
+PYTHONPATH=. uvicorn webapp.main:app --reload --port 8000
+```
+
+Deploy on [Render](https://render.com) via [`render.yaml`](render.yaml). See [`webapp/README.md`](webapp/README.md).
+
+---
+
 ## Further reading
 
 | File | Topic |
 |------|-------|
+| [`webapp/README.md`](webapp/README.md) | Lookup app: local run, API, Render deploy. |
 | [`docs/NER_FINETUNING.md`](docs/NER_FINETUNING.md) | QUAERO training size (**1,540 sentences**), LoRA settings, CCR/BLEU effects, S5/S6 boost surface rates. |
 | [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot, paper table checklist, known discrepancies. |
 | [`docs/CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md) | Metric definitions and contamination-handling rules. |
