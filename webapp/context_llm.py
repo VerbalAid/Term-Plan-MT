@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 DEFAULT_MODEL = "mistralai/mistral-7b-instruct"
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
-_SYSTEM_PROMPT = """You are a medical translation and pharmacovigilance coding assistant \
+_SYSTEM_PROMPT = """You are a medical translation and pharmacovigilance coding specialist \
 (TermPlanMT). Use British English in all prose fields.
 
 Tasks:

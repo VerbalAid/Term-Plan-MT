@@ -1,7 +1,6 @@
 """
-TermPlanMT Error Analysis Pipeline
-Annotates 30 segments with Claude, then produces a structured
-taxonomy and paper paragraph for Section 8.
+TermPlanMT error analysis pipeline.
+Annotates sampled segments via a hosted evaluator model, then builds a taxonomy report.
 """
 
 import json, csv, random, time, os, sys
@@ -60,9 +59,9 @@ THE SIX SYSTEMS:
   Oracle upper bound — not a fair comparison.
 
 THE MEDDRA HIERARCHY (L1=broadest, L5=most specific):
-L1 SOC  - System Organ Class  (e.g. "Respiratory disorders")
-L2 HLGT - High Level Group Term (e.g. "Pulmonary conditions")
-L3 HLT  - High Level Term (e.g. "Pneumonitis NEC")
+L1 SOC  - System Organ Class  (e.g. "Respiratory, thoracic and mediastinal disorders")
+L2 HLGT - High Level Group Term (e.g. "Lower respiratory tract inflammatory and immunologic conditions")
+L3 HLT  - High Level Term (e.g. "Pneumonitis and lung infiltration disorders")
 L4 PT   - Preferred Term (e.g. "Pneumonitis") <- the target level
 L5 LLT  - Lowest Level Term (e.g. "Immune-mediated pneumonitis")
 
