@@ -9,11 +9,12 @@ import threading
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
+from webapp.context_llm import llm_configured, llm_model, resolve_context
 from webapp.graph import MeddraGraph, norm_key
 
 log = logging.getLogger(__name__)
 
-MatchKind = Literal["exact", "fuzzy", "semantic", "none"]
+MatchKind = Literal["exact", "fuzzy", "semantic", "context_llm", "none"]
 Lang = Literal["fr", "en"]
 
 _FR_HINT = re.compile(
@@ -86,6 +87,28 @@ class LookupResult:
         }
 
 
+@dataclass
+class ContextLookupResult:
+    context_sentence: str
+    target_term: str
+    query_lang: str
+    baseline: LookupResult
+    candidates: list[dict[str, Any]]
+    llm: dict[str, Any]
+    selected: LookupResult | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "context_sentence": self.context_sentence,
+            "target_term": self.target_term,
+            "query_lang": self.query_lang,
+            "baseline": self.baseline.to_dict(),
+            "candidates": self.candidates,
+            "llm": self.llm,
+            "selected": self.selected.to_dict() if self.selected else None,
+        }
+
+
 class _SemanticIndex:
     def __init__(self, model_id: str, threshold: float) -> None:
         self.model_id = model_id
@@ -108,6 +131,10 @@ class MeddraLookupService:
         )
         self._semantic_threshold = float(os.environ.get("LOOKUP_SEMANTIC_MIN", "0.55"))
         self._fuzzy_cutoff = float(os.environ.get("GROUND_FUZZY_CUTOFF", "90"))
+        self._candidate_fuzzy_cutoff = float(
+            os.environ.get("CONTEXT_FUZZY_CUTOFF", str(max(70.0, self._fuzzy_cutoff - 15)))
+        )
+        self._candidate_limit = int(os.environ.get("CONTEXT_CANDIDATE_LIMIT", "8"))
         self._semantic: dict[str, _SemanticIndex] = {
             "fr": _SemanticIndex(self._embed_model_id, self._semantic_threshold),
             "en": _SemanticIndex(self._embed_model_id, self._semantic_threshold),
@@ -131,6 +158,8 @@ class MeddraLookupService:
                 "semantic_ready": self.semantic_status(),
                 "embed_model": self._embed_model_id,
                 "prewarm_semantic": self._prewarm,
+                "llm_configured": llm_configured(),
+                "llm_model": llm_model() if llm_configured() else None,
             }
         except Exception as exc:
             return {
@@ -178,6 +207,132 @@ class MeddraLookupService:
             result = self._lookup_french(raw, query_lang)
         result.semantic_ready = self.semantic_status()
         return result
+
+    def collect_candidates(
+        self, term: str, *, lang: str = "auto", limit: int | None = None
+    ) -> tuple[str, list[dict[str, Any]]]:
+        """Hybrid graph retrieval: exact, ambiguous alts, fuzzy, semantic (deduped)."""
+        raw = (term or "").strip()
+        cap = limit if limit is not None else self._candidate_limit
+        lang_norm = (lang or "auto").lower()
+        if lang_norm == "auto":
+            query_lang = detect_lang(raw)
+        elif lang_norm.startswith("en"):
+            query_lang = "en"
+        else:
+            query_lang = "fr"
+
+        merged: dict[str, dict[str, Any]] = {}
+
+        def add(concept: dict, source: str, score: float | None) -> None:
+            anchored = self._graph.resolve_concept(concept)
+            cid = str(anchored.get("id", ""))
+            if not cid:
+                return
+            if cid not in merged or (score or 0) > float(merged[cid].get("score") or 0):
+                merged[cid] = self._enrich_candidate(anchored, source, score)
+
+        if query_lang == "fr":
+            key = norm_key(raw)
+            if self._graph.is_ambiguous_fr(raw):
+                for row in self._graph.alternatives_fr(key):
+                    add(row, "ambiguous", 100.0)
+            if exact := self._graph.exact_fr(raw):
+                add(exact, "exact", 100.0)
+            for concept, score in self._graph.fuzzy_fr_candidates(
+                raw, self._candidate_fuzzy_cutoff, limit=5
+            ):
+                add(concept, "fuzzy", score)
+            for concept, score in self._semantic_top_k(raw, "fr", k=5):
+                add(concept, "semantic", round(score * 100, 1))
+        else:
+            if exact := self._graph.exact_en(raw):
+                add(exact, "exact", 100.0)
+            for concept, score in self._graph.fuzzy_en_candidates(
+                raw, self._candidate_fuzzy_cutoff, limit=5
+            ):
+                add(concept, "fuzzy", score)
+            for concept, score in self._semantic_top_k(raw, "en", k=5):
+                add(concept, "semantic", round(score * 100, 1))
+
+        ranked = sorted(
+            merged.values(),
+            key=lambda c: float(c.get("score") or 0),
+            reverse=True,
+        )[:cap]
+        return query_lang, ranked
+
+    def context_lookup(
+        self,
+        context_sentence: str,
+        target_term: str,
+        *,
+        lang: str = "auto",
+    ) -> ContextLookupResult:
+        """In-context mode: graph candidates plus OpenRouter disambiguation."""
+        ctx = (context_sentence or "").strip()
+        term = (target_term or "").strip()
+        query_lang, candidates = self.collect_candidates(term, lang=lang)
+        baseline = self.lookup(term, lang=lang)
+        baseline.semantic_ready = self.semantic_status()
+
+        llm_out: dict[str, Any] = {
+            "configured": llm_configured(),
+            "model": llm_model() if llm_configured() else None,
+        }
+        selected: LookupResult | None = None
+
+        if not candidates:
+            llm_out.update(
+                ok=False,
+                error="no_candidates",
+                message="No graph candidates for this term.",
+            )
+        elif llm_configured():
+            llm_out.update(resolve_context(ctx, term, candidates))
+            if llm_out.get("ok") and not llm_out.get("abstain"):
+                cid = llm_out.get("selected_concept_id")
+                concept = self._graph.concept_by_id(str(cid)) if cid else None
+                if concept:
+                    selected = self._result_from_concept(
+                        term, query_lang, concept, "context_llm", 100.0
+                    )
+                    selected.message = "Resolved from sentence context."
+        else:
+            llm_out.update(
+                ok=False,
+                error="llm_not_configured",
+                message="Context routing unavailable.",
+            )
+            if baseline.concept and len(candidates) <= 1:
+                selected = baseline
+
+        return ContextLookupResult(
+            context_sentence=ctx,
+            target_term=term,
+            query_lang=query_lang,
+            baseline=baseline,
+            candidates=candidates,
+            llm=llm_out,
+            selected=selected,
+        )
+
+    def _enrich_candidate(
+        self, concept: dict, source: str, score: float | None
+    ) -> dict[str, Any]:
+        anchored = self._graph.resolve_concept(concept)
+        parents = self._graph.parents(anchored)
+        ancestors = self._graph.ancestor_chain(anchored)
+        parent_names = [str(p.get("name") or "") for p in parents if p.get("name")]
+        chain = [str(a.get("name") or "") for a in ancestors if a.get("name")]
+        view = self._concept_view(anchored)
+        return {
+            **view.to_dict(),
+            "match_source": source,
+            "score": score,
+            "parent_names": parent_names,
+            "ancestor_summary": " › ".join(chain) if chain else None,
+        }
 
     def _lookup_english(self, raw: str, query_lang: str) -> LookupResult:
         concept = self._graph.exact_en(raw)
@@ -320,6 +475,37 @@ class MeddraLookupService:
         if best < idx.threshold:
             return None
         return idx.concepts[best_i], best
+
+    def _semantic_top_k(
+        self, raw: str, lang: str, *, k: int = 5
+    ) -> list[tuple[dict, float]]:
+        try:
+            self._ensure_semantic_index(lang)
+        except Exception as exc:
+            log.warning("Semantic top-k unavailable (%s): %s", lang, exc)
+            return []
+        idx = self._semantic[lang]
+        assert idx.model is not None and idx.matrix is not None
+        from sentence_transformers import util
+
+        q_emb = idx.model.encode(raw, convert_to_tensor=True)
+        scores = util.cos_sim(q_emb, idx.matrix)[0]
+        floor = idx.threshold * 0.85
+        pairs: list[tuple[dict, float]] = []
+        seen: set[str] = set()
+        for i in scores.argsort(descending=True)[: k * 3]:
+            sc = float(scores[i])
+            if sc < floor:
+                break
+            concept = idx.concepts[int(i)]
+            cid = str(concept.get("id", ""))
+            if cid in seen:
+                continue
+            seen.add(cid)
+            pairs.append((concept, sc))
+            if len(pairs) >= k:
+                break
+        return pairs
 
 
 _service: MeddraLookupService | None = None

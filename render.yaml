@@ -27,3 +27,7 @@ services:
         value: "0.55"
       - key: PREWARM_SEMANTIC
         value: "false"
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: meta-llama/llama-3-8b-instruct:free

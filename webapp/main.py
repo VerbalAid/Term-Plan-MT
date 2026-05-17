@@ -45,7 +45,7 @@ app = FastAPI(
         "Standalone browser + API for MedDRA v28 concept search "
         "(exact → fuzzy → semantic) with hierarchy navigation."
     ),
-    version="1.1.0",
+    version="1.2.0",
     lifespan=lifespan,
 )
 
@@ -60,6 +60,12 @@ app.add_middleware(
 
 class LookupRequest(BaseModel):
     term: str = Field(..., min_length=1, max_length=500)
+    lang: str = Field(default="auto", description="fr | en | auto")
+
+
+class ContextLookupRequest(BaseModel):
+    context_sentence: str = Field(..., min_length=1, max_length=2000)
+    target_term: str = Field(..., min_length=1, max_length=500)
     lang: str = Field(default="auto", description="fr | en | auto")
 
 
@@ -116,6 +122,20 @@ def api_lookup_get(
         return get_lookup_service().lookup(term, lang=lang).to_dict()
     except Exception as exc:
         log.exception("lookup failed")
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/context-lookup")
+def api_context_lookup(body: ContextLookupRequest):
+    """In-context lookup: graph candidates plus OpenRouter disambiguation."""
+    try:
+        return get_lookup_service().context_lookup(
+            body.context_sentence,
+            body.target_term,
+            lang=body.lang,
+        ).to_dict()
+    except Exception as exc:
+        log.exception("context lookup failed")
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 

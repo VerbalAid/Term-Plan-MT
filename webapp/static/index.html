@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MedDRA Lookup Tool</title>
+  <title>MedDRA Lookup</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -16,14 +16,19 @@
       <span class="brand-mark">ML</span>
       <div>
         <h1>MedDRA Lookup</h1>
-        <p class="tagline">Standalone graph explorer · exact → fuzzy → semantic</p>
+        <p class="tagline">v28 graph · exact, fuzzy, semantic · FR ↔ EN</p>
       </div>
     </div>
     <a class="gh-link" href="https://github.com/VerbalAid/Term-Plan-MT/tree/main/webapp" target="_blank" rel="noopener">GitHub</a>
   </header>
 
   <main class="main">
-    <section class="search-panel">
+    <nav class="mode-tabs" role="tablist" aria-label="Lookup mode">
+      <button type="button" class="mode-tab active" data-mode="term" role="tab" aria-selected="true">Term</button>
+      <button type="button" class="mode-tab" data-mode="context" role="tab" aria-selected="false">In context</button>
+    </nav>
+
+    <section id="panel-term" class="search-panel mode-panel" role="tabpanel">
       <form id="search-form" class="search-form" autocomplete="off">
         <div class="lang-toggle" role="group" aria-label="Search language">
           <button type="button" class="lang-btn active" data-lang="auto">Auto</button>
@@ -34,22 +39,53 @@
           <input
             id="term-input"
             type="search"
-            placeholder="French or English — e.g. pneumopathie inflammatoire, pembrolizumab…"
+            placeholder="French or English, e.g. pneumopathie inflammatoire"
             spellcheck="false"
             autofocus
           />
           <button type="submit" class="submit-btn" id="submit-btn">
-            <span class="btn-label">Lookup</span>
+            <span class="btn-label">Look up</span>
             <span class="spinner" hidden></span>
           </button>
         </div>
       </form>
       <ol class="pipeline-steps" aria-label="Lookup order">
-        <li class="pipe-step" data-step="exact">1 · Exact</li>
-        <li class="pipe-step" data-step="fuzzy">2 · Fuzzy</li>
-        <li class="pipe-step" data-step="semantic">3 · Semantic</li>
+        <li class="pipe-step" data-step="exact">Exact</li>
+        <li class="pipe-step" data-step="fuzzy">Fuzzy</li>
+        <li class="pipe-step" data-step="semantic">Semantic</li>
       </ol>
-      <p class="hint">Bidirectional FR ↔ EN · parents &amp; children via <code>BROADER_THAN</code></p>
+      <p class="hint">Hierarchy via <code>BROADER_THAN</code> · click a node to explore</p>
+    </section>
+
+    <section id="panel-context" class="search-panel mode-panel hidden" role="tabpanel" hidden>
+      <form id="context-form" class="search-form context-form" autocomplete="off">
+        <div class="lang-toggle context-lang" role="group" aria-label="Search language">
+          <button type="button" class="lang-btn active" data-lang="auto">Auto</button>
+          <button type="button" class="lang-btn" data-lang="fr">French</button>
+          <button type="button" class="lang-btn" data-lang="en">English</button>
+        </div>
+        <label class="field-label" for="context-input">Sentence</label>
+        <textarea
+          id="context-input"
+          rows="3"
+          placeholder="Le patient a développé une pneumopathie inflammatoire suite au traitement."
+          spellcheck="false"
+        ></textarea>
+        <label class="field-label" for="target-input">Term in sentence</label>
+        <div class="search-row">
+          <input
+            id="target-input"
+            type="search"
+            placeholder="pneumopathie inflammatoire"
+            spellcheck="false"
+          />
+          <button type="submit" class="submit-btn" id="context-submit-btn">
+            <span class="btn-label">Resolve</span>
+            <span class="spinner" hidden></span>
+          </button>
+        </div>
+      </form>
+      <p class="hint">Candidates from the graph; disambiguation when several nodes match</p>
     </section>
 
     <section id="status" class="status" hidden></section>
@@ -57,7 +93,7 @@
   </main>
 
   <footer class="footer">
-    <p>MedDRA Lookup Tool (not the TermPlanMT MT pipeline) · Neo4j required · <span id="health-dot" class="health-dot"></span> <span id="health-text">checking…</span></p>
+    <p>MedDRA Lookup · <span id="health-dot" class="health-dot"></span> <span id="health-text">checking…</span></p>
   </footer>
 
   <script src="/static/app.js" type="module"></script>

@@ -136,16 +136,30 @@ class MeddraGraph:
         return dict(hit) if hit else None
 
     def fuzzy_fr(self, fr_term: str, cutoff: float) -> tuple[dict, float] | None:
+        hits = self.fuzzy_fr_candidates(fr_term, cutoff, limit=1)
+        return hits[0] if hits else None
+
+    def fuzzy_fr_candidates(
+        self, fr_term: str, cutoff: float, *, limit: int = 5
+    ) -> list[tuple[dict, float]]:
         self._load()
-        hit = process.extractOne(
+        hits = process.extract(
             norm_key(fr_term),
             self._fr_fuzzy_keys,
             scorer=fuzz.ratio,
             score_cutoff=cutoff,
+            limit=limit,
         )
-        if not hit:
-            return None
-        return dict(self._fr_fuzzy_vals[hit[2]]), float(hit[1])
+        out: list[tuple[dict, float]] = []
+        seen: set[str] = set()
+        for _label, score, idx in hits:
+            concept = dict(self._fr_fuzzy_vals[idx])
+            cid = str(concept.get("id", ""))
+            if cid in seen:
+                continue
+            seen.add(cid)
+            out.append((concept, float(score)))
+        return out
 
     def exact_en(self, en_term: str) -> dict | None:
         q = """
@@ -160,16 +174,30 @@ class MeddraGraph:
         return self._row_to_concept(rec) if rec else None
 
     def fuzzy_en(self, en_term: str, cutoff: float) -> tuple[dict, float] | None:
+        hits = self.fuzzy_en_candidates(en_term, cutoff, limit=1)
+        return hits[0] if hits else None
+
+    def fuzzy_en_candidates(
+        self, en_term: str, cutoff: float, *, limit: int = 5
+    ) -> list[tuple[dict, float]]:
         self._load()
-        hit = process.extractOne(
+        hits = process.extract(
             norm_key(en_term),
             self._en_fuzzy_keys,
             scorer=fuzz.ratio,
             score_cutoff=cutoff,
+            limit=limit,
         )
-        if not hit:
-            return None
-        return dict(self._en_fuzzy_vals[hit[2]]), float(hit[1])
+        out: list[tuple[dict, float]] = []
+        seen: set[str] = set()
+        for _label, score, idx in hits:
+            concept = dict(self._en_fuzzy_vals[idx])
+            cid = str(concept.get("id", ""))
+            if cid in seen:
+                continue
+            seen.add(cid)
+            out.append((concept, float(score)))
+        return out
 
     def alternatives_fr(self, key: str) -> list[dict]:
         q = """
