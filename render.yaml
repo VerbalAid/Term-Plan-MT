@@ -1,14 +1,13 @@
-# Render Blueprint — MedDRA Lookup Tool (standalone webapp/)
-# Neo4j must be reachable (Aura or self-hosted) with MedDRA graph loaded.
+# Render Blueprint — MedDRA Lookup Tool
+# Service must install webapp/requirements.txt (includes uvicorn), not repo-root requirements.txt.
 
 services:
   - type: web
     name: meddra-lookup
     runtime: python
-    rootDir: webapp
     plan: standard
-    buildCommand: pip install -r requirements.txt
-    startCommand: PYTHONPATH=.. uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    buildCommand: pip install --upgrade pip && pip install -r webapp/requirements.txt
+    startCommand: PYTHONPATH=. python -m uvicorn webapp.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
