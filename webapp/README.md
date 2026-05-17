@@ -22,7 +22,7 @@ From the repository root:
 
 ```bash
 pip install -r webapp/requirements.txt
-cp webapp/.env.example webapp/.env   # Neo4j + OPENROUTER_API_KEY
+cp webapp/.env.example webapp/.env   # Neo4j + LLM_API_KEY
 PYTHONPATH=. uvicorn webapp.main:app --reload --port 8000
 ```
 
@@ -50,8 +50,9 @@ First semantic query may download ~471 MB embeddings once (`~/.cache/huggingface
 |----------|---------|---------|
 | `NEO4J_URI` | `bolt://localhost:7687` | Bolt URI |
 | `NEO4J_USER` / `NEO4J_PASS` | — | Auth |
-| `OPENROUTER_API_KEY` | — | In-context routing |
-| `OPENROUTER_MODEL` | `meta-llama/llama-3-8b-instruct:free` | OpenRouter model id |
+| `LLM_API_BASE_URL` | `https://openrouter.ai/api/v1` | OpenRouter gateway |
+| `LLM_API_KEY` | — | OpenRouter secret (`sk-or-…`) |
+| `LLM_MODEL_NAME` | `mistralai/mistral-7b-instruct` | Rolling production model id |
 | `GROUND_FUZZY_CUTOFF` | `90` | RapidFuzz minimum |
 | `LOOKUP_SEMANTIC_MIN` | `0.55` | Cosine floor |
 | `PREWARM_SEMANTIC` | `false` | Load embeddings at startup |

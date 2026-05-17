@@ -1,4 +1,4 @@
-"""OpenRouter-hosted routing over MedDRA graph candidates (OpenAI-compatible API)."""
+"""OpenRouter context routing (OpenAI-compatible gateway, rolling model id)."""
 
 from __future__ import annotations
 
@@ -10,8 +10,9 @@ from typing import Any
 
 log = logging.getLogger(__name__)
 
-OPENROUTER_BASE = "https://openrouter.ai/api/v1"
-DEFAULT_MODEL = "meta-llama/llama-3-8b-instruct:free"
+# Rolling production id — avoids pinned variants deprecated on OpenRouter (e.g. v0.1).
+DEFAULT_MODEL = "mistralai/mistral-7b-instruct"
+DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
 _SYSTEM_PROMPT = """You are a medical translation and pharmacovigilance coding assistant \
 (TermPlanMT). Use British English in all prose fields.
@@ -28,23 +29,43 @@ _JSON_ID_RE = re.compile(r"^\d+$")
 _JSON_BLOCK = re.compile(r"\{[\s\S]*\}")
 
 
+def _env(name: str, *legacy_names: str) -> str:
+    val = os.environ.get(name, "").strip()
+    if val:
+        return val
+    for leg in legacy_names:
+        val = os.environ.get(leg, "").strip()
+        if val:
+            return val
+    return ""
+
+
 def llm_configured() -> bool:
-    return bool(os.environ.get("OPENROUTER_API_KEY", "").strip())
+    return bool(_env("LLM_API_KEY", "OPENROUTER_API_KEY"))
 
 
 def llm_model() -> str:
-    return os.environ.get("OPENROUTER_MODEL", DEFAULT_MODEL)
+    return _env("LLM_MODEL_NAME", "OPENROUTER_MODEL") or DEFAULT_MODEL
+
+
+def llm_base_url() -> str:
+    return _env("LLM_API_BASE_URL") or DEFAULT_BASE_URL
 
 
 def _client():
     from openai import OpenAI
 
+    referer = _env("LLM_HTTP_REFERER", "OPENROUTER_REFERER") or (
+        "https://github.com/VerbalAid/Term-Plan-MT"
+    )
+    title = os.environ.get("LLM_X_TITLE", "TermPlanMT-WebUI")
+
     return OpenAI(
-        api_key=os.environ.get("OPENROUTER_API_KEY"),
-        base_url=OPENROUTER_BASE,
+        api_key=_env("LLM_API_KEY", "OPENROUTER_API_KEY"),
+        base_url=llm_base_url(),
         default_headers={
-            "HTTP-Referer": os.environ.get("OPENROUTER_REFERER", "https://github.com/VerbalAid/Term-Plan-MT"),
-            "X-Title": "MedDRA Lookup",
+            "HTTP-Referer": referer,
+            "X-Title": title,
         },
     )
 
@@ -64,18 +85,19 @@ def _parse_json_payload(raw: str) -> dict[str, Any]:
 
 def _format_candidates(candidates: list[dict[str, Any]]) -> str:
     lines: list[str] = []
-    for c in candidates:
-        lines.append(
-            f"- ID: {c['id']} | EN: {c.get('name', '')} | FR: {c.get('fr_label') or '—'} "
-            f"| Tier: {c.get('tier', '')} | Level: {c.get('level', '—')} "
-            f"| Source: {c.get('match_source', '')} | Score: {c.get('score', '—')}"
-        )
+    for idx, c in enumerate(candidates, start=1):
+        lines.append(f"Candidate [{idx}]:")
+        lines.append(f"  - MedDRA ID: {c.get('id')}")
+        lines.append(f"  - English Preferred Term: {c.get('name', '')}")
+        lines.append(f"  - French Grounded Label: {c.get('fr_label') or '—'}")
+        lines.append(f"  - Tier: {c.get('tier', '')} | Level: {c.get('level', '—')}")
+        path = c.get("ancestor_summary")
+        if path:
+            lines.append(f"  - Lineage to SOC: {path}")
         parents = c.get("parent_names") or []
         if parents:
-            lines.append(f"  Parents: {', '.join(parents[:6])}")
-        anc = c.get("ancestor_summary")
-        if anc:
-            lines.append(f"  Lineage: {anc}")
+            lines.append(f"  - Immediate parents: {', '.join(parents[:6])}")
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -83,12 +105,32 @@ def _valid_ids(candidates: list[dict[str, Any]]) -> set[str]:
     return {str(c["id"]) for c in candidates if _JSON_ID_RE.match(str(c.get("id", "")))}
 
 
+def _fallback_result(
+    candidates: list[dict[str, Any]],
+    *,
+    model: str,
+    reason: str,
+) -> dict[str, Any]:
+    valid = _valid_ids(candidates)
+    cid = next(iter(valid), None)
+    return {
+        "ok": True,
+        "abstain": False,
+        "fallback": True,
+        "selected_concept_id": cid,
+        "clinical_justification": reason,
+        "stylistic_analysis": "Stylistic register analysis unavailable.",
+        "confidence": "low",
+        "model": model,
+    }
+
+
 def resolve_context(
     context_sentence: str,
     target_term: str,
     candidates: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    """Call OpenRouter to pick a concept and explain register nuances."""
+    """Call OpenRouter (Mistral 7B rolling id) to pick a concept and explain register."""
     if not candidates:
         return {
             "ok": False,
@@ -99,17 +141,18 @@ def resolve_context(
         return {
             "ok": False,
             "error": "llm_not_configured",
-            "message": "Context routing is unavailable (OpenRouter not configured).",
+            "message": "Context routing is unavailable (LLM_API_KEY not set).",
         }
 
     valid = _valid_ids(candidates)
+    model = llm_model()
     user_prompt = f"""Context sentence:
 "{context_sentence.strip()}"
 
-Target term to ground in MedDRA:
+Target source term:
 "{target_term.strip()}"
 
-Candidate MedDRA nodes:
+Grounded MedDRA graph candidates:
 {_format_candidates(candidates)}
 
 Return JSON with exactly these keys:
@@ -120,7 +163,6 @@ Return JSON with exactly these keys:
 - "confidence": "high", "medium", or "low"
 """
 
-    model = llm_model()
     try:
         client = _client()
         kwargs: dict[str, Any] = {
@@ -129,7 +171,7 @@ Return JSON with exactly these keys:
                 {"role": "system", "content": _SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
             ],
-            "temperature": 0.2,
+            "temperature": 0.1,
         }
         try:
             kwargs["response_format"] = {"type": "json_object"}
@@ -142,10 +184,18 @@ Return JSON with exactly these keys:
         parsed = _parse_json_payload(raw)
     except json.JSONDecodeError as exc:
         log.warning("Model returned invalid JSON: %s", exc)
-        return {"ok": False, "error": "invalid_json", "message": str(exc)}
+        return _fallback_result(
+            candidates,
+            model=model,
+            reason=f"Invalid JSON from model; defaulted to top graph candidate. ({exc})",
+        )
     except Exception as exc:
         log.exception("OpenRouter context resolve failed")
-        return {"ok": False, "error": "llm_request_failed", "message": str(exc)}
+        return _fallback_result(
+            candidates,
+            model=model,
+            reason=f"OpenRouter routing unavailable; defaulted to top graph candidate. ({exc})",
+        )
 
     selected = str(parsed.get("selected_concept_id", "")).strip()
     abstain = bool(parsed.get("abstain", False))
@@ -161,6 +211,15 @@ Return JSON with exactly these keys:
         }
     if selected not in valid:
         log.warning("Model selected unknown id %r; valid=%s", selected, valid)
+        if valid:
+            return _fallback_result(
+                candidates,
+                model=model,
+                reason=(
+                    f"Model returned id {selected!r} outside the candidate set; "
+                    "defaulted to top graph candidate."
+                ),
+            )
         return {
             "ok": False,
             "error": "invalid_selection",

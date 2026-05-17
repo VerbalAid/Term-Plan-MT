@@ -297,7 +297,10 @@ class MeddraLookupService:
                     selected = self._result_from_concept(
                         term, query_lang, concept, "context_llm", 100.0
                     )
-                    selected.message = "Resolved from sentence context."
+                    if llm_out.get("fallback"):
+                        selected.message = "Resolved via graph fallback (routing unavailable)."
+                    else:
+                        selected.message = "Resolved from sentence context."
         else:
             llm_out.update(
                 ok=False,
