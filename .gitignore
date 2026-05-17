@@ -29,6 +29,9 @@ models/*
 data/meddra/
 data/QUAERO_FrenchMed/
 
+# Superseded segment JSONLs (canonical files are in section48/)
+data/section48/archive/
+
 # Large ontology NER SFT exports (regenerate; see tools/data/build_ontology_sft.py)
 data/ontology_ner_full*.jsonl
 data/ontology_ner_full*.jsonl.bak

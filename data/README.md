@@ -10,6 +10,23 @@
 
 Each segment JSONL has one JSON object per line with keys `id`, `fr`, `en_ref`, `terms`.
 
+## QUAERO training corpus (fine-tuned NER)
+
+The fine-tuned condition is trained on **QUAERO French Medical** BRAT data (not redistributed here):
+
+- **Location (local):** `data/QUAERO_FrenchMed/` (gitignored)
+- **Splits:** `corpus/train/EMEA` + `corpus/train/MEDLINE`
+- **Labels:** `DISO`, `CHEM`, `PROC` only (not MedDRA hierarchy levels)
+- **Size:** **1,540** sentence-level lines combined (706 EMEA + 834 MEDLINE when all train `.txt` lines are counted)
+
+Re-count after download:
+
+```bash
+PYTHONPATH=. python tools/count_quaero_brat_sentences.py
+```
+
+See **[`docs/NER_FINETUNING.md`](../docs/NER_FINETUNING.md)** for hyperparameters, evaluation effects, and what *not* to claim on posters.
+
 ## MedDRA setup (Neo4j graph)
 
 MedDRA is not redistributed. Obtain a licence from the MSSO, then:

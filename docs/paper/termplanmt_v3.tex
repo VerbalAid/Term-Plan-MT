@@ -11,6 +11,8 @@
 \usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{array}
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \usepackage{caption}
 \usepackage{graphicx}
 \graphicspath{{figures/}{../figures/}}
@@ -214,43 +216,74 @@ excluding segment~48\_028 (a dense frequency table whose n-gram overlap
 distorts corpus metrics). Coverage: $\approx$4,400 words; all three failure
 modes at high density.
 
-\begin{table}[!ht]
+\begin{table*}[t]
 \centering
-\small
-\begin{tabular}{lll}
-\toprule
-Level & Abbr. & Example \\
-\midrule
-L1 & SOC  & Respiratory disorders \\
-L2 & HLGT & Pulmonary conditions \\
-L3 & HLT  & Pneumonitis \\
-L4 & PT   & Pembro.\ pneumonitis \\
-L5 & LLT  & Immune-med.\ pneumonitis \\
-\bottomrule
-\end{tabular}
-\caption{MedDRA hierarchy. Adverse-event mentions in clinical
-text map almost exclusively to L5 ($\approx$96\%).}
+\footnotesize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+\caption{MedDRA hierarchy levels (MedDRA~v28) with acronym, meaning, and
+specificity; examples follow the Section~4.8 immune-mediated pneumonitis chain.}
 \label{tab:meddra}
-\end{table}
+\begin{tabularx}{\textwidth}{@{}c l
+  >{\raggedright\arraybackslash\hsize=0.95\hsize}Y
+  >{\raggedright\arraybackslash\hsize=0.75\hsize}Y
+  >{\raggedright\arraybackslash\hsize=1.3\hsize}Y@{}}
+\toprule
+\textbf{Level} & \textbf{Abbr.} & \textbf{Meaning} & \textbf{Specificity} & \textbf{Example} \\
+\midrule
+L1 & SOC  & System Organ Class    & Broadest                  & Respiratory, thoracic and mediastinal disorders \\
+L2 & HLGT & High Level Group Term & Broad                     & Lower respiratory tract inflammatory and immunologic conditions \\
+L3 & HLT  & High Level Term       & Intermediate              & Pneumonitis and lung infiltration disorders \\
+L4 & PT   & Preferred Term        & Specific clinical concept & Pneumonitis \\
+L5 & LLT  & Lowest Level Term     & Most specific             & Immune-mediated pneumonitis \\
+\bottomrule
+\end{tabularx}
+\end{table*}
 
-\paragraph{NER conditions as a CCR perturbation.}
-Rather than comparing two NER systems, we use them as a controlled perturbation
-of CCR within the same pipeline. \textbf{Baseline NER} (\texttt{ner\_biollm}):
-BioMistral-7B zero-shot; CCR~=~39.0\%, 184 grounded spans across 472 extracted
-(126-segment evaluation set)\footnote{CCR is a joint function of NER recall
-and graph coverage. The fine-tuned NER extracted more spans (580 vs.\ 472)
-yet produced lower CCR (36.4\% vs.\ 39.0\%) because stronger NER finds
-rarer, harder terms less likely to be in the graph. The binding constraint
-is therefore absolute grounded span count (211 vs.\ 184), not CCR alone.}. This condition exhibits a systematic
-artefact--the model generates \textit{hypothyro\"{i}die} for 92/127 segments
-regardless of content--partially contaminating consistency measurements.
-\textbf{Fine-tuned (higher-quality) NER} (\texttt{ner\_biollm\_ft}):
-BioMistral-7B fine-tuned on a hierarchical MedDRA SFT dataset; 211 grounded
-spans across 580 extracted (36.4\% CCR) with cleaner boundaries and no
-hallucinated terms. Graph-augmented systems benefit substantially under this
-condition, confirming that \emph{effective} span quality (clean boundaries,
-usable grounding)--not raw graph retrieval--is the binding constraint once
-contamination is controlled.
+\noindent
+MedDRA (Medical Dictionary for Regulatory Activities) represents adverse events
+using a five-level hierarchical terminology structure, enabling both
+fine-grained clinical coding and higher-level safety aggregation. In our
+corpus, adverse-event mentions map almost exclusively to L5 ($\approx$96\%).
+
+\paragraph{Two NER conditions (zero-shot vs.\ QUAERO fine-tuned).}
+\label{sec:ner_conditions}
+We hold the MT stack (S1--S6) fixed and vary only how French spans are
+extracted before Neo4j grounding. Both conditions use \textbf{BioMistral-7B}
+\citep{labrak2024biomistral}; they differ in prompting versus supervised
+adaptation on biomedical French NER.
+
+\textbf{Condition A --- zero-shot prompting} (\texttt{ner\_biollm}):
+BioMistral-7B in 4-bit inference with a French JSON-list prompt (no weight
+updates). On the 126-segment evaluation set this yields CCR~=~39.0\% (184
+grounded spans out of 472 extracted). The run also shows a systematic
+prompting artefact: \textit{hypothyro\"{i}die} appears in 92/127 full-corpus
+segments regardless of clinical content, which partially contaminates
+cross-segment consistency scores for systems that consume these spans.
+
+\textbf{Condition B --- Unsloth LoRA on QUAERO} (\texttt{ner\_biollm\_ft}):
+the same base model fine-tuned with \textbf{Unsloth} on the \textbf{QUAERO}
+French Medical corpus in BRAT format (EMEA + MEDLINE train splits;
+\textbf{1{,}540} sentence-level training examples}; entity types DISO, CHEM, PROC only). Each sentence is an Alpaca instruction example
+(extract disorders, drugs, and procedures as a JSON string list); training
+uses 4-bit loading, LoRA rank~16 / $\alpha{=}32$ / dropout~0.05 on all
+linear projections, 3~epochs, per-device batch~4, gradient accumulation~4,
+learning rate $2{\times}10^{-4}$, cosine schedule, 10 warmup steps, and
+response-only loss (\texttt{SFTTrainer}). Spans are written to
+\texttt{segments\_ner\_unsloth\_full.jsonl} and fed through the identical
+pipeline. On the evaluation set: 211 grounded spans out of 580 extracted
+(CCR~=~36.4\%)\footnote{CCR depends on both NER recall and whether a span
+exists in the MedDRA graph. Condition~B extracts more spans (580 vs.\ 472)
+but grounds a larger share of difficult/rare strings, so the \emph{rate} can
+fall while the absolute grounded count rises (211 vs.\ 184). Downstream
+comparisons should treat CCR as a diagnostic, not as the manipulated variable.};
+boundaries are cleaner and the hypothyroidism hallucination disappears.
+
+Graph-augmented Mistral systems (S3--S5-Mistral) gain $\approx$7~BLEU only
+under Condition~B (Table~\ref{tab:delta}), while S1/S2 translations are
+unchanged. That pattern isolates \emph{span quality}---usable grounding and
+clean boundaries---as the binding constraint upstream of graph retrieval, not
+the graph machinery itself.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{System Architecture}
@@ -686,9 +719,23 @@ CCR~=~36.4\%; 126 segments, 48\_028 excluded).
 \label{tab:finetuned}
 \end{table}
 
-Under fine-tuned NER, graph-augmented Mistral systems close the fluency gap
-substantially (Table~\ref{tab:finetuned}), confirming NER quality as the
+\noindent
+Tables~\ref{tab:biollm} and~\ref{tab:finetuned} report corpus-level scores;
+Fig.~\ref{fig:metrics-grouped} visualises the same systems (baseline BioMistral
+NER left, fine-tuned NER right). Under fine-tuned NER, graph-augmented Mistral
+systems close the fluency gap substantially, confirming NER quality as the
 binding constraint.
+
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=0.47\textwidth]{comparison_metrics_grouped_baseline.png}\hfill
+\includegraphics[width=0.47\textwidth]{comparison_metrics_grouped_finetuned.png}
+\caption{Grouped metrics by system. \textbf{Left:} baseline NER
+(\texttt{ner\_biollm}, CCR~=~39.0\%). \textbf{Right:} fine-tuned NER
+(\texttt{ner\_biollm\_ft}, CCR~=~36.4\%). Top: BLEU and chrF\texttt{++};
+bottom: HTM (lexical, graph-aware). HTM is not comparable across panels.}
+\label{fig:metrics-grouped}
+\end{figure*}
 
 \paragraph{HTM is recall-dependent on NER quality.}
 BLEU and chrF scores for S1 and S2 are identical across both NER conditions
@@ -700,7 +747,21 @@ HTM is computed only over spans the NER model successfully extracts; a stronger
 NER model exposes a larger and more challenging set of terminology spans,
 changing both the denominator and the matched set simultaneously. Scores across
 NER conditions are therefore not directly comparable and should be interpreted
-within each condition only.
+within each condition only. Fig.~\ref{fig:tradeoff} shows the chrF\texttt{++}/HTM
+scatter \emph{within} each NER condition (separate axes; do not compare HTM
+across panels).
+
+\begin{figure*}[!ht]
+\centering
+\includegraphics[width=0.47\textwidth]{comparison_tradeoff_chrF_vs_HTM_baseline.png}\hfill
+\includegraphics[width=0.47\textwidth]{comparison_tradeoff_chrF_vs_HTM_finetuned.png}
+\caption{chrF\texttt{++} vs.\ HTM trade-off by system.
+\textbf{Left:} baseline NER (\texttt{ner\_biollm}).
+\textbf{Right:} fine-tuned NER (\texttt{ner\_biollm\_ft}).
+HTM uses different grounded span sets in each panel; interpret fluency--terminology
+trade-offs only within a panel.}
+\label{fig:tradeoff}
+\end{figure*}
 
 \subsection{CCR is the Binding Constraint}
 \label{sec:ccr_bottleneck}
@@ -832,8 +893,8 @@ graph-augmented systems score consistently \emph{lower} on HRA than S2
 (Table~\ref{tab:biollm}: S3~=~0.601 vs.\ S2~=~0.743;
 Table~\ref{tab:finetuned}: S3~=~0.440 vs.\ S2~=~0.476): the graph pushes
 outputs toward MedDRA labels that professional translators avoid.
-The fluency--terminology trade-off and per-system inference times are
-available as figures in the project repository (\texttt{results/ner\_biollm/figures/}).
+The fluency--terminology trade-off is in Fig.~\ref{fig:tradeoff}; per-system
+inference times are in the project repository (\texttt{results/ner\_biollm/figures/}).
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Consistency Failure Analysis}
@@ -999,28 +1060,5 @@ via MSSO/UPV/EHU, supervised by Gorka Labaka.
 
 \bibliographystyle{plainnat}
 \bibliography{termplanmt_refs_v3}
-
-%% ── Supplementary figures ─────────────────────────────────────────────────
-\appendix
-\section*{Supplementary Figures}
-
-\begin{figure*}[h]
-\centering
-\includegraphics[width=0.88\textwidth]{comparison_metrics_grouped_baseline.png}
-\caption{Full system comparison under baseline NER (\texttt{ner\_biollm},
-CCR~=~39.0\%). Top panel: BLEU and chrF\texttt{++}; bottom panel: HTM.
-S1/S2 lead on fluency; graph-augmented systems lead on HTM at the cost
-of BLEU, confirming the register mismatch.}
-\label{fig:app_baseline}
-\end{figure*}
-
-\begin{figure*}[h]
-\centering
-\includegraphics[width=0.88\textwidth]{comparison_metrics_grouped_finetuned.png}
-\caption{Full system comparison under fine-tuned NER (\texttt{ner\_biollm\_ft},
-CCR~=~36.4\%). Graph-augmented Mistral systems (S3--S5-Mistral) close the
-fluency gap substantially, confirming NER quality as the binding constraint.}
-\label{fig:app_finetuned}
-\end{figure*}
 
 \end{document}

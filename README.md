@@ -12,6 +12,15 @@
 
 **Terminology-aware machine translation** — French → English for pharmaceutical adverse-event text (SmPC Section 4.8), with MedDRA-grounded terminology planning across six MT systems (S1–S6).
 
+**Repository:** [github.com/VerbalAid/Term-Plan-MT](https://github.com/VerbalAid/Term-Plan-MT)
+
+| NER condition | Training / inference | Eval segments (126 scored) |
+|---------------|----------------------|----------------------------|
+| Baseline | BioMistral-7B zero-shot JSON prompt | `segments_ner_biollm.jsonl` → `results/ner_biollm/` |
+| Fine-tuned | Unsloth QLoRA on **~1,540** QUAERO BRAT sentences (EMEA + MEDLINE) | `segments_ner_unsloth_full.jsonl` → `results/ner_biollm_finetuned/` |
+
+Full NER training counts, hyperparameters, and poster-safe claims: **[`docs/NER_FINETUNING.md`](docs/NER_FINETUNING.md)**.
+
 ---
 
 ## Structure
@@ -128,6 +137,9 @@ PYTHONPATH=. python bootstrap_bleu_delta.py \
 
 | File | Topic |
 |------|-------|
+| [`docs/NER_FINETUNING.md`](docs/NER_FINETUNING.md) | QUAERO training size (**1,540 sentences**), LoRA settings, CCR/BLEU effects, S5/S6 boost surface rates. |
 | [`docs/RESULTS_INTERPRETATION.md`](docs/RESULTS_INTERPRETATION.md) | Authoritative metric snapshot, paper table checklist, known discrepancies. |
 | [`docs/CANONICAL_METRICS.md`](docs/CANONICAL_METRICS.md) | Metric definitions and contamination-handling rules. |
 | [`data/README.md`](data/README.md) | Segment JSONL format and MedDRA setup. |
+| [`models/README.md`](models/README.md) | Local checkpoint paths (not in git). |
+| [`docs/paper/termplanmt_v3.pdf`](docs/paper/termplanmt_v3.pdf) | Paper PDF. |

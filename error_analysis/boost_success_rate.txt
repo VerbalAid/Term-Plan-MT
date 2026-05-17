@@ -1,5 +1,6 @@
 PROXY BOOST / GLOSSARY SURFACE RATE ANALYSIS
 ============================================================
+Canonical context: docs/NER_FINETUNING.md (S5/S6 decoding enforcement).
 
 S5 — NER TERM VERBATIM SURFACE RATE
 (does the NER-extracted source term appear verbatim in S5's English hypothesis?)
