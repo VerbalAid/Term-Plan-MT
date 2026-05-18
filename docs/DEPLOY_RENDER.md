@@ -1,72 +1,34 @@
-# Deploy MedDRA lookup on Render
+# Render deployment (term-plan-mt)
 
-## MedDRA licence (academic / MSSO)
+## One-time service setup
 
-MedDRA is **not** open data. If you hold an academic licence:
+1. [Render Dashboard](https://dashboard.render.com) → **term-plan-mt** (or create Web Service from this repo).
+2. **Settings → General**
+   - **Runtime:** `Docker` (not Python)
+   - **Dockerfile path:** `./Dockerfile`
+   - **Root directory:** leave empty
+3. **Clear** the **Build command** and **Start command** fields (Docker uses the Dockerfile `CMD`).
+4. **Health check path:** `/api/health`
 
-- Do **not** leave the app world-readable. Set **`WEBAPP_PASSWORD`** on Render (and locally if the port is exposed).
-- Prefer **local use** (`uvicorn` on your machine) for demos and thesis work.
-- If you use Aura, keep credentials secret; load the graph only into **your** instance.
-- **Suspend** or delete the Render service when you are not actively demonstrating it.
+Redeploy: **Manual Deploy → Clear build cache & deploy**.
 
-With `WEBAPP_PASSWORD` set (e.g. `term`), visitors see a **login page** first. `/api/health` stays open so Render probes still work.
+Docker fixes `uvicorn: command not found` from an old Start command stuck in the dashboard.
 
-## Fix `uvicorn: command not found`
+## Environment variables (required)
 
-Your service is still using this **wrong** start command:
+Set in **Environment** (not in git):
 
-```text
-uvicorn webapp.main:app --host 0.0.0.0 --port $PORT --workers 1
-```
-
-Replace it. Pick **one** option below.
-
-### Option A — Python runtime (edit Start command)
-
-**Settings → Build**
-
-```bash
-pip install --upgrade pip && pip install -r requirements-render.txt
-```
-
-**Root directory:** leave empty.
-
-**Settings → Deploy → Start command**
-
-```bash
-bash start.sh
-```
-
-**Health check path:** `/api/health`
-
-Save, then **Manual Deploy → Clear build cache & deploy**.
-
-### Option B — Docker runtime (ignores a bad Start command)
-
-1. **Settings → General** → change **Runtime** from *Python* to **Docker**.
-2. Leave **Dockerfile path** as `./Dockerfile`.
-3. Clear **Start command** (Docker uses the Dockerfile `CMD`).
-4. **Build command** can be empty for Docker.
-5. Redeploy with cache clear.
-
-## Neo4j Aura environment variables
-
-From the Aura “Connection details” panel (not localhost):
-
-| Key | Example |
-|-----|---------|
-| `NEO4J_URI` | `neo4j+s://xxxx.databases.neo4j.io` |
+| Key | Value |
+|-----|--------|
+| `NEO4J_URI` | Aura URI, e.g. `neo4j+s://xxxx.databases.neo4j.io` |
 | `NEO4J_USER` | `neo4j` |
-| `NEO4J_PASS` | password shown once when the instance was created |
+| `NEO4J_PASS` | Aura password (from download) |
+| `WEBAPP_PASSWORD` | e.g. `term` (login form before UI) |
+| `LLM_API_KEY` | OpenRouter key (optional; for **In context** tab) |
 
-Also set:
+Already set in `render.yaml` if you use Blueprint sync: `LLM_MODEL_NAME`, `PREWARM_SEMANTIC=false`, etc.
 
-| Key | Purpose |
-|-----|---------|
-| `WEBAPP_PASSWORD` | **Required** — e.g. `term` (only people you share it with) |
-| `LLM_API_KEY` | OpenRouter, if you use **In context** |
-
-Load the MedDRA graph into Aura from your machine:
+## Load MedDRA into Aura (once, from your laptop)
 
 ```bash
 export NEO4J_URI='neo4j+s://YOUR-ID.databases.neo4j.io'
@@ -75,12 +37,18 @@ export NEO4J_PASS='your-aura-password'
 PYTHONPATH=. python data/build_graph.py
 ```
 
-## Success
+Without this, the app runs but lookups return no matches.
 
-Deploy logs should contain:
+## After deploy
 
-```text
-Uvicorn running on http://0.0.0.0:...
-```
+- URL: `https://term-plan-mt.onrender.com`
+- Login with `WEBAPP_PASSWORD` (e.g. `term`)
+- Logs should show: `Uvicorn running on http://0.0.0.0:...`
 
-Not `uvicorn: command not found`.
+## Free tier (512 MB)
+
+Semantic search loads a large model on first use. If the service crashes, upgrade to **Starter** (2 GB) or use **Term** lookup only until upgraded.
+
+## Licence
+
+Do not share the public URL widely. Use `WEBAPP_PASSWORD` and keep Aura credentials secret.

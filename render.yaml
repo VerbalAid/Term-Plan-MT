@@ -1,37 +1,37 @@
-# MedDRA Lookup on Render — copy Build/Start from here if the dashboard drifts.
+# Render — MedDRA lookup webapp (Docker; ignores a stale dashboard Start command).
+# Sync blueprint OR copy settings below into the term-plan-mt service.
 
 services:
   - type: web
-    name: meddra-lookup
-    runtime: python
-    plan: standard
-    buildCommand: pip install --upgrade pip && pip install -r requirements-render.txt
-    startCommand: bash start.sh
+    name: term-plan-mt
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /api/health
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.12.8"
       - key: PYTHONPATH
         value: .
       - key: TERMPLAN_EMBED_MODEL
         value: sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
-      - key: NEO4J_URI
-        sync: false
-      - key: NEO4J_USER
-        sync: false
-      - key: NEO4J_PASS
-        sync: false
+      - key: PREWARM_SEMANTIC
+        value: "false"
       - key: GROUND_FUZZY_CUTOFF
         value: "90"
       - key: LOOKUP_SEMANTIC_MIN
         value: "0.55"
-      - key: PREWARM_SEMANTIC
-        value: "false"
       - key: LLM_API_BASE_URL
         value: https://openrouter.ai/api/v1
-      - key: LLM_API_KEY
-        sync: false
       - key: LLM_MODEL_NAME
         value: mistralai/mistral-7b-instruct
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        value: neo4j
+      - key: NEO4J_PASS
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
       - key: WEBAPP_PASSWORD
         sync: false

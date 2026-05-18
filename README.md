@@ -48,7 +48,7 @@ cp webapp/.env.example webapp/.env   # Neo4j + LLM_API_KEY
 PYTHONPATH=. uvicorn webapp.main:app --reload --port 8000
 ```
 
-Deploy only with licence compliance: set `WEBAPP_PASSWORD` (HTTP Basic auth). See [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md). Local use is fine without a public URL.
+**Deploy on Render:** Docker runtime — see [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md). Set Aura `NEO4J_*`, `WEBAPP_PASSWORD` (e.g. `term`), optional `LLM_API_KEY`.
 
 ## Docs
 

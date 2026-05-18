@@ -1,0 +1,17 @@
+.git
+.venv
+__pycache__
+*.pyc
+.env
+webapp/.env
+data/meddra
+data/QUAERO_FrenchMed
+results
+archive
+logs
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
+models
+unsloth_compiled_cache
+.cursor
