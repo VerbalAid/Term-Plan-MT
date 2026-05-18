@@ -15,6 +15,7 @@ S2_PATH = ROOT / "results/ner_biollm/s2.jsonl"
 S5_PATH = ROOT / "results/ner_biollm/s5_mistral.jsonl"
 S6_PATH = ROOT / "results/ner_biollm/s6.jsonl"
 AUDIT_CSV = ROOT / "error_analysis/audit_annotated.csv"
+EXCLUDE_SEGMENT_IDS = frozenset({"48_028"})
 
 
 def load_jsonl(path: Path) -> list[dict]:
@@ -42,6 +43,8 @@ def main() -> None:
     if not rows:
         print("No rows in audit CSV", file=sys.stderr)
         sys.exit(1)
+
+    rows = [r for r in rows if r["id"] not in EXCLUDE_SEGMENT_IDS]
 
     for row in rows:
         sid = row["id"]

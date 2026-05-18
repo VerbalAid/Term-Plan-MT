@@ -37,8 +37,17 @@ SEED           = 42
 PROMPT_FR_MAX = 500
 PROMPT_REF_MAX = 400
 PROMPT_HYP_MAX = 400
+# Segments that are MedDRA table blocks, not prose (excluded from audit sample).
+EXCLUDE_SEGMENT_IDS = frozenset({"48_028"})
 
 Path("error_analysis").mkdir(exist_ok=True)
+
+
+def is_table_segment(seg: dict) -> bool:
+    if seg.get("id") in EXCLUDE_SEGMENT_IDS:
+        return True
+    blob = f"{seg.get('fr', '')}\n{seg.get('en_ref', '')}".casefold()
+    return "tableau 2 :" in blob or blob.lstrip().startswith("table 2:")
 client = OpenAI()
 
 # ── Context given to the model about the project ─────────────────────────────
@@ -168,6 +177,7 @@ valid = [
     s for s in segs
     if s["id"] in s2_map and s["id"] in s5_map
     and s2_map[s["id"]].strip() and s5_map[s["id"]].strip()
+    and not is_table_segment(s)
 ]
 
 random.seed(SEED)
