@@ -48,7 +48,7 @@ cp webapp/.env.example webapp/.env   # Neo4j + LLM_API_KEY
 PYTHONPATH=. uvicorn webapp.main:app --reload --port 8000
 ```
 
-Deploy via [`render.yaml`](render.yaml) (repo root; **not** `rootDir: webapp`). Build must use `webapp/requirements.txt`. Start: `python -m uvicorn webapp.main:app`. Env: `NEO4J_*`, `LLM_API_KEY`.
+Deploy only with licence compliance: set `WEBAPP_PASSWORD` (HTTP Basic auth). See [`docs/DEPLOY_RENDER.md`](docs/DEPLOY_RENDER.md). Local use is fine without a public URL.
 
 ## Docs
 

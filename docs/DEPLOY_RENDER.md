@@ -1,5 +1,16 @@
 # Deploy MedDRA lookup on Render
 
+## MedDRA licence (academic / MSSO)
+
+MedDRA is **not** open data. If you hold an academic licence:
+
+- Do **not** leave the app world-readable. Set **`WEBAPP_PASSWORD`** on Render (and locally if the port is exposed).
+- Prefer **local use** (`uvicorn` on your machine) for demos and thesis work.
+- If you use Aura, keep credentials secret; load the graph only into **your** instance.
+- **Suspend** or delete the Render service when you are not actively demonstrating it.
+
+With `WEBAPP_PASSWORD` set, visitors must pass HTTP Basic auth (browser login prompt). `/api/health` stays open so Render probes still work.
+
 ## Fix `uvicorn: command not found`
 
 Your service is still using this **wrong** start command:
@@ -48,7 +59,13 @@ From the Aura “Connection details” panel (not localhost):
 | `NEO4J_USER` | `neo4j` |
 | `NEO4J_PASS` | password shown once when the instance was created |
 
-Also set `LLM_API_KEY` (OpenRouter) if you use **In context**.
+Also set:
+
+| Key | Purpose |
+|-----|---------|
+| `WEBAPP_PASSWORD` | **Required** — shared login password for the UI |
+| `WEBAPP_USERNAME` | Optional login name (default `termplan`) |
+| `LLM_API_KEY` | OpenRouter, if you use **In context** |
 
 Load the MedDRA graph into Aura from your machine:
 

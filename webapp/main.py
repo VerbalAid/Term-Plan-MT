@@ -19,6 +19,7 @@ REPO_ROOT = WEBAPP_DIR.parent
 load_dotenv(WEBAPP_DIR / ".env")
 load_dotenv(REPO_ROOT / ".env")
 
+from webapp.auth import AccessGateMiddleware, access_gate_enabled, warn_if_public
 from webapp.lookup import get_lookup_service
 
 log = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ STATIC = WEBAPP_DIR / "static"
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    warn_if_public()
     svc = get_lookup_service()
     if os.environ.get("PREWARM_SEMANTIC", "").lower() in ("1", "true", "yes"):
         svc.prewarm_semantic()
@@ -49,13 +51,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+_cors = os.environ.get("CORS_ORIGINS", "")
+if access_gate_enabled() and (not _cors or _cors.strip() == "*"):
+    _cors_origins: list[str] = []
+else:
+    _cors_origins = [o.strip() for o in (_cors or "*").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=_cors_origins or ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AccessGateMiddleware)
 
 
 class LookupRequest(BaseModel):
@@ -71,6 +80,8 @@ class ContextLookupRequest(BaseModel):
 
 @app.get("/api/health")
 def api_health():
+    if access_gate_enabled():
+        return {"status": "ok", "access_gate": True}
     return get_lookup_service().health()
 
 
