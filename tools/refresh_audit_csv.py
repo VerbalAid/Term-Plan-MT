@@ -14,7 +14,7 @@ S1_PATH = ROOT / "results/ner_biollm/s1.jsonl"
 S2_PATH = ROOT / "results/ner_biollm/s2.jsonl"
 S5_PATH = ROOT / "results/ner_biollm/s5_mistral.jsonl"
 S6_PATH = ROOT / "results/ner_biollm/s6.jsonl"
-AUDIT_CSV = ROOT / "error_analysis/audit_annotated.csv"
+AUDIT_CSV = ROOT / "error_analysis/annotations/audit_annotated.csv"
 EXCLUDE_SEGMENT_IDS = frozenset({"48_028"})
 
 

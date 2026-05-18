@@ -55,7 +55,7 @@ If any overview or slide deck cites HTM around **0.45 / 0.43** for S2/S3, that *
 
 1. **Re-run evaluation** with Neo4j up and document git revision + segment paths; refresh `scores_summary.csv` if anything changed.
 2. **Gold terms list** — building `gold_terms.json` (e.g. via `build_gold_terms_from_parallel_ner.py`) so HTM is measured against intended concepts, not only NER coverage.
-3. **Qualitative sheet** — fill real labels in [`error_analysis/error_review_50.csv`](../error_analysis/error_review_50.csv); prioritize high-drift rows from [`error_analysis/ner_biollm_term_drift.csv`](../error_analysis/ner_biollm_term_drift.csv).
+3. **Qualitative sheet** — fill real labels in [`error_analysis/annotations/error_review_50.csv`](../error_analysis/annotations/error_review_50.csv); prioritize high-drift rows from [`error_analysis/ner_biollm_term_drift.csv`](../error_analysis/ner_biollm_term_drift.csv).
 4. **Ambiguous grounding** — resolve concrete cases (e.g. `pneumopathie inflammatoire`) using MedDRA context + optional gold-term locks.
 5. **Cross-NER dashboard** — run `plot_cross_ner_dashboard.py` (or the eval phase in [`rerun_all.sh`](../rerun_all.sh)) with Neo4j up; output dir is typically `results/cross_ner_comparison/` (created on demand, not always committed).
 6. **Ontology LoRA track** — appendix / future work unless cluster time allows.

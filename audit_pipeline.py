@@ -28,7 +28,7 @@ S2_PATH   = "results/ner_biollm/s2.jsonl"
 S5_PATH   = "results/ner_biollm/s5_mistral.jsonl"
 S6_PATH   = "results/ner_biollm/s6.jsonl"
 
-OUT_CSV        = "error_analysis/audit_annotated.csv"
+OUT_CSV        = "error_analysis/annotations/audit_annotated.csv"
 SUMMARY_TXT    = "error_analysis/audit_summary.txt"
 TAXONOMY_TXT   = "error_analysis/taxonomy.txt"
 N_SAMPLE       = 30
@@ -40,7 +40,7 @@ PROMPT_HYP_MAX = 400
 # Segments that are MedDRA table blocks, not prose (excluded from audit sample).
 EXCLUDE_SEGMENT_IDS = frozenset({"48_028"})
 
-Path("error_analysis").mkdir(exist_ok=True)
+Path("error_analysis/annotations").mkdir(parents=True, exist_ok=True)
 
 
 def is_table_segment(seg: dict) -> bool:

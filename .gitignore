@@ -39,7 +39,11 @@ data/sft/
 
 # IDE / OS
 .cursor/
+.claude/
 .DS_Store
+
+# Webapp local env (secrets)
+webapp/.env
 
 # Planning cache (local)
 data/section48/planning_locks.json
