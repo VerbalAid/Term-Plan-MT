@@ -41,12 +41,19 @@ def access_gate_enabled() -> bool:
     return bool(webapp_password())
 
 
+def _env_secret(name: str) -> str:
+    val = os.environ.get(name, "").strip()
+    if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
+        val = val[1:-1].strip()
+    return val
+
+
 def webapp_password() -> str:
-    return os.environ.get("WEBAPP_PASSWORD", "").strip()
+    return _env_secret("WEBAPP_PASSWORD")
 
 
 def link_key() -> str:
-    return os.environ.get("WEBAPP_LINK_KEY", "").strip()
+    return _env_secret("WEBAPP_LINK_KEY")
 
 
 def link_key_required() -> bool:
@@ -76,7 +83,11 @@ def link_cookie_value() -> str:
 def password_ok(candidate: str) -> bool:
     if not access_gate_enabled():
         return True
-    return secrets.compare_digest(candidate, webapp_password())
+    expected = webapp_password()
+    got = (candidate or "").strip()
+    if not expected or len(got) != len(expected):
+        return False
+    return secrets.compare_digest(got, expected)
 
 
 def link_key_ok(candidate: str | None) -> bool:

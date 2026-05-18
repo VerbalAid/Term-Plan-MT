@@ -75,12 +75,12 @@
 <body>
   <div class="card">
     <h1>MedDRA Lookup</h1>
-    <p>Private access — strong password required (min. 16 characters).</p>
+    <p>Private access — use the shared password (e.g. <strong>Term10</strong>).</p>
     <!--ERROR-->
     <form method="post" action="/login">
       <input type="hidden" name="next" value="__NEXT__" />
       <label for="password">Password</label>
-      <input id="password" name="password" type="password" minlength="16" autocomplete="current-password" autofocus required />
+      <input id="password" name="password" type="password" minlength="5" autocomplete="current-password" autofocus required />
       <button type="submit">Continue</button>
     </form>
   </div>
