@@ -387,7 +387,6 @@ class MeddraLookupService:
 
     def _lookup_french(self, raw: str, query_lang: str) -> LookupResult:
         key = norm_key(raw)
-        self._graph._load()
 
         if self._graph.is_ambiguous_fr(raw):
             alts_rows = self._graph.alternatives_fr(key)
