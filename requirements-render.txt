@@ -1,0 +1,2 @@
+# Render web service only — do not use repo-root requirements.txt (MT pipeline).
+-r webapp/requirements.txt
