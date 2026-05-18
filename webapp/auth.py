@@ -1,4 +1,4 @@
-"""Unlisted link key + strong password gate (licensed MedDRA deployments)."""
+"""Unlisted link key + password gate (licensed MedDRA deployments)."""
 
 from __future__ import annotations
 
@@ -23,16 +23,16 @@ _SESSION_COOKIE = "meddra_session"
 _LINK_COOKIE = "meddra_link"
 _SESSION_SALT = b"meddra-lookup-v1"
 _LINK_SALT = b"meddra-link-v1"
-_MIN_PASSWORD_LEN = 16
+_MIN_PASSWORD_LEN = 5
 
+# Block only trivial single-word secrets (class demos may use e.g. Term10).
 _WEAK_PASSWORDS = frozenset(
     {
         "term",
         "password",
         "meddra",
-        "1234567890123456",
-        "termplanmt2026!",
-        "changeme123456!",
+        "12345",
+        "123456",
     }
 )
 
@@ -198,7 +198,7 @@ def validate_deploy_config() -> None:
         )
     if link_key_required() and len(link_key()) < 24:
         raise RuntimeError("WEBAPP_LINK_KEY must be at least 24 characters.")
-    log.info("Access gate: unlisted link key + strong password.")
+    log.info("Access gate: unlisted link key + password.")
 
 
 class AccessGateMiddleware(BaseHTTPMiddleware):
