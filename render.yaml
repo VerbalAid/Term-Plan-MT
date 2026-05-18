@@ -33,5 +33,7 @@ services:
         sync: false
       - key: LLM_API_KEY
         sync: false
+      - key: WEBAPP_LINK_KEY
+        sync: false
       - key: WEBAPP_PASSWORD
         sync: false

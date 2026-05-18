@@ -1,34 +1,46 @@
 # Render deployment (term-plan-mt)
 
-## One-time service setup
+## Access model (unlisted link + strong password)
 
-1. [Render Dashboard](https://dashboard.render.com) → **term-plan-mt** (or create Web Service from this repo).
-2. **Settings → General**
-   - **Runtime:** `Docker` (not Python)
-   - **Dockerfile path:** `./Dockerfile`
-   - **Root directory:** leave empty
-3. **Clear** the **Build command** and **Start command** fields (Docker uses the Dockerfile `CMD`).
-4. **Health check path:** `/api/health`
+1. **Secret link** — only people with the full URL can reach the login page.  
+   Anyone visiting `https://term-plan-mt.onrender.com/` without the key sees **404 Not found**.
+2. **Strong password** — min. 16 characters, letters + digits; weak values like `term` are rejected at startup.
+3. **No search indexing** — `robots.txt` blocks crawlers; pages send `noindex`.
 
-Redeploy: **Manual Deploy → Clear build cache & deploy**.
+Generate secrets locally:
 
-Docker fixes `uvicorn: command not found` from an old Start command stuck in the dashboard.
+```bash
+python tools/generate_webapp_secrets.py
+```
 
-## Environment variables (required)
+Copy the two lines into Render **Environment** (never commit them).
 
-Set in **Environment** (not in git):
+**Share with supervisors:** the printed URL  
+`https://term-plan-mt.onrender.com/?k=YOUR_LINK_KEY`  
+They open it once, then sign in with `WEBAPP_PASSWORD`.
 
-| Key | Value |
-|-----|--------|
-| `NEO4J_URI` | Aura URI, e.g. `neo4j+s://xxxx.databases.neo4j.io` |
-| `NEO4J_USER` | `neo4j` |
-| `NEO4J_PASS` | Aura password (from download) |
-| `WEBAPP_PASSWORD` | e.g. `term` (login form before UI) |
-| `LLM_API_KEY` | OpenRouter key (optional; for **In context** tab) |
+## Render service settings
 
-Already set in `render.yaml` if you use Blueprint sync: `LLM_MODEL_NAME`, `PREWARM_SEMANTIC=false`, etc.
+1. **Runtime:** Docker  
+2. **Dockerfile path:** `Dockerfile`  
+3. **Root directory:** empty  
+4. **Build / Start commands:** empty  
+5. **Health check:** `/api/health`
 
-## Load MedDRA into Aura (once, from your laptop)
+**Manual Deploy → Clear build cache & deploy**
+
+## Environment variables
+
+| Key | Required | Notes |
+|-----|----------|--------|
+| `WEBAPP_LINK_KEY` | Yes | ≥24 chars; use `generate_webapp_secrets.py` |
+| `WEBAPP_PASSWORD` | Yes | ≥16 chars, letters + digits |
+| `NEO4J_URI` | Yes | Aura `neo4j+s://….databases.neo4j.io` |
+| `NEO4J_USER` | Yes | `neo4j` |
+| `NEO4J_PASS` | Yes | Aura password |
+| `LLM_API_KEY` | No | OpenRouter, for **In context** |
+
+## Load MedDRA into Aura (once)
 
 ```bash
 export NEO4J_URI='neo4j+s://YOUR-ID.databases.neo4j.io'
@@ -37,18 +49,6 @@ export NEO4J_PASS='your-aura-password'
 PYTHONPATH=. python data/build_graph.py
 ```
 
-Without this, the app runs but lookups return no matches.
-
-## After deploy
-
-- URL: `https://term-plan-mt.onrender.com`
-- Login with `WEBAPP_PASSWORD` (e.g. `term`)
-- Logs should show: `Uvicorn running on http://0.0.0.0:...`
-
-## Free tier (512 MB)
-
-Semantic search loads a large model on first use. If the service crashes, upgrade to **Starter** (2 GB) or use **Term** lookup only until upgraded.
-
 ## Licence
 
-Do not share the public URL widely. Use `WEBAPP_PASSWORD` and keep Aura credentials secret.
+Share link + password only with people covered by your MedDRA academic licence. Do not post the URL on public pages.

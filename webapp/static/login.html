@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MedDRA Lookup — Sign in</title>
+  <meta name="robots" content="noindex, nofollow, noarchive" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -74,12 +75,12 @@
 <body>
   <div class="card">
     <h1>MedDRA Lookup</h1>
-    <p>Licensed access — enter the shared password.</p>
+    <p>Private access — strong password required (min. 16 characters).</p>
     <!--ERROR-->
     <form method="post" action="/login">
       <input type="hidden" name="next" value="__NEXT__" />
       <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" autofocus required />
+      <input id="password" name="password" type="password" minlength="16" autocomplete="current-password" autofocus required />
       <button type="submit">Continue</button>
     </form>
   </div>
