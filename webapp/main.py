@@ -8,9 +8,9 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Form, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -19,7 +19,14 @@ REPO_ROOT = WEBAPP_DIR.parent
 load_dotenv(WEBAPP_DIR / ".env")
 load_dotenv(REPO_ROOT / ".env")
 
-from webapp.auth import AccessGateMiddleware, access_gate_enabled, warn_if_public
+from webapp.auth import (
+    AccessGateMiddleware,
+    access_gate_enabled,
+    password_ok,
+    session_valid,
+    set_session_cookie,
+    warn_if_public,
+)
 from webapp.lookup import get_lookup_service
 
 log = logging.getLogger(__name__)
@@ -148,6 +155,44 @@ def api_context_lookup(body: ContextLookupRequest):
     except Exception as exc:
         log.exception("context lookup failed")
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+def _login_html(next_path: str, *, error: bool) -> str:
+    template = (STATIC / "login.html").read_text(encoding="utf-8")
+    err_block = '<div class="err">Incorrect password.</div>' if error else ""
+    return template.replace("<!--ERROR-->", err_block).replace("__NEXT__", next_path)
+
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request, next: str = "/", error: int = 0):
+    if not access_gate_enabled():
+        return RedirectResponse("/")
+    if session_valid(request):
+        dest = next if next.startswith("/") and not next.startswith("//") else "/"
+        return RedirectResponse(dest)
+    safe_next = next if next.startswith("/") and not next.startswith("//") else "/"
+    return _login_html(safe_next, error=bool(error))
+
+
+@app.post("/login")
+def login_submit(
+    request: Request,
+    password: str = Form(...),
+    next: str = Form("/"),
+):
+    safe_next = next if next.startswith("/") and not next.startswith("//") else "/"
+    if not password_ok(password):
+        return RedirectResponse(f"/login?next={safe_next}&error=1", status_code=303)
+    resp = RedirectResponse(safe_next, status_code=303)
+    set_session_cookie(resp, secure=request.url.scheme == "https")
+    return resp
+
+
+@app.get("/logout")
+def logout():
+    resp = RedirectResponse("/login", status_code=303)
+    resp.delete_cookie("meddra_session", path="/")
+    return resp
 
 
 @app.get("/")

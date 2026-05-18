@@ -33,7 +33,5 @@ services:
         sync: false
       - key: LLM_MODEL_NAME
         value: mistralai/mistral-7b-instruct
-      - key: WEBAPP_USERNAME
-        value: termplan
       - key: WEBAPP_PASSWORD
         sync: false

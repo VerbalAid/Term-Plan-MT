@@ -9,7 +9,7 @@ MedDRA is **not** open data. If you hold an academic licence:
 - If you use Aura, keep credentials secret; load the graph only into **your** instance.
 - **Suspend** or delete the Render service when you are not actively demonstrating it.
 
-With `WEBAPP_PASSWORD` set, visitors must pass HTTP Basic auth (browser login prompt). `/api/health` stays open so Render probes still work.
+With `WEBAPP_PASSWORD` set (e.g. `term`), visitors see a **login page** first. `/api/health` stays open so Render probes still work.
 
 ## Fix `uvicorn: command not found`
 
@@ -63,8 +63,7 @@ Also set:
 
 | Key | Purpose |
 |-----|---------|
-| `WEBAPP_PASSWORD` | **Required** — shared login password for the UI |
-| `WEBAPP_USERNAME` | Optional login name (default `termplan`) |
+| `WEBAPP_PASSWORD` | **Required** — e.g. `term` (only people you share it with) |
 | `LLM_API_KEY` | OpenRouter, if you use **In context** |
 
 Load the MedDRA graph into Aura from your machine:
