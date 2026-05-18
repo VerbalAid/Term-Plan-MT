@@ -6,6 +6,7 @@ import logging
 import os
 import re
 import threading
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -141,6 +142,7 @@ class MeddraLookupService:
             "en": _SemanticIndex(self._embed_model_id, self._semantic_threshold),
         }
         self._semantic_lock = threading.Lock()
+        self._semantic_enabled = not _env_bool("DISABLE_SEMANTIC", False)
         self._prewarm = _env_bool("PREWARM_SEMANTIC", False)
 
     def close(self) -> None:
@@ -151,12 +153,24 @@ class MeddraLookupService:
 
     def health(self) -> dict[str, Any]:
         try:
-            self._graph._load()
+            self._graph.verify_connectivity()
+            labels: int | None = None
+            if self._graph.cache_ready():
+                labels = self._graph.label_count()
+            else:
+                with ThreadPoolExecutor(max_workers=1) as pool:
+                    fut = pool.submit(self._graph.quick_label_count)
+                    try:
+                        labels = fut.result(timeout=8.0)
+                    except FuturesTimeout:
+                        log.warning("Neo4j label count timed out on health check")
             return {
                 "status": "ok",
                 "neo4j": "connected",
-                "labels_loaded": self._graph.label_count(),
+                "labels_loaded": labels,
+                "cache_ready": self._graph.cache_ready(),
                 "semantic_ready": self.semantic_status(),
+                "semantic_disabled": not self._semantic_enabled,
                 "embed_model": self._embed_model_id,
                 "prewarm_semantic": self._prewarm,
                 "llm_configured": llm_configured(),
@@ -169,11 +183,12 @@ class MeddraLookupService:
                 "neo4j_target": safe_uri_hint(),
                 "detail": friendly_connection_error(exc),
                 "semantic_ready": self.semantic_status(),
+                "semantic_disabled": not self._semantic_enabled,
             }
 
     def prewarm_semantic(self) -> None:
         """Load embedding model + both language indexes (optional startup)."""
-        if not self._prewarm:
+        if not self._semantic_enabled or not self._prewarm:
             return
         for lang in ("fr", "en"):
             try:
@@ -239,23 +254,27 @@ class MeddraLookupService:
             if self._graph.is_ambiguous_fr(raw):
                 for row in self._graph.alternatives_fr(key):
                     add(row, "ambiguous", 100.0)
-            if exact := self._graph.exact_fr(raw):
+            exact = self._graph.exact_fr(raw)
+            if exact:
                 add(exact, "exact", 100.0)
-            for concept, score in self._graph.fuzzy_fr_candidates(
-                raw, self._candidate_fuzzy_cutoff, limit=5
-            ):
-                add(concept, "fuzzy", score)
-            for concept, score in self._semantic_top_k(raw, "fr", k=5):
-                add(concept, "semantic", round(score * 100, 1))
+            if not exact or self._graph.is_ambiguous_fr(raw):
+                for concept, score in self._graph.fuzzy_fr_candidates(
+                    raw, self._candidate_fuzzy_cutoff, limit=5
+                ):
+                    add(concept, "fuzzy", score)
+                for concept, score in self._semantic_top_k(raw, "fr", k=5):
+                    add(concept, "semantic", round(score * 100, 1))
         else:
-            if exact := self._graph.exact_en(raw):
+            exact = self._graph.exact_en(raw)
+            if exact:
                 add(exact, "exact", 100.0)
-            for concept, score in self._graph.fuzzy_en_candidates(
-                raw, self._candidate_fuzzy_cutoff, limit=5
-            ):
-                add(concept, "fuzzy", score)
-            for concept, score in self._semantic_top_k(raw, "en", k=5):
-                add(concept, "semantic", round(score * 100, 1))
+            if not exact:
+                for concept, score in self._graph.fuzzy_en_candidates(
+                    raw, self._candidate_fuzzy_cutoff, limit=5
+                ):
+                    add(concept, "fuzzy", score)
+                for concept, score in self._semantic_top_k(raw, "en", k=5):
+                    add(concept, "semantic", round(score * 100, 1))
 
         ranked = sorted(
             merged.values(),
@@ -444,18 +463,27 @@ class MeddraLookupService:
         )
 
     def _ensure_semantic_index(self, lang: str) -> None:
+        if not self._semantic_enabled:
+            return
         idx = self._semantic[lang]
         if idx.ready:
             return
         with self._semantic_lock:
             if idx.ready:
                 return
-            log.info("Loading semantic model %s for %s…", self._embed_model_id, lang)
-            from sentence_transformers import SentenceTransformer, util
+            from sentence_transformers import SentenceTransformer
 
             corpus = self._graph.semantic_corpus(lang)
             idx.labels = [t for t, _ in corpus]
             idx.concepts = [c for _, c in corpus]
+            if not idx.labels:
+                log.warning(
+                    "Semantic corpus empty for %s — load MedDRA into Neo4j (data/build_graph.py)",
+                    lang,
+                )
+                idx.ready = True
+                return
+            log.info("Loading semantic model %s for %s…", self._embed_model_id, lang)
             idx.model = SentenceTransformer(self._embed_model_id)
             idx.matrix = idx.model.encode(
                 idx.labels, convert_to_tensor=True, show_progress_bar=False
@@ -470,6 +498,8 @@ class MeddraLookupService:
             log.warning("Semantic search unavailable (%s): %s", lang, exc)
             return None
         idx = self._semantic[lang]
+        if not idx.labels:
+            return None
         assert idx.model is not None and idx.matrix is not None
         from sentence_transformers import util
 
@@ -490,6 +520,8 @@ class MeddraLookupService:
             log.warning("Semantic top-k unavailable (%s): %s", lang, exc)
             return []
         idx = self._semantic[lang]
+        if not idx.labels:
+            return []
         assert idx.model is not None and idx.matrix is not None
         from sentence_transformers import util
 

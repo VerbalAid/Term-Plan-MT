@@ -9,6 +9,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Form, HTTPException, Query, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -91,7 +92,16 @@ class ContextLookupRequest(BaseModel):
 def api_health():
     data = get_lookup_service().health()
     if access_gate_enabled() and data.get("status") == "ok":
-        return {"status": "ok", "access_gate": True, "neo4j": data.get("neo4j")}
+        return {
+            "status": "ok",
+            "access_gate": True,
+            "neo4j": data.get("neo4j"),
+            "labels_loaded": data.get("labels_loaded"),
+            "cache_ready": data.get("cache_ready"),
+            "semantic_disabled": data.get("semantic_disabled"),
+            "semantic_ready": data.get("semantic_ready"),
+            "llm_configured": data.get("llm_configured"),
+        }
     return data
 
 
@@ -126,35 +136,43 @@ def api_debug_neighborhood(
 
 
 @app.post("/api/lookup")
-def api_lookup(body: LookupRequest):
+async def api_lookup(body: LookupRequest):
     try:
-        return get_lookup_service().lookup(body.term, lang=body.lang).to_dict()
+        return await run_in_threadpool(
+            lambda: get_lookup_service().lookup(body.term, lang=body.lang).to_dict()
+        )
     except Exception as exc:
         log.exception("lookup failed")
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get("/api/lookup")
-def api_lookup_get(
+async def api_lookup_get(
     term: str = Query(..., min_length=1, max_length=500),
     lang: str = Query("auto"),
 ):
     try:
-        return get_lookup_service().lookup(term, lang=lang).to_dict()
+        return await run_in_threadpool(
+            lambda: get_lookup_service().lookup(term, lang=lang).to_dict()
+        )
     except Exception as exc:
         log.exception("lookup failed")
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/api/context-lookup")
-def api_context_lookup(body: ContextLookupRequest):
+async def api_context_lookup(body: ContextLookupRequest):
     """In-context lookup: graph candidates plus OpenRouter disambiguation."""
     try:
-        return get_lookup_service().context_lookup(
-            body.context_sentence,
-            body.target_term,
-            lang=body.lang,
-        ).to_dict()
+        return await run_in_threadpool(
+            lambda: get_lookup_service()
+            .context_lookup(
+                body.context_sentence,
+                body.target_term,
+                lang=body.lang,
+            )
+            .to_dict()
+        )
     except Exception as exc:
         log.exception("context lookup failed")
         raise HTTPException(status_code=503, detail=str(exc)) from exc

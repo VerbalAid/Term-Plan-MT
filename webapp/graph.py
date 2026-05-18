@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import re
+import threading
+import time
 import unicodedata
 from collections import defaultdict
 from typing import Any
+
+log = logging.getLogger(__name__)
 
 from neo4j import Driver, GraphDatabase
 from rapidfuzz import fuzz, process
@@ -46,6 +51,9 @@ class MeddraGraph:
         self._ambiguous: set[str] = set()
         self._ambiguous_counts: dict[str, int] = {}
         self._label_count = 0
+        self._load_lock = threading.Lock()
+        self._count_cached_at: float = 0.0
+        self._count_cached_val: int = -1
 
     def close(self) -> None:
         self._driver.close()
@@ -70,69 +78,106 @@ class MeddraGraph:
             return dict(node.items())
         return dict(node)
 
-    def _load(self) -> None:
-        if self._fr_cache is not None:
-            return
+    def verify_connectivity(self) -> None:
+        with self._driver.session() as s:
+            s.run("RETURN 1").consume()
 
-        buckets: dict[str, list[dict]] = defaultdict(list)
-        q_fr = """
+    def quick_label_count(self, *, ttl_seconds: float = 120.0) -> int:
+        """COUNT for health checks (cached; does not build fuzzy indexes)."""
+        now = time.monotonic()
+        if self._count_cached_val >= 0 and now - self._count_cached_at < ttl_seconds:
+            return self._count_cached_val
+        q = """
         MATCH (c:Concept)
         WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
           AND c.id =~ '^[0-9]+$'
-        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        RETURN count(c) AS n
         """
         with self._driver.session() as s:
-            for r in s.run(q_fr):
-                k = norm_key(r["fr_label"])
-                buckets[k].append(self._row_to_concept(r))
+            n = int(s.run(q).single()["n"])
+        self._count_cached_at = now
+        self._count_cached_val = n
+        return n
 
-        cache: dict[str, dict] = {}
-        for k, items in buckets.items():
-            ids = {str(p["id"]) for p in items}
-            self._ambiguous_counts[k] = len(ids)
-            if len(ids) > 1:
-                self._ambiguous.add(k)
-            cache[k] = items[0]
+    def cache_ready(self) -> bool:
+        return self._fr_cache is not None and bool(self._en_fuzzy_keys)
 
-        self._fr_fuzzy_keys = []
-        self._fr_fuzzy_vals = []
-        q_fuzzy = """
-        MATCH (c:Concept)
-        WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
-          AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
-        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
-        """
-        with self._driver.session() as s:
-            for r in s.run(q_fuzzy):
-                self._fr_fuzzy_keys.append(norm_key(r["fr_label"]))
-                self._fr_fuzzy_vals.append(self._row_to_concept(r))
+    def _load_fr(self) -> None:
+        if self._fr_cache is not None:
+            return
+        with self._load_lock:
+            if self._fr_cache is not None:
+                return
+            log.info("Loading French label cache from Neo4j…")
+            buckets: dict[str, list[dict]] = defaultdict(list)
+            q_fr = """
+            MATCH (c:Concept)
+            WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
+              AND c.id =~ '^[0-9]+$'
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+            """
+            with self._driver.session() as s:
+                for r in s.run(q_fr):
+                    k = norm_key(r["fr_label"])
+                    buckets[k].append(self._row_to_concept(r))
 
-        self._en_fuzzy_keys = []
-        self._en_fuzzy_vals = []
-        q_en = """
-        MATCH (c:Concept)
-        WHERE c.name IS NOT NULL AND trim(c.name) <> ''
-          AND c.tier IN ['PT', 'LLT', 'HLT', 'SOC'] AND c.id =~ '^[0-9]+$'
-        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
-        """
-        with self._driver.session() as s:
-            for r in s.run(q_en):
-                self._en_fuzzy_keys.append(norm_key(r["name"]))
-                self._en_fuzzy_vals.append(self._row_to_concept(r))
+            cache: dict[str, dict] = {}
+            for k, items in buckets.items():
+                ids = {str(p["id"]) for p in items}
+                self._ambiguous_counts[k] = len(ids)
+                if len(ids) > 1:
+                    self._ambiguous.add(k)
+                cache[k] = items[0]
 
-        self._fr_cache = cache
-        self._label_count = len(cache)
+            self._fr_fuzzy_keys = []
+            self._fr_fuzzy_vals = []
+            q_fuzzy = """
+            MATCH (c:Concept)
+            WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
+              AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+            """
+            with self._driver.session() as s:
+                for r in s.run(q_fuzzy):
+                    self._fr_fuzzy_keys.append(norm_key(r["fr_label"]))
+                    self._fr_fuzzy_vals.append(self._row_to_concept(r))
+
+            self._fr_cache = cache
+            self._label_count = len(cache)
+            log.info("French cache ready: %d labels", self._label_count)
+
+    def _load_en(self) -> None:
+        if self._en_fuzzy_keys:
+            return
+        with self._load_lock:
+            if self._en_fuzzy_keys:
+                return
+            log.info("Loading English fuzzy index from Neo4j…")
+            self._en_fuzzy_keys = []
+            self._en_fuzzy_vals = []
+            q_en = """
+            MATCH (c:Concept)
+            WHERE c.name IS NOT NULL AND trim(c.name) <> ''
+              AND c.tier IN ['PT', 'LLT', 'HLT', 'SOC'] AND c.id =~ '^[0-9]+$'
+            RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+            """
+            with self._driver.session() as s:
+                for r in s.run(q_en):
+                    self._en_fuzzy_keys.append(norm_key(r["name"]))
+                    self._en_fuzzy_vals.append(self._row_to_concept(r))
+            log.info("English fuzzy index ready: %d terms", len(self._en_fuzzy_keys))
 
     def label_count(self) -> int:
-        self._load()
-        return self._label_count
+        if self._fr_cache is not None:
+            return self._label_count
+        return self.quick_label_count()
 
     def is_ambiguous_fr(self, fr_term: str) -> bool:
-        self._load()
+        self._load_fr()
         return norm_key(fr_term) in self._ambiguous
 
     def exact_fr(self, fr_term: str) -> dict | None:
-        self._load()
+        self._load_fr()
         assert self._fr_cache is not None
         hit = self._fr_cache.get(norm_key(fr_term))
         return dict(hit) if hit else None
@@ -144,7 +189,7 @@ class MeddraGraph:
     def fuzzy_fr_candidates(
         self, fr_term: str, cutoff: float, *, limit: int = 5
     ) -> list[tuple[dict, float]]:
-        self._load()
+        self._load_fr()
         hits = process.extract(
             norm_key(fr_term),
             self._fr_fuzzy_keys,
@@ -179,10 +224,37 @@ class MeddraGraph:
         hits = self.fuzzy_en_candidates(en_term, cutoff, limit=1)
         return hits[0] if hits else None
 
+    def _fuzzy_en_via_cypher(
+        self, en_term: str, *, limit: int = 5
+    ) -> list[tuple[dict, float]]:
+        """Fast path when the in-memory English index is not built yet."""
+        needle = (en_term or "").strip()
+        if not needle:
+            return []
+        q = """
+        MATCH (c:Concept)
+        WHERE c.name IS NOT NULL AND toLower(c.name) CONTAINS toLower($n)
+          AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        LIMIT $lim
+        """
+        out: list[tuple[dict, float]] = []
+        with self._driver.session() as s:
+            for rec in s.run(q, n=needle, lim=limit * 4):
+                concept = self._row_to_concept(rec)
+                name = str(rec.get("name") or "")
+                score = float(fuzz.ratio(norm_key(needle), norm_key(name)))
+                out.append((concept, score))
+        out.sort(key=lambda x: x[1], reverse=True)
+        return out[:limit]
+
     def fuzzy_en_candidates(
         self, en_term: str, cutoff: float, *, limit: int = 5
     ) -> list[tuple[dict, float]]:
-        self._load()
+        if not self._en_fuzzy_keys:
+            hits = self._fuzzy_en_via_cypher(en_term, limit=limit)
+            return [(c, s) for c, s in hits if s >= cutoff][:limit]
+        self._load_en()
         hits = process.extract(
             norm_key(en_term),
             self._en_fuzzy_keys,

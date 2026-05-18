@@ -85,16 +85,24 @@ function setPipelineHighlight(matchType) {
 async function checkHealth() {
   try {
     const res = await fetch("/api/health");
-    const data = await res.json();
+    const data = await readJsonResponse(res);
     if (data.status === "ok") {
       healthDot.className = "health-dot ok";
       const sem = data.semantic_ready || {};
-      const semNote =
-        sem.fr || sem.en ? " · semantic ready" : " · semantic loads on first use";
+      const semNote = data.semantic_disabled
+        ? " · semantic off (low RAM)"
+        : sem.fr || sem.en
+          ? " · semantic ready"
+          : " · semantic loads on first use";
       const ctxNote = data.llm_configured
         ? " · context routing on"
         : " · context routing off";
-      healthText.textContent = `Neo4j · ${data.labels_loaded?.toLocaleString() ?? "?"} labels${semNote}${ctxNote}`;
+      const cacheNote = data.cache_ready === false ? " · index loads on first search" : "";
+      const labelsNote =
+        data.labels_loaded != null
+          ? `${Number(data.labels_loaded).toLocaleString()} labels`
+          : "connected";
+      healthText.textContent = `Neo4j · ${labelsNote}${cacheNote}${semNote}${ctxNote}`;
     } else {
       healthDot.className = "health-dot err";
       const hint = data.neo4j_target ? ` (${data.neo4j_target})` : "";
@@ -103,6 +111,27 @@ async function checkHealth() {
   } catch {
     healthDot.className = "health-dot err";
     healthText.textContent = "API unreachable";
+  }
+}
+
+async function readJsonResponse(res) {
+  const text = await res.text();
+  if (!text.trim()) {
+    throw new Error(
+      res.status >= 500
+        ? "Server error (empty response). The app may have timed out or restarted — try again in a minute."
+        : "Empty response from server."
+    );
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    const preview = text.slice(0, 80).replace(/\s+/g, " ");
+    throw new Error(
+      res.status >= 500 || res.status === 504
+        ? "Request timed out or the server restarted (common on first semantic / In context use). Wait and retry."
+        : `Server returned non-JSON (${res.status}): ${preview}`
+    );
   }
 }
 
@@ -372,6 +401,7 @@ form.addEventListener("submit", async (e) => {
   resultsEl.hidden = true;
   pipeSteps.forEach((el) => el.classList.remove("active"));
   setLoading(true, "term");
+  showStatus("Searching… first lookup may take 1–2 minutes while the index loads.", false);
 
   try {
     const res = await fetch("/api/lookup", {
@@ -379,12 +409,13 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ term, lang }),
     });
-    const data = await res.json();
+    const data = await readJsonResponse(res);
     if (!res.ok) {
       setPipelineHighlight("none");
       showStatus(data.detail || "Lookup failed", true);
       return;
     }
+    hideStatus();
     renderResults(data);
   } catch (err) {
     setPipelineHighlight("none");
@@ -406,6 +437,7 @@ contextForm.addEventListener("submit", async (e) => {
   hideStatus();
   resultsEl.hidden = true;
   setLoading(true, "context");
+  showStatus("Resolving… first request may take 1–2 minutes while the index loads.", false);
 
   try {
     const res = await fetch("/api/context-lookup", {
@@ -413,11 +445,12 @@ contextForm.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ context_sentence, target_term, lang }),
     });
-    const data = await res.json();
+    const data = await readJsonResponse(res);
     if (!res.ok) {
       showStatus(data.detail || "Context lookup failed", true);
       return;
     }
+    hideStatus();
     renderContextResults(data);
   } catch (err) {
     showStatus(err.message || "Network error", true);
