@@ -97,7 +97,8 @@ async function checkHealth() {
       healthText.textContent = `Neo4j · ${data.labels_loaded?.toLocaleString() ?? "?"} labels${semNote}${ctxNote}`;
     } else {
       healthDot.className = "health-dot err";
-      healthText.textContent = data.detail || "Neo4j unavailable";
+      const hint = data.neo4j_target ? ` (${data.neo4j_target})` : "";
+      healthText.textContent = (data.detail || "Neo4j unavailable") + hint;
     }
   } catch {
     healthDot.className = "health-dot err";

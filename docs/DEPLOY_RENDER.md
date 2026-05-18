@@ -35,7 +35,7 @@ They open it once, then sign in with `WEBAPP_PASSWORD`.
 |-----|----------|--------|
 | `WEBAPP_LINK_KEY` | Yes | ≥24 chars; use `generate_webapp_secrets.py` |
 | `WEBAPP_PASSWORD` | Yes | ≥16 chars, letters + digits |
-| `NEO4J_URI` | Yes | Aura `neo4j+s://….databases.neo4j.io` |
+| `NEO4J_URI` | **Yes** | Aura only: `neo4j+s://xxxx.databases.neo4j.io` — **never** `localhost` on Render |
 | `NEO4J_USER` | Yes | `neo4j` |
 | `NEO4J_PASS` | Yes | Aura password |
 | `LLM_API_KEY` | No | OpenRouter, for **In context** |

@@ -28,6 +28,7 @@ from webapp.auth import (
     warn_if_public,
 )
 from webapp.lookup import get_lookup_service
+from webapp.neo4j_config import validate_neo4j_config
 
 log = logging.getLogger(__name__)
 STATIC = WEBAPP_DIR / "static"
@@ -37,6 +38,7 @@ STATIC = WEBAPP_DIR / "static"
 async def lifespan(_app: FastAPI):
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     warn_if_public()
+    validate_neo4j_config()
     svc = get_lookup_service()
     if os.environ.get("PREWARM_SEMANTIC", "").lower() in ("1", "true", "yes"):
         svc.prewarm_semantic()
@@ -87,9 +89,10 @@ class ContextLookupRequest(BaseModel):
 
 @app.get("/api/health")
 def api_health():
-    if access_gate_enabled():
-        return {"status": "ok", "access_gate": True}
-    return get_lookup_service().health()
+    data = get_lookup_service().health()
+    if access_gate_enabled() and data.get("status") == "ok":
+        return {"status": "ok", "access_gate": True, "neo4j": data.get("neo4j")}
+    return data
 
 
 @app.get("/api/graph/schema")

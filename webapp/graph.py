@@ -11,6 +11,8 @@ from typing import Any
 from neo4j import Driver, GraphDatabase
 from rapidfuzz import fuzz, process
 
+from webapp.neo4j_config import friendly_connection_error, neo4j_password, neo4j_uri, neo4j_user
+
 _TIER_ORDER = {"SOC": 1, "HLGT": 2, "HLT": 3, "PT": 4, "LLT": 5}
 _MEDDRA_CODE = re.compile(r"^\d+$")
 
@@ -32,10 +34,10 @@ class MeddraGraph:
     """
 
     def __init__(self) -> None:
-        uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
-        user = os.environ.get("NEO4J_USER", "neo4j")
-        pwd = os.environ.get("NEO4J_PASS", "password")
-        self._driver: Driver = GraphDatabase.driver(uri, auth=(user, pwd))
+        uri = neo4j_uri()
+        self._driver: Driver = GraphDatabase.driver(
+            uri, auth=(neo4j_user(), neo4j_password())
+        )
         self._fr_cache: dict[str, dict] | None = None
         self._fr_fuzzy_keys: list[str] = []
         self._fr_fuzzy_vals: list[dict] = []

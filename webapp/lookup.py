@@ -11,6 +11,7 @@ from typing import Any, Literal
 
 from webapp.context_llm import llm_configured, llm_model, resolve_context
 from webapp.graph import MeddraGraph, norm_key
+from webapp.neo4j_config import friendly_connection_error, safe_uri_hint, validate_neo4j_config
 
 log = logging.getLogger(__name__)
 
@@ -165,7 +166,8 @@ class MeddraLookupService:
             return {
                 "status": "error",
                 "neo4j": "unavailable",
-                "detail": str(exc),
+                "neo4j_target": safe_uri_hint(),
+                "detail": friendly_connection_error(exc),
                 "semantic_ready": self.semantic_status(),
             }
 
