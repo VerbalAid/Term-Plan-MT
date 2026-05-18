@@ -2,7 +2,7 @@
 
 Terminology-aware French→English machine translation for SmPC Section 4.8 adverse-event text, with MedDRA-grounded planning (systems S1–S6).
 
-**Repository:** [github.com/VerbalAid/Term-Plan-MT](https://github.com/VerbalAid/Term-Plan-MT)
+**Repository:** [github.com/VerbalAid/Term-Plan-MT](https://github.com/VerbalAid/Term-Plan-MT) — canonical home for this project (formerly `MT_Project_terminology`).
 
 ## Quick start
 
