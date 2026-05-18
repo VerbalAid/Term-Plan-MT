@@ -1,9 +1,29 @@
 id,fr,human_ref,s1,s2,s5,s6,primary_term,human_register,s1_pattern,s2_pattern,s5_pattern,s6_pattern,register_mismatch,consistency_paradox,best_system,error_type,annotation_note,your_correction,your_notes,raw_response
 48_082,"Chez les patients atteints d’un CETEC localement avancé résécable traités par
 pembrolizumab en traitement néoadjuvant et en association à une radiothérapie avec ou sans cisplatine
-concomitant en traitement adjuvant (n = 361), l’incidence de l’hypothy","170
+concomitant en traitement adjuvant (n = 361), l’incidence de l’hypothyroïdie était de 24,7 %, toutes étant de
+Grade 1 ou 2.","170
 Hypothyroidism occurred in 939 (12.3%) patients, including Grade 2 or 3 cases in 687 (9.0%) and
-8 (0.1%) patients, respectively, receiving pembrolizumab.","In patients with locally advanced resectable CETEC treated with pembrolizumab as neoadjuvant and in combination with or without concomitant cisplatin as adjuvant therapy (n = 361), the incidence of hy","In patients with locally advanced resectable CETEC treated with pembrolizumab in the neoadjuvant setting and in combination with radiotherapy with or without cisplatin adjuvant therapy (n = 361), the ","In patients with locally advanced, resectable CETEC (cervical carcinoma of the esophagus, cervical carcinoma of the esophagus and gastric cardia, and esophageal adenocarcinoma) treated with pembrolizu",Among patients with locally advanced resectable CETEC treated with pembrolizumab in neoadjuvant therapy and in combination with radiation therapy with or without concomitant cisplatin in adjuvant ther,Hypothyroidism,DESCRIPTIVE,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,MISS,Yes,Yes,S2,REGISTER_MISMATCH,"The human reference incorrectly mentions ""hyperthyroidism"" instead of ""hypothyroidism"". S5 uses a technical MedDRA term, which aligns with ontology but mismatches the descriptive style preferred by humans.",,,"1. PRIMARY_TERM: Hypothyroidism
+8 (0.1%) patients, respectively, receiving pembrolizumab.","In patients with locally advanced resectable CETEC treated with pembrolizumab as neoadjuvant and in combination with or without concomitant cisplatin as adjuvant therapy (n = 361), the incidence of hypothyroidism was 24.7%, all of which were Grade 1 or 2.","In patients with locally advanced resectable CETEC treated with pembrolizumab in the neoadjuvant setting and in combination with radiotherapy with or without cisplatin adjuvant therapy (n = 361), the incidence of hypothyroidism was 24.7%, all being of Grade 1 or 2.","In patients with locally advanced, resectable CETEC (cervical carcinoma of the esophagus, cervical carcinoma of the esophagus and gastric cardia, and esophageal adenocarcinoma) treated with pembrolizumab as neoadjuvant therapy and in combination with radiotherapy with or without cisplatin as adjuvant therapy (n = 361), the incidence of hypothyroidism was 24.7%, all being of Grade 1 or 2.
+
+Translation:
+In patients with locally advanced, resectable CETEC treated with pembrolizumab as neoadjuvant therapy and in combination with radiotherapy with or without cisplatin as adjuvant therapy (n = 361), the incidence of hypothyroidism was 24.7%, all being of Grade 1 or 2.
+
+Hypothyroidie → Hypothyroidism (MedDRA LLT L5)
+Grade 1 or 2 → Mild or moderate (MedDRA Medical Dictionary)
+CETEC → Esophageal carcinoma (MedDRA High-Level Term)
+Resectable → Surgically resectable (Medical Term)
+Neoadjuvant therapy → Neoadjuvant treatment (MedDRA LLT LT03)
+Adjuvant therapy → Adjuvant treatment (MedDRA LLT LT03)
+Incidence → Frequency (Medical Term)
+Grade → Severity (MedDRA Medical Dictionary)
+Patients → Subjects (Medical Term)
+Treatment → Therapy (Medical Term)
+N = 361 → Number of subjects = 361 (Medical Term)
+
+Therefore, the translation is:
+
+In subjects with locally advanced, resectable esophageal carcinoma treated with pembrolizumab as neoadjuvant therapy and in combination with radiotherapy with or without cisplatin as adjuvant therapy (n = 361), the frequency of hypothyroidism was 24.7%, all being of mild or moderate severity.","Among patients with locally advanced resectable CETEC treated with pembrolizumab in neoadjuvant therapy and in combination with radiation therapy with or without concomitant cisplatin in adjuvant therapy (n = 361), the incidence of hyperthyroidism was 24.7%, all being Grade 1 or 2.",Hypothyroidism,DESCRIPTIVE,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,MISS,Yes,Yes,S2,REGISTER_MISMATCH,"The human reference incorrectly mentions ""hyperthyroidism"" instead of ""hypothyroidism"". S5 uses a technical MedDRA term, which aligns with ontology but mismatches the descriptive style preferred by humans.",,,"1. PRIMARY_TERM: Hypothyroidism
 
 2. HUMAN_REGISTER: DESCRIPTIVE
 
@@ -26,10 +46,10 @@ Hypothyroidism occurred in 939 (12.3%) patients, including Grade 2 or 3 cases in
 11. ANNOTATION_NOTE: The human reference incorrectly mentions ""hyperthyroidism"" instead of ""hypothyroidism"". S5 uses a technical MedDRA term, which aligns with ontology but mismatches the descriptive style preferred by humans."
 48_015,"Pembrolizumab en association à un inhibiteur de tyrosine kinase (ITK) (voir rubrique 4.2)
 Lorsque pembrolizumab est administré en association à l'axitinib ou au lenvatinib, reportez-vous au RCP de
-l'axitinib ou du lenvatinib avant l’initiation du tra","Pembrolizumab in combination with tyrosine kinase inhibitor (TKI) (see section 4.2)
+l'axitinib ou du lenvatinib avant l’initiation du traitement.","Pembrolizumab in combination with tyrosine kinase inhibitor (TKI) (see section 4.2)
 When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the SmPC
-for axitinib or lenvatinib prior to initiation of treatment.","Pembrolizumab in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2) When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the axitinib or lenvatinib","When pembrolizumab is given in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2), refer to the product information of axitinib or lenvatinib before initiating treatment.","Pembrolizumab in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2)
-When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the respective SmPC of axi","When pembrolizumab is given in combination with axitinib or lenvatinib, refer to the axitinib or lenvatinib RCP before starting treatment.",SmPC,TECHNICAL,CORRECT_TERM,PARAPHRASE,CORRECT_TERM,CORRECT_TERM,No,Yes,HUMAN,NO_ERROR,"The segment highlights that while S5 strictly uses the technical term ""SmPC"" like the human reference, S2 opts for ""product information,"" showing a language choice less aligned with the reference.",,,"```plaintext
+for axitinib or lenvatinib prior to initiation of treatment.","Pembrolizumab in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2) When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the axitinib or lenvatinib RCP before starting treatment.","When pembrolizumab is given in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2), refer to the product information of axitinib or lenvatinib before initiating treatment.","Pembrolizumab in combination with a tyrosine kinase inhibitor (ITK) (see section 4.2)
+When pembrolizumab is administered in combination with axitinib or lenvatinib, refer to the respective SmPC of axitinib or lenvatinib before initiating treatment.","When pembrolizumab is given in combination with axitinib or lenvatinib, refer to the axitinib or lenvatinib RCP before starting treatment.",SmPC,TECHNICAL,CORRECT_TERM,PARAPHRASE,CORRECT_TERM,CORRECT_TERM,No,Yes,HUMAN,NO_ERROR,"The segment highlights that while S5 strictly uses the technical term ""SmPC"" like the human reference, S2 opts for ""product information,"" showing a language choice less aligned with the reference.",,,"```plaintext
 PRIMARY_TERM: SmPC
 HUMAN_REGISTER: TECHNICAL
 S1_PATTERN: CORRECT_TERM
@@ -45,12 +65,26 @@ ANNOTATION_NOTE: The segment highlights that while S5 strictly uses the technica
 48_004,"Formulation sous-cutanée
 Le profil de sécurité de KEYTRUDA solution injectable en association avec un doublet de chimiothérapie à
 base de platine (évalué chez 126 et 251 patients traités avec les formulations intraveineuse et sous-cutanée
-respectivem","Subcutaneous formulation
+respectivement) était globalement cohérent avec le profil de sécurité connu de pembrolizumab intraveineux
+en association avec une chimiothérapie, avec un effet indésirable supplémentaire de réactions au site
+d’injection (2,4 % dans le bras pembrolizumab sous-cutané), toutes de Grade 1.","Subcutaneous formulation
 The safety profile of KEYTRUDA solution for injection in combination with platinum doublet
 163
 chemotherapy (evaluated in 126 and 251 patients treated with the intravenous and subcutaneous
-formulations respectively) was overa",Subcutaneous formulation The safety profile of KEYTRUDA solution for injection in combination with a double platinum-based chemotherapy (assessed in 126 and 251 patients treated with intravenous and s,The profile of safety for KEYTRUDA injectable solution when used in combination with a platinum-based chemotherapy (evaluated in 126 and 251 patients treated with the intravenous and subcutaneous form,"Subcutaneous formulation of KEYTRUDA injectable solution
-The safety profile of KEYTRUDA intravenous solution in combination with a platine-based chemotherapy (evaluated in 126 and 251 patients treated",The safety profile of KEYTRUDA injectable solution in combination with a platinum-based chemotherapy doublet (assessed in 126 and 251 patients treated with intravenous and subcutaneous formulations re,injection site reactions,DESCRIPTIVE,CORRECT_TERM,PARAPHRASE,PARAPHRASE,CORRECT_TERM,No,No,HUMAN,REGISTER_MISMATCH,"The human reference uses descriptive prose by saying ""additional adverse reaction of injection site,"" whereas some systems like S5 attempt a more formalized and technical terminology which can create a register mismatch.",,,"```plaintext
+formulations respectively) was overall consistent with the known safety profile of intravenous
+pembrolizumab in combination with chemotherapy, with an additional adverse reaction of
+injection-site reactions (2.4% in the subcutaneous pembrolizumab arm), which were all Grade 1.","Subcutaneous formulation The safety profile of KEYTRUDA solution for injection in combination with a double platinum-based chemotherapy (assessed in 126 and 251 patients treated with intravenous and subcutaneous formulas respectively) was broadly consistent with the known safety profile of intravenous pembrolizumab in combination with chemotherapy, with an additional adverse effect of injection site reactions (2.4% in the subcutaneous pembrolizumab arm), all of Grade 1.","The profile of safety for KEYTRUDA injectable solution when used in combination with a platinum-based chemotherapy (evaluated in 126 and 251 patients treated with the intravenous and subcutaneous formulations, respectively) was generally consistent with the known safety profile of pembrolizumab intravenous in combination with chemotherapy, with an additional adverse effect of injection site reactions (2.4% in the pembrolizumab subcutaneous arm), all of Grade 1.","Subcutaneous formulation of KEYTRUDA injectable solution
+The safety profile of KEYTRUDA intravenous solution in combination with a platine-based chemotherapy (evaluated in 126 and 251 patients treated with intravenous and subcutaneous formulations respectively) was overall consistent with the known safety profile of pembrolizumab intravenous in combination with chemotherapy, with an additional adverse effect of injection site reactions (2.4% with subcutaneous pembrolizumab), all of Grade 1.
+
+Translation:
+
+Formulation sous-cutanée de KEYTRUDA solution injectable
+Le profil de sécurité du KEYTRUDA solution injectable intraveineuse en association avec une chimiothérapie à base de platine (évaluée chez 126 et 251 patients traités respectivement avec les formulations intraveineuse et sous-cutanée) a été globalement cohérent avec le profil de sécurité connu de pembrolizumab intraveineux en association avec une chimiothérapie, avec un effet indésirable supplémentaire de réactions aux injections (2,4 % dans le bras pembrolizumab sous-cutané), toutes de Grades 1.
+
+Subcutaneous formulation of KEYTRUDA injectable solution
+The safety profile of the KEYTRUDA injectable solution intravenously administered in combination with platine-based chemotherapy (evaluated in 126 and 251 patients treated with intravenous and subcutaneous formulations respectively) was overall consistent with the known safety profile of pembrolizumab intravenously in combination with chemotherapy, with an additional adverse effect of injection site reactions (2.4% with subcutaneous pembrolizumab), all of Grade 1.
+
+Note: The term ""Formulation sous-cutanée"" is translated as ""Subcutaneous formulation"" and ""réactions au site d’injection"" is translated as ""injection site reactions"". The term ""Grade 1"" refers to the Common Terminology Criteria for Adverse Events (CTCAE) scale, which is used to describe the severity of adverse events. Grade 1 adverse events are mild","The safety profile of KEYTRUDA injectable solution in combination with a platinum-based chemotherapy doublet (assessed in 126 and 251 patients treated with intravenous and subcutaneous formulations respectively) was generally consistent with the known safety profile of pembrolizumab intravenously in combination with chemotherapy, with an additional adverse effect of reactions to the injection site (2.4% in pembrolizumab subcutaneous arms), all of Grade 1.",injection site reactions,DESCRIPTIVE,CORRECT_TERM,PARAPHRASE,PARAPHRASE,CORRECT_TERM,No,No,HUMAN,REGISTER_MISMATCH,"The human reference uses descriptive prose by saying ""additional adverse reaction of injection site,"" whereas some systems like S5 attempt a more formalized and technical terminology which can create a register mismatch.",,,"```plaintext
 PRIMARY_TERM: injection site reactions
 HUMAN_REGISTER: DESCRIPTIVE
 S1_PATTERN: CORRECT_TERM
@@ -72,7 +106,49 @@ Translate:
 No patient presented hypothyroidism.
 
 MedDRA context:
-",No patients were presented with hepatic MVO.,hepatic veno-occlusive disease,TECHNICAL,PARAPHRASE,CORRECT_TERM,PARAPHRASE,PARAPHRASE,No,Yes,S2,TERM_DRIFT,"S2 used the correct term ""hepatic veno-occlusive disease,"" closely aligning with the technical register. S5 drifted by using ""hepatic morphological abnormalities,"" deviating from the MedDRA term.",,,"1. PRIMARY_TERM: hepatic veno-occlusive disease
+'hypothyroïdie' → 'Hypothyroid state' (MedDRA HL code: Q60.1)
+
+Translate:
+No patient presented hypothyroid state.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, myxedema coma' (MedDRA HL code: Q60.1X1)
+
+Translate:
+No patient presented myxedema coma.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, subclinical' (MedDRA HL code: Q60.1X2)
+
+Translate:
+No patient presented subclinical hypothyroidism.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, cretinism' (MedDRA HL code: Q60.1X3)
+
+Translate:
+No patient presented cretinism.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, goiter' (MedDRA HL code: Q60.1X4)
+
+Translate:
+No patient presented goiter.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, myxedema' (MedDRA HL code: Q60.1X5)
+
+Translate:
+No patient presented myxedema.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, uncomplicated' (MedDRA HL code: Q60.1X6)
+
+Translate:
+No patient presented uncomplicated hypothyroidism.
+
+MedDRA context:
+'hypothyroïdie' → 'Hypothyroidism, unspecified' (MedDRA HL code:",No patients were presented with hepatic MVO.,hepatic veno-occlusive disease,TECHNICAL,PARAPHRASE,CORRECT_TERM,PARAPHRASE,PARAPHRASE,No,Yes,S2,TERM_DRIFT,"S2 used the correct term ""hepatic veno-occlusive disease,"" closely aligning with the technical register. S5 drifted by using ""hepatic morphological abnormalities,"" deviating from the MedDRA term.",,,"1. PRIMARY_TERM: hepatic veno-occlusive disease
 
 2. HUMAN_REGISTER: TECHNICAL
 
@@ -99,7 +175,9 @@ pembrolizumab en monothérapie.","The incidence of rash maculo-papular was 36% a
 Grades 3-4), which is higher than observed in pembrolizumab monotherapy.","The incidence of macular-papular skin rash was 36% in all Grades (10% in Grades 3-4), which is higher than that observed with pembrolizumab as monotherapy.","The incidence of maculo-papular rash was 36% (10% Grades 3-4), which is higher than that observed with pembrolizumab monotherapy.","The incidence of maculo-papular rash was 36% across all Grades (10% of Grades 3-4), which is higher than that observed with pembrolizumab monotherapy.
 
 Translation:
-The incidence of maculo-papular ras","The incidence of macular-papular skin rashes was 36 percent in all grades (10 percent in grades 3-4), which is higher than that seen with pembrolizumab monotherapy.",maculo-papular rash,TECHNICAL,PARAPHRASE,CORRECT_TERM,CORRECT_TERM,PARAPHRASE,No,No,S2,NO_ERROR,"The term ""maculo-papular rash"" is used consistently across all outputs. The human reference uses the exact MedDRA preferred term, thus there are no notable errors in ontology term usage.",,,"1. PRIMARY_TERM: maculo-papular rash
+The incidence of maculo-papular rash was 36% across all Grades (10% of Grades 3-4), which is higher than that observed with pembrolizumab monotherapy.
+
+[Hypercarotinaemia: not applicable in this context]","The incidence of macular-papular skin rashes was 36 percent in all grades (10 percent in grades 3-4), which is higher than that seen with pembrolizumab monotherapy.",maculo-papular rash,TECHNICAL,PARAPHRASE,CORRECT_TERM,CORRECT_TERM,PARAPHRASE,No,No,S2,NO_ERROR,"The term ""maculo-papular rash"" is used consistently across all outputs. The human reference uses the exact MedDRA preferred term, thus there are no notable errors in ontology term usage.",,,"1. PRIMARY_TERM: maculo-papular rash
 
 2. HUMAN_REGISTER: TECHNICAL
 
@@ -122,15 +200,191 @@ The incidence of maculo-papular ras","The incidence of macular-papular skin rash
 11. ANNOTATION_NOTE: The term ""maculo-papular rash"" is used consistently across all outputs. The human reference uses the exact MedDRA preferred term, thus there are no notable errors in ontology term usage."
 48_032,"⁎ Les termes suivants représentent un groupe d’évènements liés qui décrivent un état pathologique plutôt qu’un évènement isolé :
 • anémie hémolytique (anémie hémolytique auto-immune et anémie hémolytique à Coombs négatif)
-• réaction liée à la perfusi","⁎ The following terms represent a group of related events that describe a medical condition rather than a single event:
+• réaction liée à la perfusion (hypersensibilité médicamenteuse, réaction anaphylactique, réaction anaphylactoïde,
+hypersensibilité, réaction d’hypersensibilité liée à la perfusion, syndrome de relargage des cytokines et maladie sérique)
+• sarcoïdose (sarcoïdose cutanée et sarcoïdose pulmonaire)
+• hypothyroïdie (myxœdème, hypothyroïdie à médiation immunitaire et hypothyroïdie auto-immune)
+• insuffisance surrénalienne (maladie d’Addison, insuffisance corticosurrénalienne aiguë, insuffisance corticosurrénalienne
+secondaire et insuffisance surrénalienne primaire)
+• thyroïdite (thyroïdite auto-immune, thyroïdite silencieuse, troubles thyroïdiens, thyroïdite aiguë et thyroïdite à médiation
+immunitaire)
+• hyperthyroïdie (maladie de Basedow)
+• hypophysite (hypopituitarisme et hypophysite lymphocytaire)
+• diabète de type 1 (acidocétose diabétique)
+• syndrome myasthénique (myasthénie grave, y compris exacerbation)
+• encéphalite (encéphalite auto-immune et encéphalite non infectieuse)
+• syndrome de Guillain-Barré (neuropathie axonale et polyneuropathie démyélinisante)
+• myélite (y compris myélite transverse)
+• méningite aseptique (méningite et méningite non infectieuse)
+• uvéite (choriorétinite, iritis et iridocyclite)
+• myocardite (myocardite auto-immune et myocardite à médiation immunitaire)
+• péricardite (péricardite auto-immune, pleuropéricardite et myopéricardite)
+• vascularite (vascularite du système nerveux central, aortite et artérite à cellules géantes)
+• pneumopathie inflammatoire (pneumopathie interstitielle diffuse, pneumopathie organisée, pneumopathie à médiation
+immunitaire, maladie pulmonaire à médiation immunitaire et maladie pulmonaire auto-immune)
+• douleur abdominale (gêne abdominale, douleur abdominale haute et douleur abdominale basse)
+• colite (colite microscopique, entérocolite, entérocolite hémorragique, colite auto-immune et entérocolite à médiation
+immunitaire)
+• gastrite (gastrite érosive, gastrite hémorragique et gastrite à médiation immunitaire)
+• pancréatite (pancréatite auto-immune, pancréatite aiguë et pancréatite à médiation immunitaire)
+• ulcération gastro-intestinale (ulcère gastrique et ulcère duodénal)
+• hépatite (hépatite auto-immune, hépatite à médiation immunitaire, atteinte hépatique d’origine médicamenteuse et
+hépatite aiguë)
+• cholangite sclérosante (cholangite à médiation immunitaire)
+• prurit (urticaire, urticaire papuleuse et prurit génital)
+• éruption cutanée (éruption érythémateuse, éruption folliculaire, éruption maculaire, éruption maculo-papuleuse, éruption
+papuleuse, éruption pruritigineuse, éruption vésiculaire et rash génital)
+• réactions cutanées sévères (rash exfoliatif, pemphigus, et évènements suivants de Grade ≥ 3 : vascularite cutanée,
+dermatite bulleuse, dermatite exfoliative, dermatite exfoliative généralisée, érythème polymorphe, lichen plan, lichen
+plan buccal, pemphigoïde, prurit, prurit génital, éruption cutanée, éruption cutanée érythémateuse, éruption maculo-
+papuleuse, éruption cutanée prurigineuse, éruption pustuleuse, nécrose cutanée et éruption cutanée toxique)
+• vitiligo (dépigmentation cutanée, hypopigmentation cutanée et hypopigmentation de la paupière)
+• kératose lichénoïde (lichen plan et lichen scléreux)
+• douleur musculo-squelettique (gêne musculo-squelettique, douleur dorsale, raideur musculo-squelettique, douleur
+thoracique musculo-squelettique et torticolis)
+• myosite (myalgie, myopathie, myosite nécrosante, pseudo-polyarthrite rhizomélique et rhabdomyolyse)
+187
+• arthrite (gonflement des articulations, polyarthrite, épanchement articulaire, arthrite auto-immune et arthrite à médiation
+immunitaire)
+• ténosynovite (tendinite, synovite et douleur aux tendons)
+• néphrite (néphrite auto-immune, néphrite à médiation immunitaire, néphrite tubulo-interstitielle, insuffisance rénale,
+insuffisance rénale aiguë ou atteinte rénale aiguë avec néphrite avérée, syndrome néphrotique, glomérulonéphrite,
+glomérulonéphrite membraneuse et glomérulonéphrite aiguë)
+• œdème (œdème périphérique, œdème généralisé, surcharge liquidienne, rétention liquidienne, œdème palpébral, œdème
+labial, œdème du visage, œdème localisé et œdème périorbitaire)
+188
+Pembrolizumab en association à l'enfortumab vedotin (voir rubrique 4.2)
+Lorsque pembrolizumab est administré en association à l'enfortumab vedotin, se référer au RCP de
+l'enfortumab vedotin avant l'initiation du traitement.","⁎ The following terms represent a group of related events that describe a medical condition rather than a single event:
 •
 haemolytic anaemia (autoimmune haemolytic anaemia and Coombs negative haemolytic anaemia)
 •
-infusion-related reaction (drug hype",When the following terms represent a group of related events describing a pathological condition rather than an isolated event: • hemolytic anemia (autoimmune hemolytic anemia and coombs-negative hemo,"""The following terms represent a group of events that describe a pathological state rather than an isolated event:
+infusion-related reaction (drug hypersensitivity, anaphylactic reaction, anaphylactoid reaction, hypersensitivity,
+infusion-related hypersensitivity reaction, cytokine release syndrome and serum sickness)
+•
+sarcoidosis (cutaneous sarcoidosis and pulmonary sarcoidosis)
+•
+hypothyroidism (myxoedema, immune-mediated hypothyroidism and autoimmune hypothyroidism)
+• adrenal insufficiency (Addison’s disease, adrenocortical insufficiency acute, secondary adrenocortical insufficiency and
+primary adrenal insufficiency)
+•
+thyroiditis (autoimmune thyroiditis, silent thyroiditis, thyroid disorder, thyroiditis acute and immune-mediated
+thyroiditis)
+•
+hyperthyroidism (Graves' disease)
+•
+hypophysitis (hypopituitarism and lymphocytic hypophysitis)
+•
+type 1 diabetes mellitus (diabetic ketoacidosis)
+•
+myasthenic syndrome (myasthenia gravis, including exacerbation)
+•
+encephalitis (autoimmune encephalitis and noninfective encephalitis)
+•
+Guillain-Barré syndrome (axonal neuropathy and demyelinating polyneuropathy)
+•
+myelitis (including transverse myelitis)
+•
+meningitis aseptic (meningitis and meningitis noninfective)
+•
+uveitis (chorioretinitis, iritis and iridocyclitis)
+•
+myocarditis (autoimmune myocarditis)
+•
+pericarditis (autoimmune pericarditis, pleuropericarditis and myopericarditis)
+•
+vasculitis (central nervous system vasculitis, aortitis and giant cell arteritis)
+168
+•
+pneumonitis (interstitial lung disease, organising pneumonia, immune-mediated pneumonitis, immune-mediated lung
+disease and autoimmune lung disease)
+•
+abdominal pain (abdominal discomfort, abdominal pain upper and abdominal pain lower)
+•
+colitis (colitis microscopic, enterocolitis, enterocolitis haemorrhagic, autoimmune colitis and immune-mediated
+enterocolitis)
+•
+gastritis (gastritis erosive, gastritis haemorrhagic and immune-mediated gastritis)
+•
+pancreatitis (autoimmune pancreatitis, pancreatitis acute and immune-mediated pancreatitis)
+•
+gastrointestinal ulceration (gastric ulcer and duodenal ulcer)
+•
+hepatitis (autoimmune hepatitis, immune-mediated hepatitis, drug induced liver injury and acute hepatitis)
+•
+cholangitis sclerosing (immune-mediated cholangitis)
+•
+pruritus (urticaria, urticaria papular and pruritus genital)
+•
+rash (rash erythematous, rash follicular, rash macular, rash maculo-papular, rash papular, rash pruritic, rash vesicular
+and genital rash)
+• severe skin reactions (exfoliative rash, pemphigus, and Grade ≥ 3 of the following: cutaneous vasculitis, dermatitis
+bullous, dermatitis exfoliative, dermatitis exfoliative generalised, erythema multiforme, lichen planus, oral lichen
+planus, pemphigoid, pruritus, pruritus genital, rash, rash erythematous, rash maculo-papular, rash pruritic, rash pustular,
+skin necrosis and toxic skin eruption)
+•
+vitiligo (skin depigmentation, skin hypopigmentation and hypopigmentation of the eyelid)
+•
+lichenoid keratosis (lichen planus and lichen sclerosus)
+•
+musculoskeletal pain (musculoskeletal discomfort, back pain, musculoskeletal stiffness, musculoskeletal chest pain and
+torticollis)
+•
+myositis (myalgia, myopathy, necrotising myositis, polymyalgia rheumatica and rhabdomyolysis)
+•
+arthritis (joint swelling, polyarthritis, joint effusion, autoimmune arthritis and immune-mediated arthritis)
+•
+tenosynovitis (tendonitis, synovitis and tendon pain)
+•
+nephritis (autoimmune nephritis, immune-mediated nephritis, tubulointerstitial nephritis and renal failure, renal failure
+acute, or acute kidney injury with evidence of nephritis, nephrotic syndrome, glomerulonephritis, glomerulonephritis
+membranous and glomerulonephritis acute)
+•
+oedema (oedema peripheral, generalised oedema, fluid overload, fluid retention, eyelid oedema and lip oedema, face
+oedema, localised oedema and periorbital oedema)
+Pembrolizumab in combination with enfortumab vedotin (see section 4.2)
+When pembrolizumab is administered in combination with enfortumab vedotin, refer to the SmPC for
+enfortumab vedotin prior to initiation of treatment.","When the following terms represent a group of related events describing a pathological condition rather than an isolated event: • hemolytic anemia (autoimmune hemolytic anemia and coombs-negative hemolytic anemia) • perfusion-related reaction (drug hypersensitivity, anaphylactic reaction, anaphylactic reaction, anaphylactoid reaction, hypersensitivity, hypersensitivity, hypersensitivity, hypersensitivity to the perfusion, autoimmune disease, autoimmune disease and immunodeficiency syndrome) • hypersensitivity to the blood glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose, glucose,","""The following terms represent a group of events that describe a pathological state rather than an isolated event:
 
-• hemolytic anemia (auto-immune hemolytic anemia and Coombs negative hemolytic anemi","When pembrolizumab is administered in combination with enfortumab vedotin, refer to the enfortumab vedotin product information before initiating treatment.
+• hemolytic anemia (auto-immune hemolytic anemia and Coombs negative hemolytic anemia)
+• infusion-related reaction (hypersensitivity reaction, anaphylactic reaction, anaphylactoid reaction, hypersensitivity, infusion-related hypersensitivity reaction, cytokine release syndrome, and serum sickness)
+• sarcoidosis (cutaneous sarcoidosis and pulmonary sarcoidosis)
+• hypothyroidism (myxedema, immune-mediated hypothyroidism, and autoimmune hypothyroidism)
+• adrenal insufficiency (Addison's disease, acute adrenal insufficiency, secondary adrenal insufficiency, and primary adrenal insufficiency)
+• thyroiditis (autoimmune thyroiditis, silent thyroiditis, thyroid disorders, acute thyroiditis, and immune-mediated thyroiditis)
+• hyperthyroidism (Graves' disease)
+• hypophysitis (hypopituitarism and lymphocytic hypophysitis)
+• type 1 diabetes (diabetes mellitus type 1)
+• myasthenia (grave myasthenia, including exacerbation)
+• encephalitis (autoimmune encephalitis and non-infectious encephalitis)
+• Guillain-Barré syndrome (axonal neuropathy and demyelinating polyneuropathy)
+• myelitis (including transverse myelitis)
+• aseptic meningitis (meningitis and non-infectious meningitis)
+• uveitis (chorio-retinitis, iritis, and iridocyclitis)
+• myocarditis (autoimmune myocarditis and immune-mediated myocarditis)
+• pericarditis (autoimmune pericarditis, pleuropericarditis, and myopericarditis)
+• vasculitis (central nervous system vasculitis, aortitis, and giant cell arteritis)
+•","When pembrolizumab is administered in combination with enfortumab vedotin, refer to the enfortumab vedotin product information before initiating treatment.
 
-The following terms represent a group of re",When the following terms represent a group of related events that describe a pathological condition rather than an isolated event: • hemolytic anemia (autoimmune hemolytic anemia and hemolytic anemia ,,UNKNOWN,,,,,,,UNKNOWN,UNKNOWN,,,,"I'm sorry, but I cannot facilitate that request."
+The following terms represent a group of related events describing a pathological state rather than an isolated event:
+
+• hemolytic anemia (hemolytic anemia auto-immune and Coombs negative hemolytic anemia)
+• perfusion-related reaction (hypersensitivity to medication, anaphylactic reaction, anaphylactoid reaction, hypersensitivity, perfusion-related hypersensitivity, cytokine release syndrome, and seric disease)
+• sarcoidosis (cutaneous sarcoidosis and pulmonary sarcoidosis)
+• hypothyroidism (myxedema, immune-mediated hypothyroidism, and autoimmune hypothyroidism)
+• adrenal insufficiency (Addison's disease, acute adrenal insufficiency, secondary adrenal insufficiency, and primary adrenal insufficiency)
+• thyroiditis (autoimmune thyroiditis, silent thyroiditis, thyroid disorders, acute thyroiditis, and immune-mediated thyroiditis)
+• hyperthyroidism (Basedow's disease)
+• pituitary (hypopituitarism and lymphocytic hypophysitis)
+• type 1 diabetes (diabetic hyperosmolar coma)
+• myasthenia (grave myasthenia, including exacerbation)
+• encephalitis (autoimmune encephalitis and noninfectious encephalitis)
+• Guillain-Barré syndrome (axonal neuropathy and demyelinating polyneuropathy)
+• myelitis (including transverse myelitis)
+• aseptic meningitis (meningitis and noninfectious meningitis)
+• uveitis (choriorretinitis, iritis, and iridocyclitis)
+• myocarditis (autoimmune myocarditis and myocarditis with immune-mediated etiology)
+• pericarditis (autoimmune pericarditis, pleuroper","When the following terms represent a group of related events that describe a pathological condition rather than an isolated event: • hemolytic anemia (autoimmune hemolytic anemia and hemolytic anemia at Coombs negative) • perfusion-related reaction (medicinal hypersensitivity, anaphylactic reactions, anaphylactic reactions, anaphylactic reactions, anaphylactic reactions, hypersensitivity of the eye, hypersensitivity of the eye, hypersensitivity of the perfusion, syndrome of enlargement of cytokines and serum immunity) • hypersensitivity of the immune system (hypertensive hemolytic anemia and hemolytic anemia at Coombs negative) • hypersensitivity of the blood (hypersensitivity of the eye, anaphylactic reaction, anaphylactic dermatitis of the eye, anaphylactic reaction, anaphylactic anemia of the eye, anaphylactic reactions of the eye, anaphylactic reactions of the eye) • hypersensitivity of the blood (hypersensitivity of",,UNKNOWN,,,,,,,UNKNOWN,UNKNOWN,,,,"I'm sorry, but I cannot facilitate that request."
 48_029,‡ Sur la base d’une requête standard incluant bradyarythmie et tachyarythmie.,‡Based upon a standard query including bradyarrhythmias and tachyarrhythmias.,‡ Based on a standard query including brady arrhythmia and tachyarythmia.,Based on a standard query including Bradyarrhythmia and Tachyarrhythmia.,Based on a standard request including bradyarrhythmia and tachyarrhythmia.,‡ On the basis of a standard request including bradyarythmie and tachyarythmie.,bradyarrhythmias and tachyarrhythmias,TECHNICAL,PARAPHRASE,CORRECT_TERM,CORRECT_TERM,MISS,No,No,S2,TERM_DRIFT,"S1 introduces a split in the terms ""brady arrhythmia"" and ""tachyarythmia,"" which does not align exactly with the reference. S2 and S5 accurately match the MedDRA terms used in the human reference. S6 fails to translate the primary terms and retains them in French.",,,"1. PRIMARY_TERM: bradyarrhythmias and tachyarrhythmias
 
 2. HUMAN_REGISTER: TECHNICAL
@@ -154,9 +408,11 @@ The following terms represent a group of re",When the following terms represent 
 11. ANNOTATION_NOTE: S1 introduces a split in the terms ""brady arrhythmia"" and ""tachyarythmia,"" which does not align exactly with the reference. S2 and S5 accurately match the MedDRA terms used in the human reference. S6 fails to translate the primary terms and retains them in French."
 48_018,"La sécurité de pembrolizumab intraveineux en association à l'axitinib ou au lenvatinib dans le CCR avancé,
 et en association au lenvatinib dans le CE avancé, a été évaluée chez un total de 1 456 patients atteints d’un
-CCR avancé ou d’un CE avancé rec","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced RCC,
+CCR avancé ou d’un CE avancé recevant 200 mg de pembrolizumab toutes les 3 semaines avec soit 5 mg
+d’axitinib deux fois par jour, soit 20 mg de lenvatinib une fois par jour dans les études cliniques, selon le cas.","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced RCC,
 and in combination with lenvatinib in advanced EC has been evaluated in a total of 1 456 patients with
-advanced RCC or advanced EC receiving 200 mg pe","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced CCR, and in combination with lenvatinib in advanced CE, was assessed in a total of 1,456 patients with ad","The safety of pembrolizumab intravenous in combination with axitinib or lenvatinib in advanced CCR, and lenvatinib in advanced CE, was evaluated in a total of 1,456 patients with advanced CCR or CE re","The safety of intravenous pembrolizumab in combination with axitinib (5 mg orally twice a day) or lenvatinib (20 mg orally once a day) was evaluated in 1,456 patients with advanced CCR or CE, receivin","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced CCR, and in combination with lenvatinib in advanced CE, has been evaluated in a total of 1,456 patients w",pembrolizumab in combination with axitinib or lenvatinib,MIXED,MISS,HYPERNYM,CORRECT_TERM,MISS,Yes,Yes,HUMAN,REGISTER_MISMATCH,"The human reference uses a mix of technical terms and descriptive phrases, aligning with typical clinical reporting style, whereas S5 strictly adheres to MedDRA terms, creating a formal technical register mismatch with the human style.",,,"I'm ready to assist you with the error analysis for the segment ID: 48_018.
+advanced RCC or advanced EC receiving 200 mg pembrolizumab every 3 weeks with either axitinib
+5 mg twice daily or lenvatinib 20 mg once daily in clinical studies, as appropriate.","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced CCR, and in combination with lenvatinib in advanced CE, was assessed in a total of 1,456 patients with advanced CCR or advanced CE receiving 200 mg of pembrolizumab every 3 weeks with either 5 mg of daxitinib twice daily or 20 mg of lenvatinib once daily in clinical trials, as the case may be.","The safety of pembrolizumab intravenous in combination with axitinib or lenvatinib in advanced CCR, and lenvatinib in advanced CE, was evaluated in a total of 1,456 patients with advanced CCR or CE receiving 200 mg of pembrolizumab every 3 weeks with either 5 mg of axitinib twice daily or 20 mg of lenvatinib once daily, depending on the case, in clinical studies.","The safety of intravenous pembrolizumab in combination with axitinib (5 mg orally twice a day) or lenvatinib (20 mg orally once a day) was evaluated in 1,456 patients with advanced CCR or CE, receiving 200 mg of pembrolizumab every 3 weeks accordingly.","The safety of intravenous pembrolizumab in combination with axitinib or lenvatinib in advanced CCR, and in combination with lenvatinib in advanced CE, has been evaluated in a total of 1,456 patients with advanced CCR or advanced CE receiving 200 mg of pembrolizumab every 3 weeks with either 5 mg of daxitinib twice daily or 20 mg of lenvatinib once daily in clinical trials, as appropriate.",pembrolizumab in combination with axitinib or lenvatinib,MIXED,MISS,HYPERNYM,CORRECT_TERM,MISS,Yes,Yes,HUMAN,REGISTER_MISMATCH,"The human reference uses a mix of technical terms and descriptive phrases, aligning with typical clinical reporting style, whereas S5 strictly adheres to MedDRA terms, creating a formal technical register mismatch with the human style.",,,"I'm ready to assist you with the error analysis for the segment ID: 48_018.
 
 1. PRIMARY_TERM: pembrolizumab in combination with axitinib or lenvatinib
 2. HUMAN_REGISTER: MIXED
@@ -188,10 +444,40 @@ clinical studies.","Long-term safety data for pembrolizumab in adolescents with 
 48_014,"Les incidences des effets
 indésirables de Grades 3-5 chez les patients avec un CBNPC étaient de 69 % pour le traitement par
 pembrolizumab en association et de 61 % pour la chimiothérapie seule, chez les patients avec un CETEC
-étaient de 80 % pour le ","Incidences of
+étaient de 80 % pour le traitement par pembrolizumab en association (chimiothérapie ou RT avec ou sans
+chimiothérapie) et de 79 % pour la chimiothérapie avec cétuximab ou RT avec ou sans chimiothérapie, chez
+les patients atteints d'un cancer de l'œsophage étaient de 86 % pour le traitement par pembrolizumab en
+association et de 83 % pour la chimiothérapie seule, chez les patients atteints d’un CSTN étaient de 80 %
+pour le traitement par pembrolizumab en association et de 77 % pour la chimiothérapie seule, chez les
+patientes atteintes d'un cancer du col de l'utérus étaient de 77 % pour le traitement par pembrolizumab en
+association (chimiothérapie avec ou sans bevacizumab ou en association à une RCT) et de 71 % pour la
+chimiothérapie avec ou sans bevacizumab ou la RCT seule, chez les patients atteints d'un cancer gastrique
+étaient de 74 % pour le traitement par pembrolizumab en association (chimiothérapie avec ou sans
+trastuzumab) et de 68 % pour la chimiothérapie avec ou sans trastuzumab, chez les patients atteints d’un
+carcinome des voies biliaires étaient de 85 % pour le traitement par pembrolizumab en association et 84 %
+pour la chimiothérapie seule, chez les patientes atteintes d’un CE étaient de 59 % pour le traitement par
+pembrolizumab en association et 46 % pour la chimiothérapie seule, chez les patients atteints d’un
+181
+mésothéliome pleural malin étaient de 44 % pour le traitement par pembrolizumab en association et 30 %
+pour la chimiothérapie seule et chez les patientes atteintes d’un cancer de l’ovaire étaient de 83 % pour le
+traitement par pembrolizumab en association (chimiothérapie avec ou sans bevacizumab) et de 71 % pour la
+chimiothérapie avec ou sans bevacizumab.","Incidences of
 Grades 3-5 adverse reactions in patients with NSCLC were 69% for pembrolizumab combination
 therapy and 61% for chemotherapy alone, in patients with HNSCC were 80% for pembrolizumab
-combination therapy (chemotherapy or RT with or without","The incidence of Grade 3-5 adverse events in patients with CBNPC was 69% for pembrolizumab treatment in combination and 61% for chemotherapy alone, in patients with CETEC was 80% for pembrolizumab tre","The incidences of Grades 3-5 adverse events in patients with CBNPC were 69% for the treatment with pembrolizumab in combination and 61% for monotherapy with chemotherapy, in patients with CETEC were 8","The incidences of Grades 3-5 adverse events in patients with CBNPC were 69% for the treatment with pembrolizumab in combination and 61% for chemotherapy alone, in patients with CETEC were 80% for the ","The incidence of Grades 3-5 adverse effects in CBNPC patients was 69% for pembrolizumab treatment in association and 61% for pembrolizumab chemotherapy alone, in CETEC patients was 80% for pembrolizum",Grade 3-5 adverse events,TECHNICAL,PARAPHRASE,PARAPHRASE,PARAPHRASE,PARAPHRASE,No,Yes,HUMAN,TERM_DRIFT,"The human reference uses ""adverse reactions"" while other systems use ""adverse events,"" indicating a lack of alignment with the human's choice of terminology. Despite higher consistency with MedDRA terms, S5 diverges from the human style.",,,"1. PRIMARY_TERM: Grade 3-5 adverse events
+combination therapy (chemotherapy or RT with or without chemotherapy), and 79% for chemotherapy
+plus cetuximab or RT with or without chemotherapy, in patients with oesophageal carcinoma were
+86% for pembrolizumab combination therapy and 83% for chemotherapy alone, in patients with
+TNBC were 80% for pembrolizumab combination therapy and 77% for chemotherapy alone, in
+patients with cervical cancer were 77% for pembrolizumab combination therapy (chemotherapy with
+or without bevacizumab or in combination with CRT) and 71% for chemotherapy with or without
+bevacizumab or CRT alone, in patients with gastric cancer were 74% for pembrolizumab combination
+therapy (chemotherapy with or without trastuzumab) and 68% for chemotherapy with or without
+trastuzumab, in patients with biliary tract carcinoma were 85% for pembrolizumab combination
+therapy and 84% for chemotherapy alone, in patients with EC were 59% for pembrolizumab
+combination therapy and 46% for chemotherapy alone and in patients with malignant pleural
+mesothelioma were 44% for pembrolizumab combination therapy and 30% for chemotherapy alone.","The incidence of Grade 3-5 adverse events in patients with CBNPC was 69% for pembrolizumab treatment in combination and 61% for chemotherapy alone, in patients with CETEC was 80% for pembrolizumab treatment in combination (chemotherapy or RT with or without chemotherapy) and 79% for chemotherapy with or without CBNPC, in patients with esophageal cancer was 86% for pembrolizumab treatment in combination and 83% for chemotherapy alone, in patients with CETEC was 80% for pembrolizumab treatment in combination with or without chemotherapy alone and 74% for chemotherapy alone, in patients with or without chemotherapy alone, in patients with 84% for pembrolizumab and 58% for chemotherapy alone, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy, in patients with or without chemotherapy,","The incidences of Grades 3-5 adverse events in patients with CBNPC were 69% for the treatment with pembrolizumab in combination and 61% for monotherapy with chemotherapy, in patients with CETEC were 80% for the treatment with pembrolizumab in combination (chemotherapy or RT with or without chemotherapy) and 79% for chemotherapy with cetuximab or RT with or without chemotherapy, in patients with esophageal cancer were 86% for the treatment with pembrolizumab in combination and 83% for monotherapy with chemotherapy, in patients with CSTN were 80% for the treatment with pembrolizumab in combination (chemotherapy or RT) and 77% for chemotherapy or RT, in patients with cervical cancer were 77% for the treatment with pembrolizumab in combination (chemotherapy or RT) and 71% for chemotherapy or RT, in patients with gastric cancer were 74% for the treatment with pembrolizumab in combination (chemotherapy) and 68% for chemotherapy, in patients with biliary cancer were 85% for the treatment with pembrolizumab in combination and 84% for monotherapy with chemotherapy, in patients with mesothelioma were 44% for the treatment with pembrolizumab in combination and 30% for monotherapy with chemotherapy, and in patients with ovarian cancer were 83% for the treatment with pembrolizumab in combination (chemotherapy) and 71% for chemotherapy.","The incidences of Grades 3-5 adverse events in patients with CBNPC were 69% for the treatment with pembrolizumab in combination and 61% for chemotherapy alone, in patients with CETEC were 80% for the treatment with pembrolizumab in combination (chemotherapy or RT with or without chemotherapy) and 79% for chemotherapy with cetuximab or RT with or without chemotherapy, in patients with cancer of the esophagus were 86% for the treatment with pembrolizumab in combination and 83% for chemotherapy alone, in patients with CSTN were 80% for the treatment with pembrolizumab in combination and 77% for chemotherapy alone, in patients with cancer of the distal colon were 77% for the treatment with pembrolizumab in combination (chemotherapy with or without bevacizumab or in association with a RCT) and 71% for chemotherapy with or without bevacizumab or the RCT alone, in patients with gastric cancer were 74% for the treatment with pembrolizumab in combination (chemotherapy with or without trastuzumab) and 68% for chemotherapy with or without trastuzumab, in patients with bile duct carcinoma were 85% for the treatment with pembrolizumab in combination and 84% for chemotherapy alone, in patients with CE were 59% for the treatment with pembrolizumab in combination and 46% for chemotherapy alone, in patients with malignant pleural mesothelioma were 44% for the treatment with pembrolizumab in combination and 30% for chemotherapy alone, and in patients with ovarian cancer were 83% for the treatment with pembrolizumab in combination (chemotherapy with or without bevacizumab) and 71% for chemotherapy with or without bevacizumab.
+
+(Note: CBNPC = Colorectal cancer, stage III or stage IV (non-small cell); CETEC = Colorectal cancer, stage II; CSTN = Colorectal cancer, stage I","The incidence of Grades 3-5 adverse effects in CBNPC patients was 69% for pembrolizumab treatment in association and 61% for pembrolizumab chemotherapy alone, in CETEC patients was 80% for pembrolizumab treatment in association (with or without chemotherapy) and 79% for pembrolizumab chemotherapy or RT chemotherapy with or without chemotherapy, in patients with pembrolizumab in association and 61% for pembrolizumab chemotherapy alone, in patients with pembrolizumab chemotherapy or pembrolizumab chemotherapy in association with pembrolizumab chemotherapy or pembrolizumab chemotherapy in association with pembrolizumab chemotherapy or pembrolizumab chemotherapy, in patients with pembrolizumab chemotherapy in association with pembrolizumab chemotherapy or pembrolizumabotherapy, in patients with pembrolizumab chemotherapy or pembrolizumabotherapy alone, in patients with pembrolizumab chemotherapy in association with pembrolizumabotherapy and pembrolizumabotherapy",Grade 3-5 adverse events,TECHNICAL,PARAPHRASE,PARAPHRASE,PARAPHRASE,PARAPHRASE,No,Yes,HUMAN,TERM_DRIFT,"The human reference uses ""adverse reactions"" while other systems use ""adverse events,"" indicating a lack of alignment with the human's choice of terminology. Despite higher consistency with MedDRA terms, S5 diverges from the human style.",,,"1. PRIMARY_TERM: Grade 3-5 adverse events
 2. HUMAN_REGISTER: TECHNICAL
 3. S1_PATTERN: PARAPHRASE
 4. S2_PATTERN: PARAPHRASE
@@ -219,7 +505,7 @@ combination therapy (chemotherapy or RT with or without","The incidence of Grade
 48_119,"Le profil de sécurité chez les patients pédiatriques était généralement similaire à celui observé chez
 les adultes traités par pembrolizumab.","In the intravenous
 pembrolizumab arm, 0.9% (1/114) of patients developed treatment-emergent anti-pembrolizumab
-antibodies and 0% (0/114) developed neutralising antibodies.",The safety profile in paediatric patients was generally similar to that seen in pembrolizumab-treated adults.,The safety profile in pediatric patients was generally similar to that observed in adults treated with pembrolizumab.,The safety profile in pediatric patients was generally similar to that observed in adult patients treated with pembrolizumab. [No need to translate as there are no French terms to translate in this se,The safety profile in pediatric patients was generally similar to that seen in pembrolizumab-treated adults.,pembrolizumab,NO_TERM,NO_TERM,NO_TERM,NO_TERM,NO_TERM,No,No,TIE,NO_ERROR,"The focus of this segment is on the comparison of safety profiles, and there is no significant medical term to translate. All systems produce outputs that align with the structure used by a certified EMA translator.",,,"Certainly! Here's the detailed analysis for the segment:
+antibodies and 0% (0/114) developed neutralising antibodies.",The safety profile in paediatric patients was generally similar to that seen in pembrolizumab-treated adults.,The safety profile in pediatric patients was generally similar to that observed in adults treated with pembrolizumab.,The safety profile in pediatric patients was generally similar to that observed in adult patients treated with pembrolizumab. [No need to translate as there are no French terms to translate in this sentence.],The safety profile in pediatric patients was generally similar to that seen in pembrolizumab-treated adults.,pembrolizumab,NO_TERM,NO_TERM,NO_TERM,NO_TERM,NO_TERM,No,No,TIE,NO_ERROR,"The focus of this segment is on the comparison of safety profiles, and there is no significant medical term to translate. All systems produce outputs that align with the structure used by a certified EMA translator.",,,"Certainly! Here's the detailed analysis for the segment:
 
 1. PRIMARY_TERM: pembrolizumab
 2. HUMAN_REGISTER: NO_TERM
@@ -238,10 +524,18 @@ inconnue.","171
 Laboratory abnormalities
 In patients treated with pembrolizumab monotherapy, the proportion of patients who experienced a
 shift from baseline to a Grade 3 or 4 laboratory abnormality was as follows: 9.9% for lymphocytes
-decreased, 7.3% for sodium",The clinical relevance of the development of recombinant anti-berahyaluronidase alfa antibodies following subcutaneous pembrolizumab treatment is unknown.,The clinical relevance of developing anti-berahyaluronidase alfa recombinant antibodies after pembrolizumab subcutaneous treatment is unknown.,"The clinical relevance of the development of anticorps anti-berahyaluronidase alfa recombinant after subcutaneous treatment with pembrolizumab is unknown.
+decreased, 7.3% for sodium decreased, 5.7% for haemoglobin decreased, 4.6% for glucose increased,
+4.5% for phosphate decreased, 3.1% for ALT increased, 2.9% for AST increased, 2.6% for alkaline
+phosphatase increased, 2.2% for potassium decreased, 2.1% for neutrophils decreased, 1.7% for
+bilirubin increased, 1.7% for platelets decreased, 1.7% for potassium increased, 1.6% for calcium
+increased, 1.4% for albumin decreased, 1.3% for calcium decreased, 1.2% for creatinine increased,
+0.8% for leukocytes decreased, 0.8% for magnesium increased, 0.6% for glucose decreased, 0.2% for
+magnesium decreased, and 0.2% for sodium increased.",The clinical relevance of the development of recombinant anti-berahyaluronidase alfa antibodies following subcutaneous pembrolizumab treatment is unknown.,The clinical relevance of developing anti-berahyaluronidase alfa recombinant antibodies after pembrolizumab subcutaneous treatment is unknown.,"The clinical relevance of the development of anticorps anti-berahyaluronidase alfa recombinant after subcutaneous treatment with pembrolizumab is unknown.
 
 Translation:
-The clinical relevance of the d",The clinical relevance of the development of recombinant anti-berahyaluronidase alfa antibodies following subcutaneous pembrolizumab treatment is unknown.,recombinant anti-berahyaluronidase alfa antibodies,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,TIE,NO_ERROR,"All systems, including S5, use a technical term consistent with the MedDRA ontology. The human reference does not contain the specific segment, leading to no direct comparison on translation style for this term.",,,"1. PRIMARY_TERM: recombinant anti-berahyaluronidase alfa antibodies
+The clinical relevance of the development of anticorps anti-berahyaluronidase alfa recombinant after subcutaneous treatment with pembrolizumab is unknown.
+
+Note: Anticorps anti-berahyaluronidase alfa recombinant refers to the recombinant form of the monoclonal antibody against berahyaluronidase alpha.",The clinical relevance of the development of recombinant anti-berahyaluronidase alfa antibodies following subcutaneous pembrolizumab treatment is unknown.,recombinant anti-berahyaluronidase alfa antibodies,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,TIE,NO_ERROR,"All systems, including S5, use a technical term consistent with the MedDRA ontology. The human reference does not contain the specific segment, leading to no direct comparison on translation style for this term.",,,"1. PRIMARY_TERM: recombinant anti-berahyaluronidase alfa antibodies
 2. HUMAN_REGISTER: NO_TERM
 3. S1_PATTERN: CORRECT_TERM
 4. S2_PATTERN: CORRECT_TERM
@@ -256,7 +550,9 @@ The clinical relevance of the d",The clinical relevance of the development of re
 Grade 2 ou 3 chez 108 (1,4 %) et 9 (0,1 %) patients, respectivement.","Adrenal insufficiency resolved in 28 patients, 11 with sequelae.","Hyperthyroidism occurred in 394 (5.2%) patients receiving pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.","Hyperthyroidism occurred in 394 (5.2%) patients receiving pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.","A hyperthyroidism event occurred in 394 (5.2%) patients receiving pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.
 
 Translation:
-An hyperthyroidism event ","Hyperthyroidism occurred in 394 (5.2%) patients receiving pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.",Hyperthyroidism,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,S1,NO_ERROR,"The human reference skipped the primary condition term, making the machine translations technically more accurate despite differing from the reference.",,,"```plaintext
+An hyperthyroidism event occurred in 394 (5.2%) patients treated with pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.
+
+Therefore, the translation for 'une hyperthyroïdie' is 'an hyperthyroidism event'. The MedDRA term for hyperthyroidism is 'Hyperthyroidism' (MedDRA HL code H04.01), but in this context, the French term 'hypothyroïdie' is specifically referring to an adverse event, so the MedDRA LLT term 'Hypercarotinaemia' (MedDRA LLT code L5) is the exact preferred English rendering.","Hyperthyroidism occurred in 394 (5.2%) patients receiving pembrolizumab, including Grade 2 or 3 cases in 108 (1.4%) and 9 (0.1%) patients, respectively.",Hyperthyroidism,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,S1,NO_ERROR,"The human reference skipped the primary condition term, making the machine translations technically more accurate despite differing from the reference.",,,"```plaintext
 PRIMARY_TERM: Hyperthyroidism
 HUMAN_REGISTER: NO_TERM
 S1_PATTERN: CORRECT_TERM
@@ -271,9 +567,23 @@ ANNOTATION_NOTE: The human reference skipped the primary condition term, making 
 ```"
 48_012,"La sécurité de pembrolizumab intraveineux en association à une chimiothérapie, une RT ou une RCT a été
 évaluée dans des études cliniques chez 7 015 patients dans différents types de tumeurs recevant 200 mg,
-2 mg/kg de poids corporel ou 10 mg/kg de po","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CRT has been
+2 mg/kg de poids corporel ou 10 mg/kg de poids corporel de pembrolizumab toutes les 3 semaines ou 400
+mg de pembrolizumab toutes les 6 semaines.","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CRT has been
 evaluated in 6 695 patients across tumour types receiving 200 mg, 2 mg/kg bw or 10 mg/kg bw
-pembrolizumab every 3 weeks, in clinical studies.","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CT has been evaluated in clinical studies in 7,015 patients in different tumour types receiving 200 mg, 2 mg/ kg body we","The safety of pembrolizumab intravenous in combination with chemotherapy, radiation therapy (RT), or radiochemotherapy (RCT) was evaluated in clinical studies involving 7,015 patients with various typ","The safety of intravenous pembrolizumab in combination with chemotherapy, radiotherapy, or radiochemotherapy was evaluated in clinical studies involving 7,015 patients with various types of tumors rec","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or RCT has been evaluated in clinical studies in 7,015 patients in different types of tumors receiving 200 mg, 2 mg/kg of p",pembrolizumab,TECHNICAL,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,HUMAN,NO_ERROR,"All systems correctly translated pembrolizumab in combination with medical procedures such as chemotherapy, RT, or RCT. The human reference and systems primarily used technical terms consistently, aligning with the formal style of regulatory documents.",,,"1. PRIMARY_TERM: pembrolizumab
+pembrolizumab every 3 weeks, in clinical studies.","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or CT has been evaluated in clinical studies in 7,015 patients in different tumour types receiving 200 mg, 2 mg/ kg body weight or 10 mg/ kg body weight of pembrolizumab every 3 weeks or 400 mg of pembrolizumab every 6 weeks.","The safety of pembrolizumab intravenous in combination with chemotherapy, radiation therapy (RT), or radiochemotherapy (RCT) was evaluated in clinical studies involving 7,015 patients with various types of tumors receiving 200 mg, 2 mg/kg body weight, or 10 mg/kg body weight of pembrolizumab every 3 weeks or 400 mg of pembrolizumab every 6 weeks.","The safety of intravenous pembrolizumab in combination with chemotherapy, radiotherapy, or radiochemotherapy was evaluated in clinical studies involving 7,015 patients with various types of tumors receiving 200 mg, 2 mg/kg body weight, or 10 mg/kg body weight of pembrolizumab every 3 weeks or 400 mg of pembrolizumab every 6 weeks.
+
+Translation:
+La sécurité de la thérapie intraveineuse de pembrolizumab en association à une chimiothérapie, une radiothérapie ou une chimiothérapie radiothérapie a été évaluée dans des études cliniques chez 7 015 patients ayant des tumeurs différentes recevant 200 mg, 2 mg/kg de poids corporel ou 10 mg/kg de poids corporel de pembrolizumab tous les 3 semaines ou 400 mg de pembrolizumab tous les 6 semaines.
+
+The safety of intravenous pembrolizumab in combination with chemotherapy, radiotherapy, or radiochemotherapy was evaluated in clinical studies involving 7,015 patients with different types of tumors receiving 200 mg, 2 mg/kg body weight, or 10 mg/kg body weight of pembrolizumab every 3 weeks or 400 mg of pembrolizumab every 6 weeks.
+
+Exact translations:
+
+* 'hypothyroïdie' → 'hypothyroidism' (MedDRA LLT L03.01)
+* 'Hypercarotinaemia' → 'Hypercarotenemia' (MedDRA LLT L5.01)
+* 'poids corporel' → 'body weight' (MedDRA LLT L06.01)
+* 'pembrolizumab' → 'pembrolizumab' (MedDRA LLT L01.00.01)
+* 'chimiothérapie' → 'chemotherapy' (MedDRA LLT L01.B0","The safety of intravenous pembrolizumab in combination with chemotherapy, RT or RCT has been evaluated in clinical studies in 7,015 patients in different types of tumors receiving 200 mg, 2 mg/kg of pembrolizumab or 10 mg/kg of pembrolizumab every 3 weeks or 400 mg of pembrolizumab every 6 weeks.",pembrolizumab,TECHNICAL,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,HUMAN,NO_ERROR,"All systems correctly translated pembrolizumab in combination with medical procedures such as chemotherapy, RT, or RCT. The human reference and systems primarily used technical terms consistently, aligning with the formal style of regulatory documents.",,,"1. PRIMARY_TERM: pembrolizumab
 
 2. HUMAN_REGISTER: TECHNICAL
 
@@ -327,12 +637,13 @@ Hepatitis occurred in 80 (1.0%) patients, including Grade 2, 3 or 4 cases in 12 
 ```"
 48_005,"Pembrolizumab en monothérapie (voir rubrique 4.2)
 La sécurité de pembrolizumab intraveineux en monothérapie a été évaluée dans des études cliniques chez
-7 631 patients dans différents types de tumeurs et avec quatre doses (2 mg/kg de poids corporel t","Pembrolizumab in monotherapy (see section 4.2)
+7 631 patients dans différents types de tumeurs et avec quatre doses (2 mg/kg de poids corporel toutes les
+3 semaines, 200 mg toutes les 3 semaines ou 10 mg/kg de poids corporel toutes les 2 ou 3 semaines).","Pembrolizumab in monotherapy (see section 4.2)
 The safety of intravenous pembrolizumab as monotherapy has been evaluated in 7 631 patients across
 tumour types and across four doses (2 mg/kg bw every 3 weeks, 200 mg every 3 weeks, or 10 mg/kg
-bw every","Pembrolizumab monotherapy (see section 4.2) The safety of pembrolizumab intravenous monotherapy has been evaluated in clinical studies in 7,631 patients with different types of tumours and at four dos","Pembrolizumab monotherapy (refer to section 4.2)
-The safety of intravenous pembrolizumab monotherapy was evaluated in clinical studies in 7,631 patients with various types of tumors and with four dosi","Monotherapy with pembrolizumab (see section 4.2)
-The safety of intravenous pembrolizumab monotherapy was assessed in clinical studies in 7,631 patients with various types of tumors and with four dosin","The safety of pembrolizumab intravenous pembrolizumab monotherapy has been evaluated in clinical studies in 7,631 patients in different types of tumors and with four doses (2 mg/kg body weight every 3",Pembrolizumab,NO_TERM,NO_TERM,NO_TERM,NO_TERM,NO_TERM,No,No,TIE,NO_ERROR,"All systems correctly handle the translation of ""pembrolizumab,"" maintaining technical accuracy without deviating from the source. No MedDRA-specific terminology appears in the segment, hence, all outputs are consistent with the human reference.",,,"```plaintext
+bw every 2 or 3 weeks) in clinical studies.","Pembrolizumab monotherapy (see section 4.2) The safety of pembrolizumab intravenous monotherapy has been evaluated in clinical studies in 7,631 patients with different types of tumours and at four doses (2 mg/ kg body weight every 3 weeks, 200 mg every 3 weeks or 10 mg/ kg body weight every 2 or 3 weeks).","Pembrolizumab monotherapy (refer to section 4.2)
+The safety of intravenous pembrolizumab monotherapy was evaluated in clinical studies in 7,631 patients with various types of tumors and with four dosing regimens (2 mg/kg body weight every 3 weeks, 200 mg every 3 weeks, or 10 mg/kg body weight every 2 or 3 weeks).","Monotherapy with pembrolizumab (see section 4.2)
+The safety of intravenous pembrolizumab monotherapy was assessed in clinical studies in 7,631 patients with various types of tumors and with four dosing regimens (2 mg/kg body weight every 3 weeks, 200 mg every 3 weeks, or 10 mg/kg body weight every 2 or 3 weeks).","The safety of pembrolizumab intravenous pembrolizumab monotherapy has been evaluated in clinical studies in 7,631 patients in different types of tumors and with four doses (2 mg/kg body weight every 3 weeks, 200 mg every 3 weeks or 10 mg/kg body weight every 2 or 3 weeks).",Pembrolizumab,NO_TERM,NO_TERM,NO_TERM,NO_TERM,NO_TERM,No,No,TIE,NO_ERROR,"All systems correctly handle the translation of ""pembrolizumab,"" maintaining technical accuracy without deviating from the source. No MedDRA-specific terminology appears in the segment, hence, all outputs are consistent with the human reference.",,,"```plaintext
 PRIMARY_TERM: Pembrolizumab
 HUMAN_REGISTER: NO_TERM
 S1_PATTERN: NO_TERM
@@ -350,9 +661,12 @@ La déclaration des effets indésirables suspectés après autorisation du médi
 Intravenous formulation
 The safety of pembrolizumab as monotherapy has been evaluated in 161 paediatric patients aged
 9 months to 17 years with advanced melanoma, lymphoma, or PD-L1 positive advanced, relapsed, or
-refractory solid tumours at 2 mg",Suspected adverse reactions Reporting of suspected adverse reactions after authorisation of the medicinal product is important.,Reporting of suspected adverse reactions is important.,"Suspected adverse reaction reporting after marketing authorization is important.
+refractory solid tumours at 2 mg/kg bw every 3 weeks in the Phase I/II study KEYNOTE-051.",Suspected adverse reactions Reporting of suspected adverse reactions after authorisation of the medicinal product is important.,Reporting of suspected adverse reactions is important.,"Suspected adverse reaction reporting after marketing authorization is important.
 
-However, in the context provided, the term ""hypothyroïdie"" is translated as ""Hypercarotinaemia"" in MedDRA, and the sen",Declaration of suspected adverse reactions Declaration of suspected adverse reactions after drug authorization is important.,Suspected adverse reactions,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,No,TIE,NO_ERROR,"All systems accurately translate ""Déclaration des effets indésirables suspectés"" and convey the importance of reporting. There is no notable error or deviation from human-like translation in this segment.",,,"1. PRIMARY_TERM: Suspected adverse reactions
+However, in the context provided, the term ""hypothyroïdie"" is translated as ""Hypercarotinaemia"" in MedDRA, and the sentence should be:
+
+Declaration of suspected adverse reactions
+The reporting of suspected adverse reactions after marketing authorization is important.",Declaration of suspected adverse reactions Declaration of suspected adverse reactions after drug authorization is important.,Suspected adverse reactions,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,No,TIE,NO_ERROR,"All systems accurately translate ""Déclaration des effets indésirables suspectés"" and convey the importance of reporting. There is no notable error or deviation from human-like translation in this segment.",,,"1. PRIMARY_TERM: Suspected adverse reactions
 2. HUMAN_REGISTER: NO_TERM
 3. S1_PATTERN: CORRECT_TERM
 4. S2_PATTERN: CORRECT_TERM
@@ -369,7 +683,7 @@ intraveineux.","Of these patients, 55% had
 no recurrence of ALT > 3 times ULN, and of those patients with recurrence of ALT > 3 times ULN,
 all recovered.",The immunogenicity profile of subcutaneous pembrolizumab was consistent with the known immunogenicity profile of intravenous pembrolizumab.,The immunogenicity profile of subcutaneously administered pembrolizumab was consistent with that of intravenously administered pembrolizumab.,"The subcutaneous immunogenicity profile of pembrolizumab was consistent with the known intravenous immunogenicity profile.
 
-No translation needed for the given French terms in this context as they hav",The immunogenicity profile of pembrolizumab subcutaneously was consistent with the known immunogenicity profile of pembrolizumab intravenously.,immunogenicity profile,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,No,TIE,NO_ERROR,"All systems provided an accurate and consistent translation of the term ""immunogenicity profile"" in this segment. No MedDRA-preferred terminology was needed here.",,,"1. PRIMARY_TERM: immunogenicity profile
+No translation needed for the given French terms in this context as they have already been provided in the MedDRA context.",The immunogenicity profile of pembrolizumab subcutaneously was consistent with the known immunogenicity profile of pembrolizumab intravenously.,immunogenicity profile,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,No,TIE,NO_ERROR,"All systems provided an accurate and consistent translation of the term ""immunogenicity profile"" in this segment. No MedDRA-preferred terminology was needed here.",,,"1. PRIMARY_TERM: immunogenicity profile
 2. HUMAN_REGISTER: NO_TERM
 3. S1_PATTERN: CORRECT_TERM
 4. S2_PATTERN: CORRECT_TERM
@@ -386,23 +700,555 @@ Classification Monothérapie En association avec En association
 MedDRA une chimiothérapie, avec axitinib ou
 par organe et une radiothérapie lenvatinib
 par ou une
-fréquenc","†
+fréquence radiochimiothérapie
+Infections et infestations
+Très fréquent infections des
+voies urinaires
+Fréquent pneumonie pneumonie pneumonie
+Affections hématologiques et du système lymphatique
+Très fréquent anémie anémie, neutropénie, anémie
+thrombopénie
+Fréquent thrombopénie, neutropénie fébrile, neutropénie,
+neutropénie, leucopénie, thrombopénie,
+lymphopénie lymphopénie lymphopénie,
+leucopénie
+Peu fréquent leucopénie, anémie hémolytique⁎, éosinophilie
+thrombopénie éosinophilie
+immunitaire,
+éosinophilie
+Rare anémie thrombopénie
+hémolytique⁎, immunitaire
+lymphohistiocytose
+hémophagocytaire,
+érythroblastopénie
+Affections du système immunitaire
+Fréquent réaction liée à la réaction liée à la réaction liée à la
+perfusion⁎ perfusion⁎ perfusion⁎
+Peu fréquent sarcoïdose⁎
+Rare sarcoïdose
+Fréquence rejet de greffe
+indéterminée d’organe solide
+Affections endocriniennes
+Très fréquent hypothyroïdie⁎ hypothyroïdie⁎ hypothyroïdie
+Fréquent hyperthyroïdie insuffisance insuffisance
+surrénalienne⁎, surrénalienne⁎,
+hyperthyroïdie⁎, hyperthyroïdie,
+thyroïdite⁎ thyroïdite⁎
+Peu fréquent insuffisance hypophysite⁎ hypophysite⁎
+surrénalienne⁎,
+hypophysite⁎,
+thyroïdite⁎
+Rare hypoparathyroïdie hypoparathyroïdie hypoparathyroïdie
+Troubles du métabolisme et de la nutrition
+Très fréquent diminution de hypokaliémie, diminution de
+l’appétit diminution de l’appétit
+l’appétit
+Fréquent hyponatrémie, hyponatrémie, hyponatrémie,
+hypokaliémie, hypocalcémie hypokaliémie,
+hypocalcémie hypocalcémie
+Peu fréquent diabète de type I⁎ diabète de type I⁎ diabète de type I⁎
+183
+Classification Monothérapie En association avec En association
+MedDRA une chimiothérapie, avec axitinib ou
+par organe et une radiothérapie lenvatinib
+par ou une
+fréquence radiochimiothérapie
+Affections psychiatriques
+Très fréquent insomnie
+Fréquent insomnie insomnie
+Affections du système nerveux
+Très fréquent céphalée neuropathie céphalée,
+périphérique, dysgueusie
+céphalées
+Fréquent étourdissements, étourdissements, étourdissements,
+neuropathie dysgueusie neuropathie
+périphérique, périphérique,
+léthargie, léthargie
+dysgueusie
+Peu fréquent syndrome encéphalite⁎, syndrome
+myasthénique⁎, léthargie myasthénique⁎,
+épilepsie encéphalite⁎
+Rare syndrome de syndrome névrite optique
+Guillain-Barré⁎, myasthénique⁎,
+encéphalite⁎, syndrome de
+myélite⁎, névrite Guillain-Barré⁎,
+optique, méningite myélite, névrite
+(aseptique)⁎ optique, épilepsie,
+méningite (aseptique)
+Affections oculaires
+Fréquent sécheresse oculaire sécheresse oculaire sécheresse oculaire
+Peu fréquent uvéite⁎ uvéite⁎ uvéite⁎
+Rare syndrome de Vogt- syndrome de
+Koyanagi-Harada Vogt-Koyanagi-
+Harada
+Affections cardiaques
+Fréquent arythmie arythmie cardiaque‡ arythmie
+cardiaque‡ (y (y compris cardiaque‡ (y
+compris fibrillation fibrillation compris
+auriculaire) auriculaire) fibrillation
+auriculaire)
+Peu fréquent myocardite, myocardite⁎, myocardite,
+péricardite⁎, péricardite⁎, épanchement
+épanchement épanchement péricardique
+péricardique péricardique
+Affections vasculaires
+Très fréquent hypertension
+Fréquent hypertension hypertension
+Peu fréquent vascularite⁎ vascularite⁎
+Rare vascularite⁎
+184
+Classification Monothérapie En association avec En association
+MedDRA une chimiothérapie, avec axitinib ou
+par organe et une radiothérapie lenvatinib
+par ou une
+fréquence radiochimiothérapie
+Affections respiratoires, thoraciques et médiastinales
+Très fréquent dyspnée, toux dyspnée, toux dyspnée, toux
+Fréquent pneumopathie pneumopathie pneumopathie
+inflammatoire⁎ inflammatoire⁎ inflammatoire⁎
+Affections gastro-intestinales
+Très fréquent diarrhée, douleurs diarrhée, nausées, diarrhée, douleurs
+abdominales⁎, vomissements, abdominales⁎,
+nausées, douleurs nausées,
+vomissements, abdominales⁎, vomissements,
+constipation constipation constipation
+Fréquent colite⁎, sécheresse colite⁎, gastrite⁎, colite⁎,
+buccale sécheresse buccale pancréatite⁎,
+gastrite⁎,
+sécheresse buccale
+Peu fréquent pancréatite⁎, pancréatite⁎, ulcération gastro-
+gastrite⁎, ulcération ulcération gastro- intestinale⁎
+gastro-intestinale⁎ intestinale⁎
+Rare insuffisance insuffisance perforation de
+pancréatique pancréatique l’intestin grêle
+exocrine, exocrine, perforation
+perforation de de l’intestin grêle,
+l’intestin grêle, maladie coeliaque
+maladie coeliaque
+Fréquence insuffisance
+indéterminée pancréatique
+exocrine, maladie
+coeliaque
+Troubles hépatobiliaires
+Fréquent hépatite⁎ hépatite⁎ hépatite⁎
+Rare cholangite cholangite
+sclérosante sclérosante⁎
+Affections de la peau et du tissu sous-cutané
+Très fréquent prurit⁎, éruption alopécie, prurit⁎, éruption cutanée⁎,
+cutanée⁎ éruption cutanée⁎ prurit⁎
+Fréquent réactions cutanées réactions cutanées réactions cutanées
+sévères⁎, érythème, sévères⁎, dermatite, sévères⁎,
+dermatite, érythème, sécheresse dermatite,
+sécheresse cutanée, cutanée, dermatite sécheresse
+vitiligo⁎, eczéma, acnéiforme, eczéma cutanée, érythème,
+alopécie, dermatite dermatite
+acnéiforme acnéiforme,
+alopécie
+Peu fréquent psoriasis, kératose psoriasis, kératose eczéma, kératose
+lichénoïde⁎, papule, lichénoïde⁎, vitiligo⁎, lichénoïde⁎,
+modification de la papule psoriasis, vitiligo⁎,
+couleur des papule,
+cheveux modification de la
+couleur des
+cheveux
+Rare syndrome de syndrome de nécrolyse
+185
+Classification Monothérapie En association avec En association
+MedDRA une chimiothérapie, avec axitinib ou
+par organe et une radiothérapie lenvatinib
+par ou une
+fréquence radiochimiothérapie
+Stevens-Johnson, Stevens-Johnson, épidermique
+érythème noueux, érythème noueux, toxique, syndrome
+nécrolyse modification de la de Stevens-
+épidermique couleur des cheveux Johnson
+toxique
+Affections musculo-squelettiques et systémiques
+Très fréquent douleur musculo- arthralgie, douleur arthralgie, douleur
+squelettique⁎, musculo- musculo-
+arthralgie squelettique⁎ squelettique⁎,
+myosite⁎, douleur
+aux extrémités
+Fréquent myosite⁎, douleur myosite⁎, douleur aux arthrite⁎
+aux extrémités, extrémités, arthrite⁎
+arthrite⁎
+Peu fréquent ténosynovite⁎ ténosynovite⁎ ténosynovite⁎
+Rare syndrome de syndrome de Sjögren syndrome de
+Sjögren Sjögren
+Troubles du rein et des voies urinaires
+Fréquent insuffisance rénale néphrite⁎
+aiguë
+Peu fréquent néphrite⁎ néphrite⁎, cystite non
+infectieuse
+Rare cystite non cystite non
+infectieuse infectieuse
+Troubles généraux et anomalies au site d'administration
+Très fréquent fatigue, asthénie, fatigue, asthénie, fatigue, asthénie,
+œdème⁎, fièvre fièvre, œdème⁎ œdème⁎, fièvre
+Fréquent syndrome pseudo- syndrome pseudo- syndrome pseudo-
+grippal, frissons grippal, frissons, grippal, frissons
+réaction au site
+d’injection§
+Investigations
+Très fréquent augmentation de augmentation de la
+l’alanine lipase,
+aminotransférase, augmentation de
+augmentation de l’alanine
+l’aspartate aminotransférase,
+aminotransférase augmentation de
+l’aspartate
+aminotransférase,
+augmentation de la
+créatininémie
+Fréquent augmentation de augmentation de la augmentation de
+l’alanine bilirubinémie, l’amylase,
+aminotransférase, augmentation des augmentation de la
+augmentation de phosphatases bilirubinémie,
+l’aspartate alcalines sanguines, augmentation des
+aminotransférase, augmentation de la phosphatases
+augmentation des créatininémie, alcalines
+phosphatases hypercalcémie sanguines,
+186
+Classification Monothérapie En association avec En association
+MedDRA une chimiothérapie, avec axitinib ou
+par organe et une radiothérapie lenvatinib
+par ou une
+fréquence radiochimiothérapie
+alcalines sanguines, hypercalcémie
+hypercalcémie,
+augmentation de la
+bilirubinémie,
+augmentation de la
+créatininémie
+Peu fréquent augmentation de augmentation de
+l’amylase l’amylase
+† Les fréquences des effets indésirables présentées dans le tableau 2 peuvent ne pas être totalement attribuables à pembrolizumab seul
+mais peuvent aussi intégrer la contribution de la maladie sous-jacente ou des autres médicaments utilisés dans une association.","†
 Table 2: Adverse reactions in patients treated with pembrolizumab
 MedDRA SOC Monotherapy In combination with In combination with
 and frequency chemotherapy, axitinib or lenvatinib
 category radiation therapy or
 chemoradiotherapy
-Infections and infes","182 Table 2 : Adverse effects in patients treated with pembrolizumab thyroid pneumonia Affections of the thyroid axis and lymphatic system Very frequently In association with MedDRA chemotherapy, with","Table 2: Adverse Events with Pembrolizumab
+Infections and infestations
+Very common urinary tract infection
+Common pneumonia pneumonia pneumonia
+Blood and lymphatic system disorders
+Very common anaemia anaemia, neutropenia, anaemia
+thrombocytopenia
+Common thrombocytopenia, febrile neutropenia, neutropenia,
+neutropenia, leukopenia, lymphopenia thrombocytopenia,
+lymphopenia lymphopenia,
+leukopenia
+⁎
+Uncommon leukopenia, immune haemolytic anaemia , eosinophilia
+thrombocytopenia, eosinophilia
+eosinophilia
+Rare haemolytic immune
+⁎
+anaemia , thrombocytopenia
+haemophagocytic
+lymphohistiocytosis,
+pure red cell aplasia
+Immune system disorders
+⁎
+Common infusion-related infusion-related reaction infusion-related
+⁎ ⁎
+reaction reaction
+⁎
+Uncommon sarcoidosis
+Rare sarcoidosis
+Not known solid organ
+transplant rejection
+Endocrine disorders
+⁎ ⁎
+Very common hypothyroidism hypothyroidism hypothyroidism
+⁎ ⁎
+Common hyperthyroidism adrenal insufficiency , adrenal insufficiency ,
+⁎
+hyperthyroidism , hyperthyroidism,
+⁎ ⁎
+thyroiditis thyroiditis
+165
+MedDRA SOC Monotherapy In combination with In combination with
+and frequency chemotherapy, axitinib or lenvatinib
+category radiation therapy or
+chemoradiotherapy
+⁎ ⁎
+Uncommon adrenal hypophysitis hypophysitis
+⁎
+insufficiency ,
+⁎
+hypophysitis ,
+⁎
+thyroiditis
+Rare hypoparathyroidism hypoparathyroidism hypoparathyroidism
+Metabolism and nutrition disorders
+Very common decreased appetite hypokalaemia, decreased decreased appetite
+appetite
+Common hyponatraemia, hyponatraemia, hyponatraemia,
+hypokalaemia, hypocalcaemia hypokalaemia,
+hypocalcaemia hypocalcaemia
+⁎
+Uncommon type 1 diabetes type 1 diabetes mellitus type 1 diabetes
+⁎ ⁎
+mellitus mellitus
+Psychiatric disorders
+Very common insomnia
+Common insomnia insomnia
+Nervous system disorders
+Very common headache neuropathy peripheral, headache, dysgeusia
+headache
+Common dizziness, dizziness, dysgeusia dizziness, neuropathy
+neuropathy peripheral, lethargy
+peripheral, lethargy,
+dysgeusia
+⁎
+Uncommon myasthenic encephalitis , epilepsy, myasthenic
+⁎ ⁎
+syndrome , epilepsy lethargy syndrome ,
+⁎
+encephalitis
+⁎
+Rare Guillain-Barré myasthenic syndrome , optic neuritis
+⁎
+syndrome , Guillain-Barré
+⁎ ⁎
+encephalitis , syndrome , myelitis,
+⁎
+myelitis , optic optic neuritis, meningitis
+neuritis, meningitis (aseptic)
+⁎
+(aseptic)
+Eye disorders
+Common dry eye dry eye dry eye
+⁎ ⁎ ⁎
+Uncommon uveitis uveitis uveitis
+Rare Vogt-Koyanagi-Har Vogt-Koyanagi-Harad
+ada syndrome a syndrome
+Cardiac disorders
+‡ ‡ ‡
+Common cardiac arrhythmia cardiac arrhythmia cardiac arrhythmia
+(including atrial (including atrial (including atrial
+fibrillation) fibrillation) fibrillation)
+⁎
+Uncommon myocarditis, myocarditis , myocarditis,
+⁎ ⁎
+pericarditis , pericarditis , pericardial pericardial effusion
+pericardial effusion effusion
+Vascular disorders
+Very common hypertension
+Common hypertension hypertension
+⁎ ⁎
+Uncommon vasculitis vasculitis
+⁎
+Rare vasculitis
+Respiratory, thoracic and mediastinal disorders
+Very common dyspnoea, cough dyspnoea, cough dyspnoea, cough
+⁎ ⁎ ⁎
+Common pneumonitis pneumonitis pneumonitis
+166
+MedDRA SOC Monotherapy In combination with In combination with
+and frequency chemotherapy, axitinib or lenvatinib
+category radiation therapy or
+chemoradiotherapy
+Gastrointestinal disorders
+Very common diarrhoea, diarrhoea, nausea, diarrhoea, abdominal
+⁎ ⁎
+abdominal pain , vomiting, abdominal pain , nausea,
+nausea, vomiting, pain
+⁎
+, constipation vomiting, constipation
+constipation
+⁎ ⁎ ⁎ ⁎ ⁎
+Common colitis , dry mouth colitis , gastritis , dry colitis , pancreatitis ,
+⁎
+mouth gastritis , dry mouth
+⁎ ⁎
+Uncommon pancreatitis , pancreatitis , gastrointestinal
+⁎ ⁎
+gastritis , gastrointestinal ulceration
+⁎
+gastrointestinal ulceration
+⁎
+ulceration
+Rare pancreatic exocrine pancreatic exocrine small intestinal
+insufficiency, small insufficiency, small perforation
+intestinal intestinal perforation,
+perforation, coeliac coeliac disease
+disease
+Not known pancreatic exocrine
+insufficiency, coeliac
+disease
+Hepatobiliary disorders
+Common hepatitis
+⁎
+hepatitis
+⁎
+hepatitis
+⁎
+⁎
+Rare cholangitis cholangitis sclerosing
+sclerosing
+Skin and subcutaneous tissue disorders
+⁎ ⁎ ⁎ ⁎ ⁎ ⁎
+Very common pruritus , rash rash , alopecia, pruritus rash , pruritus
+⁎ ⁎
+Common severe skin severe skin reactions , severe skin reactions ,
+⁎
+reactions , erythema, erythema, dermatitis, dry dermatitis, dry skin,
+dermatitis, dry skin, skin, dermatitis erythema, dermatitis
+⁎
+vitiligo , eczema, acneiform, eczema acneiform, alopecia
+alopecia, dermatitis
+acneiform
+Uncommon psoriasis, lichenoid psoriasis, lichenoid eczema, lichenoid
+⁎ ⁎ ⁎ ⁎
+keratosis , papule, keratosis , vitiligo , keratosis , psoriasis,
+⁎
+hair colour changes papule vitiligo , papule, hair
+colour changes
+Rare Stevens-Johnson Stevens-Johnson toxic epidermal
+syndrome, erythema syndrome, erythema necrolysis,
+nodosum, toxic nodosum, hair colour Stevens-Johnson
+epidermal necrolysis changes syndrome
+Musculoskeletal and connective tissue disorders
+⁎
+Very common musculoskeletal musculoskeletal pain , arthralgia,
+⁎ ⁎
+pain , arthralgia arthralgia musculoskeletal pain ,
+⁎
+myositis , pain in
+extremity
+⁎ ⁎ ⁎
+Common myositis , pain in myositis , pain in arthritis
+⁎ ⁎
+extremity, arthritis extremity, arthritis
+⁎ ⁎ ⁎
+Uncommon tenosynovitis tenosynovitis tenosynovitis
+Rare Sjogren’s syndrome Sjogren’s syndrome Sjogren’s syndrome
+Renal and urinary disorders
+⁎
+Common acute kidney injury nephritis
+167
+MedDRA SOC Monotherapy In combination with In combination with
+and frequency chemotherapy, axitinib or lenvatinib
+category radiation therapy or
+chemoradiotherapy
+⁎ ⁎
+Uncommon nephritis nephritis , cystitis
+noninfective
+Rare cystitis noninfective cystitis noninfective
+General disorders and administration site conditions
+Very common fatigue, asthenia, fatigue, asthenia, pyrexia, fatigue, asthenia,
+⁎ ⁎ ⁎
+oedema , pyrexia oedema oedema , pyrexia
+Common influenza-like influenza-like illness, influenza-like illness,
+illness, chills chills, injection site chills
+reaction§
+Investigations
+Very common alanine aminotransferase lipase increased,
+increased, aspartate alanine
+aminotransferase aminotransferase
+increased increased, aspartate
+aminotransferase
+increased, blood
+creatinine increased
+Common alanine blood bilirubin increased, amylase increased,
+aminotransferase blood alkaline blood bilirubin
+increased, aspartate phosphatase increased, increased, blood
+aminotransferase blood creatinine alkaline phosphatase
+increased, blood increased, increased,
+alkaline phosphatase hypercalcaemia hypercalcaemia
+increased,
+hypercalcaemia,
+blood bilirubin
+increased, blood
+creatinine increased
+Uncommon amylase increased amylase increased
+†Adverse reaction frequencies presented in Table 2 may not be fully attributable to pembrolizumab alone but may contain
+contributions from the underlying disease or from other medicinal products used in a combination.","182 Table 2 : Adverse effects in patients treated with pembrolizumab thyroid pneumonia Affections of the thyroid axis and lymphatic system Very frequently In association with MedDRA chemotherapy, with axitinib or peripheral thrombosis, and radiotherapy of lenvatinib by or in association with radiotherapy Infections and infestations Very common infections of the urinary tract Frequency of pneumococcal pneumonia Affections of the thyroid axis and lymphatic system Very frequently In association with MedDRA chemotherapy, with axitinib or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis Very commonly In association with acute or peripheral thrombosis, with acute or peripheral thrombosis, with acute or peripheral thrombosis Very common","Table 2: Adverse Events with Pembrolizumab
 
 Classification: Monotherapy vs. in combination with
 MedDRA: a chemotherapy, with axitinib or
 by organ and a radiotherapy, lenvatinib
-or a radio-chemotherapy","1. Tableau 2: Adverse Events in Patients Treated with Pembrolizumab
+or a radio-chemotherapy
+
+Infections and Infestations:
+Very common: urinary tract infections
+Frequent: pneumonia, pneumonia, pneumonia
+
+Hematologic and Lymphatic Disorders:
+Very common: anemia, neutropenia, thrombopenia
+Frequent: thrombopenia, neutropenia, neutropenia,
+lymphopenia, lymphopenia, leucopenia,
+thrombopenia, eosinophilia, eosinophilia
+
+Immune System Disorders:
+Frequent: infusion-related reactions
+Rare: sarcoidosis, sarcoidosis, rejection of solid organ
+
+Endocrine Disorders:
+Very common: hypothyroidism, hypothyroidism, hypothyroidism
+Frequent: hyperthyroidism, insufficiency,
+suprarenal insufficiency, suprarenal insufficiency,
+thyroiditis, thyroiditis, thyroiditis
+
+Metabolism and Nutrition Disorders:
+Very common: hypokalemia, decreased appetite
+Frequent: hyponatremia, hyponatremia, hyponatremia,
+hypokalemia, hypocalcemia, hypokalemia,
+hypokalemia, vomiting, abdominal pain,
+constipation
+
+Nervous System Disorders:
+Very common: insomnia, insomnia, insomnia
+Frequent: headache, peripheral neuropathy,
+dizziness, dizziness, dizziness, lethargy,
+dysgeusia
+
+Eye Disorders:
+Frequent: dry eye
+Rare: uveitis, uveitis, uveitis
+
+Cardiac Disorders:
+Frequent: arrhythmia, arrhythmia, arrhythmia
+Rare: myocarditis, myocarditis, myocarditis,
+pericard","1. Tableau 2: Adverse Events in Patients Treated with Pembrolizumab
 
 Classification: Monotherapy or in association with:
 - A chemotherapy, with axitinib or
 - A radiotherapy, with lenvatinib
-- Or a rad",,"Urinary tract infections, Pneumonia, Anemia, Neutropenia, Thrombopenia",TECHNICAL,MISS,CORRECT_TERM,CORRECT_TERM,N/A,No,Yes,S2,MISS,"The human reference uses technical MedDRA labels directly for terms like ""urinary tract infection"" and ""pneumonia,"" which match closely with S2 and S5 outputs. S1 misses relevant terms, resulting in significant errors.",,,"1. PRIMARY_TERM: Urinary tract infections, Pneumonia, Anemia, Neutropenia, Thrombopenia
+- Or a radiochemotherapy
+
+Infections and Infestations:
+- Very common: urinary tract infections
+- Frequent: pneumonia
+
+Hematologic and Lymphatic Disorders:
+- Very common: anemia, neutropenia, thrombopenia
+- Frequent: thrombopenia, neutropenia, leucopenia, lymphopenia, leucopenia
+- Rare: anemia thrombopenia, immune-mediated, eosinophilia, immunological, lymphohistiocytosis, hemophagocytosis, erythroblastopenia
+
+Immune System Disorders:
+- Frequent: infusion-related reactions
+- Rare: sarcoidosis, sarcoidosis
+- Very rare: organ solid organ rejection, unspecified
+
+Endocrine Disorders:
+- Very common: hypothyroidism, hypothyroidism, hypothyroidism
+- Frequent: hyperthyroidism, insufficiency, surrenal insufficiency, surrenal insufficiency, thyroiditis, thyroiditis, thyroiditis
+- Rare: insufficiency, insufficiency, insufficiency
+
+Metabolism and Nutrition Disorders:
+- Very common: decreased appetite, decreased appetite, decreased appetite
+- Frequent: hyponatremia, hyponatremia, hyponatremia, hypokalemia, hypocalcemia, hypokalemia, hypocalcemia
+- Rare: type 1 diabetes, type 1 diabetes, type 1 diabetes
+
+Nervous System Disorders:
+- Very common: insomnia
+- Frequent: insomnia, insomnia, insomnia
+- Frequent: headache, peripheral neuropathy, cephalgia
+- Rare: encephalitis, myasthenia, myasthhenia, en",,"Urinary tract infections, Pneumonia, Anemia, Neutropenia, Thrombopenia",TECHNICAL,MISS,CORRECT_TERM,CORRECT_TERM,N/A,No,Yes,S2,MISS,"The human reference uses technical MedDRA labels directly for terms like ""urinary tract infection"" and ""pneumonia,"" which match closely with S2 and S5 outputs. S1 misses relevant terms, resulting in significant errors.",,,"1. PRIMARY_TERM: Urinary tract infections, Pneumonia, Anemia, Neutropenia, Thrombopenia
 2. HUMAN_REGISTER: TECHNICAL
 3. S1_PATTERN: MISS
 4. S2_PATTERN: CORRECT_TERM
@@ -413,7 +1259,7 @@ Classification: Monotherapy or in association with:
 9. BEST_SYSTEM: S2
 10. ERROR_TYPE: MISS
 11. ANNOTATION_NOTE: The human reference uses technical MedDRA labels directly for terms like ""urinary tract infection"" and ""pneumonia,"" which match closely with S2 and S5 outputs. S1 misses relevant terms, resulting in significant errors."
-48_030,§Rapportée dans une étude en dehors des données poolées (liée à une injection sous-cutanée).,§Reported in a study outside of the pooled dataset (subcutaneous injection related).,§Reported in a study outside of pooled data (related to subcutaneous injection).,Reported in a study outside the pooled data (relating to subcutaneous injection).,"Reported in an out-of-pool study (associated with subcutaneous injection). (Note: The term ""hypothyroïdie"" in the context is translated as ""Hypercarotinaemia"" in MedDRA LLT L5, and the translation pro",Reported in a study outside of pooled data (related to subcutaneous injection).,subcutaneous injection,DESCRIPTIVE,PARAPHRASE,PARAPHRASE,PARAPHRASE,PARAPHRASE,No,No,TIE,NO_ERROR,"All systems use the phrase ""related to subcutaneous injection"" similar to the human reference, maintaining a descriptive style without technical MedDRA terms.",,,"```plaintext
+48_030,§Rapportée dans une étude en dehors des données poolées (liée à une injection sous-cutanée).,§Reported in a study outside of the pooled dataset (subcutaneous injection related).,§Reported in a study outside of pooled data (related to subcutaneous injection).,Reported in a study outside the pooled data (relating to subcutaneous injection).,"Reported in an out-of-pool study (associated with subcutaneous injection). (Note: The term ""hypothyroïdie"" in the context is translated as ""Hypercarotinaemia"" in MedDRA LLT L5, and the translation provided above is based on that.)",Reported in a study outside of pooled data (related to subcutaneous injection).,subcutaneous injection,DESCRIPTIVE,PARAPHRASE,PARAPHRASE,PARAPHRASE,PARAPHRASE,No,No,TIE,NO_ERROR,"All systems use the phrase ""related to subcutaneous injection"" similar to the human reference, maintaining a descriptive style without technical MedDRA terms.",,,"```plaintext
 1. PRIMARY_TERM: subcutaneous injection
 2. HUMAN_REGISTER: DESCRIPTIVE
 3. S1_PATTERN: PARAPHRASE
@@ -466,8 +1312,21 @@ ANNOTATION_NOTE: The human translation avoids specific terms entirely, focusing 
 ```"
 48_109,"Chez les patients traités par pembrolizumab en association à l’axitinib ou au lenvatinib, la proportion de
 patients ayant présenté une variation des paramètres biologiques vers des anomalies de Grade 3 ou 4 par
-rapport aux valeurs à l'inclusion a été","The median time to onset of ALT increased was 2.3 months (range:
-7 days to 19.8 months).","In patients treated with pembrolizumab in combination with laxitinib or lenvatinib, the proportion of patients who showed a change in biological parameters to grade 3 or 4 abnormalities from inclusion","In patients treated with pembrolizumab in combination with axitinib or lenvatinib, the proportion of patients who presented laboratory abnormalities of Grade 3 or 4 compared to baseline values was as ","In patients treated with pembrolizumab in combination with axitinib or lenvatinib, the proportion of patients who presented Grade 3 or 4 biochemical parameter abnormalities compared to baseline values","Among patients treated with pembrolizumab in combination with laxitinib or lenvatinib, the proportion of patients who showed a change in biological parameters versus Grade 3 or 4 abnormalities compare",ALT increased,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,Yes,Yes,HUMAN,REGISTER_MISMATCH,"The human reference uses a plain prose description of an event, while all systems provide a systematic enumeration of clinical statistics. This creates a formal register mismatch.",,,"```
+rapport aux valeurs à l'inclusion a été la suivante : 23,0 % pour une augmentation de la lipase (non mesurée
+chez les patients traités par pembrolizumab et axitinib), 12,3 % pour une diminution des lymphocytes,
+11,4 % pour une diminution du sodium, 11,2 % pour une augmentation de l'amylase, 11,2 % pour une
+augmentation des triglycérides, 10,4 % pour une augmentation des ALAT, 8,9 % pour une augmentation des
+ASAT, 7,8 % pour une augmentation du glucose, 6,8 % pour une diminution du phosphate, 6,1 % pour une
+diminution du potassium, 5,1 % pour une augmentation du potassium, 4,5 % pour une augmentation du
+cholestérol, 4,4 % pour une augmentation de la créatinine, 4,2 % pour une diminution de l'hémoglobine,
+4,0 % pour une diminution des neutrophiles, 3,1 % pour une augmentation des phosphatases alcalines, 3,0 %
+pour une diminution des plaquettes, 2,8 % pour une augmentation de la bilirubine, 2,2 % pour une
+diminution du calcium, 2,2 % pour une augmentation du magnésium, 1,7 % pour une diminution des
+leucocytes, 1,5 % pour une diminution du magnésium, 1,5 % pour une augmentation de l’INR
+(prothrombine), 1,4 % pour une diminution du glucose, 1,2 % pour une diminution de l'albumine, 1,0 % pour
+une augmentation du calcium, 0,4 % pour une augmentation du sodium et 0,1 % pour une augmentation de
+l'hémoglobine.","The median time to onset of ALT increased was 2.3 months (range:
+7 days to 19.8 months).","In patients treated with pembrolizumab in combination with laxitinib or lenvatinib, the proportion of patients who showed a change in biological parameters to grade 3 or 4 abnormalities from inclusion values was as follows: 23.0% for lipase increase (not measured in patients treated with pembrolizumab and axitinib), 12.3% for lymphocyte decrease, 11.4% for sodium decrease, 11.2% for amylase, 11.2% for triglycerides, 10.4% for calcium, 8.9% for ASAT, 7.8% for glucose increase, 6.8% for glucose increase, 0.1% for phosphate decrease, 6.1% for potassium, 0.1% for calcium, 0.1% for calcium, 0.1% for magnesium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium, 0.1% for calcium,","In patients treated with pembrolizumab in combination with axitinib or lenvatinib, the proportion of patients who presented laboratory abnormalities of Grade 3 or 4 compared to baseline values was as follows: 23.0% for an increase in lipase (not measured in patients treated with pembrolizumab and axitinib), 12.3% for a decrease in lymphocytes, 11.4% for a decrease in sodium, 11.2% for an increase in amylase, 11.2% for an increase in triglycerides, 10.4% for an increase in ALT, 8.9% for an increase in AST, 7.8% for an increase in glucose, 6.8% for a decrease in phosphate, 6.1% for an increase in potassium, 5.1% for a decrease in potassium, 4.5% for an increase in cholesterol, 4.4% for an increase in creatinine, 4.2% for a decrease in hemoglobin, 4.0% for a decrease in neutrophils, 3.1% for an increase in alkaline phosphatase, 3.0% for a decrease in platelets, 2.8% for an increase in bilirubin, 2.2% for a decrease in calcium, 2.2% for an increase in magnesium, 1.7% for a decrease in leucocytes, 1.5% for a decrease in magnesium, 1.5% for an increase in INR (prothrombin time), 1.4% for a decrease in glucose, 1.2% for a decrease in albumin, 1.0% for an increase in calcium, 0.4% for an increase in sodium, and 0.1% for an increase in hemoglobin.","In patients treated with pembrolizumab in combination with axitinib or lenvatinib, the proportion of patients who presented Grade 3 or 4 biochemical parameter abnormalities compared to baseline values was as follows: 23.0% for an increase in lipase (not measured in patients treated with pembrolizumab and axitinib), 12.3% for a decrease in lymphocytes, 11.4% for a decrease in sodium, 11.2% for an increase in amylase, 11.2% for an increase in triglycerides, 10.4% for an increase in ALT, 8.9% for an increase in AST, 7.8% for an increase in glucose, 6.8% for a decrease in phosphate, 6.1% for a decrease in potassium, 5.1% for an increase in potassium, 4.5% for an increase in cholesterol, 4.4% for an increase in creatinine, 4.2% for a decrease in hemoglobin, 4.0% for a decrease in neutrophils, 3.1% for an increase in alkaline phosphatases, 3.0% for a decrease in platelets, 2.8% for an increase in bilirubin, 2.2% for a decrease in calcium, 2.2% for an increase in magnesium, 1.7% for a decrease in leukocytes, 1.5% for a decrease in magnesium, 1.5% for an increase in INR (prothrombin), 1.4% for a decrease in glucose, 1.2% for a decrease in albumin, 1.0% for an increase in calcium, 0.4% for an increase in sodium, and 0.1% for an increase in hemoglobin.","Among patients treated with pembrolizumab in combination with laxitinib or lenvatinib, the proportion of patients who showed a change in biological parameters versus Grade 3 or 4 abnormalities compared to inclusion values was as follows: 23.0 percent for an increase in lipase (not measured in patients treated with pembrolizumab and axitinib), 12.3 percent for a decrease in lymphocytes, 11.4 percent for a decrease in sodium, 11.2 percent for a decrease in amylase, 11.2 percent for a decrease in triglycerides, 10.4 percent for a decrease in triglycerides, 8.9 percent for an increase in ASINAT, 7.8 percent for an increase in glucose, 6.8 percent for a decrease in phosphate, 6.1 percent for a decrease in potassium, 1.4 percent for a decrease in calcium, 1.4 percent for a decrease in calcium, 1.4 percent for a decrease in calcium, 1.4 percent for a decrease in calcium, 1.4 percent for a decrease in calcium, 1.4 percent for a",ALT increased,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,Yes,Yes,HUMAN,REGISTER_MISMATCH,"The human reference uses a plain prose description of an event, while all systems provide a systematic enumeration of clinical statistics. This creates a formal register mismatch.",,,"```
 PRIMARY_TERM: ALT increased
 HUMAN_REGISTER: NO_TERM
 S1_PATTERN: CORRECT_TERM
@@ -504,10 +1363,11 @@ hypophysitis was 5.9 months (range: 1 day to 17.7 months).",Hyperthyroidism led 
 11. ANNOTATION_NOTE: The human reference translation is misaligned with the source text, likely due to an error in the provided reference translation segment. However, both the S1 and S2 outputs correctly reflect the term ""hyperthyroidism"" from the source text, consistent with MedDRA terminology."
 48_026,"Les effets indésirables connus pour survenir avec pembrolizumab ou les médicaments du traitement
 en association administrés seuls peuvent apparaître pendant le traitement avec ces médicaments en
-association, même si ces effets n'ont pas été rapportés","Adverse reactions known to occur with
+association, même si ces effets n'ont pas été rapportés au cours des études cliniques avec l’association
+thérapeutique.","Adverse reactions known to occur with
 pembrolizumab or combination therapy components given alone may occur during treatment with
 these medicinal products in combination, even if these reactions were not reported in clinical studies
-with combination ","Adverse reactions known to occur with pembrolizumab or combination therapy medicinal products administered alone may occur during treatment with these medicinal products in combination, although these","Known adverse effects of pembrolizumab or the monotherapies used in combination may occur during treatment with these medications in combination, even if they were not reported in clinical studies of ","Adverse events known to occur with pembrolizumab or monotherapy medicines may appear during treatment with these medicines in combination, even if these events were not reported during the therapeutic","Side effects known to occur with pembrolizumab or combination therapy medications administered alone may appear during treatment with these medications in combination, even if these effects have not b",Adverse reactions,DESCRIPTIVE,PARAPHRASE,PARAPHRASE,CORRECT_TERM,PARAPHRASE,Yes,Yes,HUMAN,REGISTER_MISMATCH,"S5 uses ""adverse events,"" aligning with MedDRA, whereas the human reference uses the more natural ""adverse reactions."" This highlights the divergence between terminological correctness and natural language use.",,,"1. PRIMARY_TERM: Adverse reactions
+with combination therapy.","Adverse reactions known to occur with pembrolizumab or combination therapy medicinal products administered alone may occur during treatment with these medicinal products in combination, although these effects have not been reported in clinical trials with therapeutic association.","Known adverse effects of pembrolizumab or the monotherapies used in combination may occur during treatment with these medications in combination, even if they were not reported in clinical studies of the therapeutic combination.","Adverse events known to occur with pembrolizumab or monotherapy medicines may appear during treatment with these medicines in combination, even if these events were not reported during the therapeutic association studies.","Side effects known to occur with pembrolizumab or combination therapy medications administered alone may appear during treatment with these medications in combination, even if these effects have not been reported during clinical trials with therapeutic association.",Adverse reactions,DESCRIPTIVE,PARAPHRASE,PARAPHRASE,CORRECT_TERM,PARAPHRASE,Yes,Yes,HUMAN,REGISTER_MISMATCH,"S5 uses ""adverse events,"" aligning with MedDRA, whereas the human reference uses the more natural ""adverse reactions."" This highlights the divergence between terminological correctness and natural language use.",,,"1. PRIMARY_TERM: Adverse reactions
 
 2. HUMAN_REGISTER: DESCRIPTIVE
 
@@ -536,7 +1396,10 @@ les patients atteints d’un mélanome, d’un CBNPC et d’un CCR traités par 
 190
 au stade adjuvant (n = 2 060), l'incidence de l'hypothyroïdie était de 18,5 %, dont la majorité était de Grade 1
 ou 2.","The median duration was not reached
-(range: 2 days to 63.0+ months).","In patients with melanoma, CBNPC and CCR treated with pembrolizumab monotherapy 190 at the adjuvant stage (n = 2,060), the incidence of hypothyroidism was 18.5%, the majority of whom were Grade 1 or 2","In patients with melanoma, CBNPC, and CCR treated with pembrolizumab as adjuvant therapy (n = 2060), the incidence of hypothyroidism was 18.5%, most of which were Grade 1 or 2.","In patients with melanoma, CBNPC (CNS brain neoplasms, central nervous system), and CCR (colorectal cancer) treated with monotherapy pembrolizumab at an adjuvant stage (n = 2,060), the incidence of hy","Among patients with melanoma, CBNPC, and CCR treated with pembrolizumab in monotherapy 190 at the adjuvant stage (n = 2,060), the incidence of hypothyroidism was 18.5%, the majority of whom were Grade",Hypothyroidism,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,TIE,NO_ERROR,"The translation outputs from S1, S2, S5, and S6 all correctly use the term ""hypothyroidism,"" matching the MedDRA preferred term. However, the human reference translation does not include this segment, focusing on an unrelated portion of the document. This highlights a consistency paradox where machine outputs are more ontology-aligned than the certified human translation.",,,"1. PRIMARY_TERM: Hypothyroidism
+(range: 2 days to 63.0+ months).","In patients with melanoma, CBNPC and CCR treated with pembrolizumab monotherapy 190 at the adjuvant stage (n = 2,060), the incidence of hypothyroidism was 18.5%, the majority of whom were Grade 1 or 2.","In patients with melanoma, CBNPC, and CCR treated with pembrolizumab as adjuvant therapy (n = 2060), the incidence of hypothyroidism was 18.5%, most of which were Grade 1 or 2.","In patients with melanoma, CBNPC (CNS brain neoplasms, central nervous system), and CCR (colorectal cancer) treated with monotherapy pembrolizumab at an adjuvant stage (n = 2,060), the incidence of hypothyroidism was 18.5%, most of which was of Grade 1 or 2.
+
+Translation:
+In patients with melanoma, CBNPC, and CCR treated with monotherapy pembrolizumab at an adjuvant stage (n = 2,060), the incidence of Hypercarotinaemia was 18.5%, most of which was of Grade 1 or 2.","Among patients with melanoma, CBNPC, and CCR treated with pembrolizumab in monotherapy 190 at the adjuvant stage (n = 2,060), the incidence of hypothyroidism was 18.5%, the majority of whom were Grade 1 or 2.",Hypothyroidism,NO_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,CORRECT_TERM,No,Yes,TIE,NO_ERROR,"The translation outputs from S1, S2, S5, and S6 all correctly use the term ""hypothyroidism,"" matching the MedDRA preferred term. However, the human reference translation does not include this segment, focusing on an unrelated portion of the document. This highlights a consistency paradox where machine outputs are more ontology-aligned than the certified human translation.",,,"1. PRIMARY_TERM: Hypothyroidism
 
 2. HUMAN_REGISTER: NO_TERM
 
@@ -560,4 +1423,4 @@ ou 2.","The median duration was not reached
 48_090,"De rares cas de SSJ et de NET, dont certains d’issue fatale, ont été observés (voir rubriques 4.2 et 4.4).","In patients with
 resectable locally advanced HNSCC treated with pembrolizumab as neoadjuvant treatment and in
 combination with radiation therapy with or without concomitant cisplatin for adjuvant treatment
-(n=361), the incidence of hypothyroidism was","Rare cases of SSJ and NET, including some fatal outbreaks, have been observed (see sections 4.2 and 4.4).","Rare cases of SSJs (Serious Skin Reactions) and TEN (Toxic Epidermal Necrosis), some of which were fatal, have been reported (see sections 4.2 and 4.4).","Rare cases of SSJs (Stevens-Johnson Syndrome) and NETs (Neutrophilic Dermatosis), some of which were fatal, have been observed (see sections 4.2 and 4.4).","Rare cases of SSJ and NET, including some fatal outbreaks, have been observed (see sections 4.2 and 4.4).",,UNKNOWN,,,,,,,UNKNOWN,UNKNOWN,,,,"I'm sorry for the misunderstanding, but there seems to be an error in the segment to annotate you've provided. The French source doesn't match the human reference provided. Could you please clarify or provide a correct segment for analysis?"
+(n=361), the incidence of hypothyroidism was 24.7%, all of which were Grade 1 or 2.","Rare cases of SSJ and NET, including some fatal outbreaks, have been observed (see sections 4.2 and 4.4).","Rare cases of SSJs (Serious Skin Reactions) and TEN (Toxic Epidermal Necrosis), some of which were fatal, have been reported (see sections 4.2 and 4.4).","Rare cases of SSJs (Stevens-Johnson Syndrome) and NETs (Neutrophilic Dermatosis), some of which were fatal, have been observed (see sections 4.2 and 4.4).","Rare cases of SSJ and NET, including some fatal outbreaks, have been observed (see sections 4.2 and 4.4).",,UNKNOWN,,,,,,,UNKNOWN,UNKNOWN,,,,"I'm sorry for the misunderstanding, but there seems to be an error in the segment to annotate you've provided. The French source doesn't match the human reference provided. Could you please clarify or provide a correct segment for analysis?"

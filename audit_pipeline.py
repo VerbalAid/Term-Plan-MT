@@ -33,6 +33,10 @@ SUMMARY_TXT    = "error_analysis/audit_summary.txt"
 TAXONOMY_TXT   = "error_analysis/taxonomy.txt"
 N_SAMPLE       = 30
 SEED           = 42
+# Truncate only for the evaluator API prompt; CSV keeps full segment text.
+PROMPT_FR_MAX = 500
+PROMPT_REF_MAX = 400
+PROMPT_HYP_MAX = 400
 
 Path("error_analysis").mkdir(exist_ok=True)
 client = OpenAI()
@@ -194,12 +198,12 @@ for i, seg in enumerate(sample):
     prompt = ANNOTATION_PROMPT.format(
         context=PROJECT_CONTEXT,
         seg_id=sid,
-        fr=seg["fr"][:500],
-        ref=seg["en_ref"][:400],
-        s1=s1_map.get(sid, "N/A")[:400],
-        s2=s2_map.get(sid, "N/A")[:400],
-        s5=s5_map.get(sid, "N/A")[:400],
-        s6=s6_map.get(sid, "N/A")[:400],
+        fr=seg["fr"][:PROMPT_FR_MAX],
+        ref=seg["en_ref"][:PROMPT_REF_MAX],
+        s1=s1_map.get(sid, "N/A")[:PROMPT_HYP_MAX],
+        s2=s2_map.get(sid, "N/A")[:PROMPT_HYP_MAX],
+        s5=s5_map.get(sid, "N/A")[:PROMPT_HYP_MAX],
+        s6=s6_map.get(sid, "N/A")[:PROMPT_HYP_MAX],
     )
 
     try:
@@ -235,12 +239,12 @@ for i, seg in enumerate(sample):
 
     rows.append({
         "id":                  sid,
-        "fr":                  seg["fr"][:250],
-        "human_ref":           seg["en_ref"][:250],
-        "s1":                  s1_map.get(sid, "")[:200],
-        "s2":                  s2_map.get(sid, "")[:200],
-        "s5":                  s5_map.get(sid, "")[:200],
-        "s6":                  s6_map.get(sid, "")[:200],
+        "fr":                  seg["fr"],
+        "human_ref":           seg["en_ref"],
+        "s1":                  s1_map.get(sid, ""),
+        "s2":                  s2_map.get(sid, ""),
+        "s5":                  s5_map.get(sid, ""),
+        "s6":                  s6_map.get(sid, ""),
         "primary_term":        parsed.get("PRIMARY_TERM", ""),
         "human_register":      parsed.get("HUMAN_REGISTER", ""),
         "s1_pattern":          parsed.get("S1_PATTERN", ""),
