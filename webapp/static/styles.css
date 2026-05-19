@@ -498,6 +498,7 @@ body {
 }
 
 .health-dot.ok { background: var(--exact); }
+.health-dot.warn { background: var(--warn); }
 .health-dot.err { background: var(--danger); }
 
 .mode-tabs {

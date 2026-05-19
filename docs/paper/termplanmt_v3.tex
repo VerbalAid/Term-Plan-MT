@@ -22,19 +22,10 @@
 \usepackage{fancyhdr}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins,breakable}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-\usepackage{listings}
-\usepackage{mdframed}
 \usepackage{float}
 \usepackage{needspace}
 \usepackage{enumitem}
 
-%% Algorithm listing box (matches Algorithm~1 style)
-\newtcolorbox{codealgobox}{
-  colback=gray!6, colframe=gray!35, boxrule=0.4pt,
-  arc=3pt, left=4pt, right=4pt, top=3pt, bottom=3pt
-}
 \newtcolorbox{metricbox}{
   colback=gray!6, colframe=gray!35, boxrule=0.4pt,
   arc=3pt, left=6pt, right=6pt, top=5pt, bottom=5pt,
@@ -119,9 +110,10 @@ for French--English Regulatory Medical Document Translation\\[4pt]
   but not for NLLB or S2. HTM scores the certified human reference at
   0.15--0.18, unchanged by full MedDRA alias expansion, confirming a
   structural mismatch between MedDRA nomenclature and professional
-  translation practice. Ambiguous grounding causes the planning stage to
-  abstain from locking critical terms, explaining why graph-augmented systems
-  produce lower cross-document consistency than graph-free baselines.
+  translation practice.   Ambiguous grounding causes the planning stage to
+  abstain from locking critical terms. Dual human annotation on nine audit
+  segments with LLM-assisted tie-breaking raises best-system agreement from
+  44\% (raw) to 67\% (adjudicated).
   \end{tcolorbox}
   \vspace{6pt}
 }]
@@ -172,9 +164,9 @@ the source text.
   than graph-free baselines, traced to the planning stage's
   abstain-on-ambiguity policy.
 
-  \item \textbf{Reproducible artefacts} including per-segment HTM scores,
-  bootstrap confidence intervals, and qualitative drift analysis exported as
-  CSV and Markdown.
+  \item \textbf{Inter-annotator reliability study} on nine audit segments with
+  dual human labels, LLM-assisted tie-breaking, and adjudicated best-system
+  agreement rising from 44\% to 67\%.
 
   \item \textbf{Two named phenomena}: the \textbf{register mismatch}
   (graph-augmented systems produce pharmacovigilance coding language while
@@ -330,54 +322,11 @@ $\text{HP} = |\hat{d} - d_{\text{src}}|$ penalises wrong specificity level
 ($\alpha{=}0.5$, $\beta{=}0.3$, $\gamma{=}0.2$). When a term matches
 \emph{multiple} MedDRA concepts, no lock is committed
 (\S\ref{sec:consistency}).
+For each unambiguous grounded term, the planner scores candidate English
+renderings from the concept node and its graph neighbours, commits the
+highest-scoring label, and skips ambiguous keys entirely.
 
-\begin{algorithm}[t]
-\caption{Global Terminology Planning -- \texttt{compute\_global\_locks}}
-\label{alg:planning}
-\begin{codealgobox}
-\begin{lstlisting}[
-  language=Python,
-  basicstyle=\scriptsize\ttfamily,
-  keywordstyle=\bfseries,
-  commentstyle=\color{gray}\itshape,
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=4pt,
-  xleftmargin=10pt,
-  frame=none,
-  showstringspaces=false,
-  breaklines=true,
-  columns=flexible
-]
-# Inputs: segments S, MedDRA graph G
-# Weights: alpha=0.5, beta=0.3, gamma=0.2
-# Output: lock map {fr_term -> en_rendering}
-
-locks = {}
-for fr_term in unique_ner_terms(S):
-    concept = G.ground(fr_term)
-    # exact match first, then fuzzy >= 90%
-
-    if concept is None or G.is_ambiguous(fr_term):
-        continue  # abstain: wrong lock propagates document-wide
-
-    candidates = [concept.name] + G.neighbours(concept)
-    best, best_score = None, -inf
-    for r in candidates:
-        ctx   = cosine(embed(segs), embed(r))
-        nbr   = cosine(embed(r), embed(G.neighbours(concept)))
-        hp    = abs(level(r) - level(concept))
-        score = alpha*ctx + beta*nbr - gamma*hp
-        if score > best_score:
-            best, best_score = r, score
-    locks[fr_term] = best
-
-return locks
-\end{lstlisting}
-\end{codealgobox}
-\end{algorithm}
-
-The abstain-on-ambiguity policy (line 4) is a deliberate safety choice: when a French
+The abstain-on-ambiguity policy is a deliberate safety choice: when a French
 term maps to multiple MedDRA concepts with equal confidence (e.g.\
 \textit{pneumopathie inflammatoire} maps to both \textsc{Pneumonitis} and
 \textsc{Interstitial Lung Disease}), forcing a lock risks propagating the wrong
@@ -401,57 +350,19 @@ degradation under strict constraints.
 \subsection{MedDRA Knowledge Graph Construction}
 \label{sec:graph-construction}
 
-The grounding component $\mathcal{G}$ used throughout Algorithms~1--5 is a
-Neo4j property graph built from the MedDRA v28 flat-file release, obtained
-under academic licence via UPV/EHU.
-Construction proceeds in four stages.
-
-\paragraph{(1) Parsing the ASCII flat files.}
-MedDRA distributes five pipe-delimited \texttt{*.asc} files.
-The primary source is \texttt{mdhier.asc}, where each row encodes the
-full SOC\,$\to$\,HLGT\,$\to$\,HLT\,$\to$\,PT\,$\to$\,LLT lineage for one
-concept, together with English and French preferred labels.
-A custom parser handles both the pipe-separated format (v28+) and the legacy
-dollar-delimited format, with automatic encoding detection
-(UTF-8\,$\to$\,CP1252\,$\to$\,ISO-8859-1).
-This yields approximately 80,000 LLT records with complete five-level lineage.
-
-\paragraph{(2) Building the French label index.}
-The French MedDRA release is read in parallel to populate a
-\texttt{fr\_label} property on each concept node.
-After case-folding normalisation, 7{,}679 French surface forms are
-\emph{ambiguous} --- a single normalised string maps to two or more distinct
-MedDRA concepts (e.g., \textit{pneumopathie inflammatoire} resolves to both
-\textsc{Pneumonitis} and \textsc{Interstitial Lung Disease}).
-These keys are recorded in an \texttt{\_ambiguous} set and trigger the
-abstain-on-ambiguity policy in \texttt{compute\_global\_locks}
-(Algorithm~\ref{alg:planning}).
-
-\paragraph{(3) Loading into Neo4j.}
-Each MedDRA concept is stored as a \texttt{:Concept} node with properties
-\texttt{\{id, name, fr\_label, level, tier\}}.
-Parent--child relationships are represented as directed
-\texttt{BROADER\_THAN} edges, producing a five-level DAG.
-The graph is populated via batched Cypher \texttt{MERGE} transactions
-against a Neo4j~5 Community instance deployed via Docker Compose.
-The final graph contains \textbf{84{,}404 concept nodes} and
-\textbf{91{,}082 entries} in the PT/LLT fuzzy index.
-
-\paragraph{(4) Runtime API (\texttt{TermGraph}).}
-All French concept keys are loaded into memory on first call (lazy,
-cached).
-String grounding applies exact case-fold matching first; if that fails,
-RapidFuzz cosine similarity with a threshold of $\geq\!90\%$ is applied,
-restricted to PT- and LLT-level nodes only (higher levels produce
-over-generalised matches).
-The \texttt{neighbours()} method returns concepts reachable via one or two
-\texttt{BROADER\_THAN} hops; \texttt{same\_branch()} executes a
-\texttt{shortestPath} Cypher query bounded to five hops.
-A CCR diagnostic over the baseline NER condition confirms the grounding
-ceiling: 23\% \textsc{Exact-Hit}, 11\% \textsc{Fuzzy-Hit}, 6\%
-\textsc{Ambiguous}, and 60\% \textsc{Not-in-Graph} --- the last category
-dominated by drug names, grade annotations, and numeric tokens that lie
-outside the adverse-event subset of MedDRA indexed in the graph.
+The grounding component $\mathcal{G}$ is a Neo4j property graph built from
+MedDRA~v28 flat files (academic licence via UPV/EHU): \texttt{mdhier.asc}
+rows yield $\approx$80{,}000 LLT records with five-level lineage; French
+\texttt{fr\_label} properties are merged with case folding.
+\textbf{7{,}679} normalised French keys are ambiguous (multiple concepts);
+these trigger planner abstention.
+The loaded graph has \textbf{84{,}404 nodes} and \textbf{91{,}082} PT/LLT
+fuzzy-index entries.
+Runtime grounding uses exact match then RapidFuzz ($\geq\!90\%$) on
+PT/LLT nodes only; \texttt{neighbours()} and \texttt{same\_branch()}
+support planning scores.
+CCR diagnostics on baseline NER: 23\% exact, 11\% fuzzy, 6\% ambiguous,
+60\% not-in-graph (mostly drugs, grades, and numerics outside the AE subset).
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Metrics}
@@ -463,14 +374,14 @@ outside the adverse-event subset of MedDRA indexed in the graph.
 \begin{itemize}[noitemsep, topsep=3pt, leftmargin=*]
   \item \textbf{HTM} (Hierarchy-Aware Terminology Metric): per grounded
   NER span, score $= 1.0$ (exact MedDRA level), $0.5$ (same branch),
-  $0.0$ (miss); macro-averaged (Algorithm~2).
+  $0.0$ (miss); macro-averaged over grounded spans.
   \item \textbf{rHTM} (Reference HTM): HTM applied to the certified human
   reference, not a system hypothesis. A dataset-level ceiling;
   values of $0.15$--$0.18$ confirm translators prefer phrasings outside
   the MedDRA preferred-term vocabulary.
   \item \textbf{HRA} (Hypothesis--Reference Agreement):
   $1 - |\mathrm{HTM}_\mathrm{hyp} - \mathrm{HTM}_\mathrm{ref}|$,
-  macro-averaged (Algorithm~3). Measures agreement with professional
+  macro-averaged. Measures agreement with professional
   translation practice rather than raw ontology proximity.
   \item \textbf{HTM-A} (Alias-Expanded HTM): accepts any ancestor up to
   SOC. Score invariance across tiers T1--T3 confirms failures are
@@ -480,176 +391,6 @@ outside the adverse-event subset of MedDRA indexed in the graph.
   diagnostic for NER quality.
 \end{itemize}
 \end{metricbox}
-
-\begin{algorithm}[H]
-\caption{HTM Scoring --- \texttt{compute\_htm}}
-\label{alg:htm}
-\begin{codealgobox}
-\begin{lstlisting}[
-  language=Python,
-  basicstyle=\scriptsize\ttfamily,
-  keywordstyle=\bfseries,
-  commentstyle=\color{gray}\itshape,
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=4pt,
-  xleftmargin=10pt,
-  frame=none,
-  showstringspaces=false,
-  breaklines=true,
-  columns=flexible
-]
-# Inputs: hypotheses H, segments S, graph G
-# Output: macro-averaged HTM in [0, 1]
-
-def htm_span(found, ref_label, ref_level, G):
-    if not found: return 0.0
-    node = G.get_by_name(found) or G.get_by_name(ref_label)
-    if not node: return 0.0
-    if node.level == ref_level: return 1.0      # exact tier
-    if G.same_branch(found, ref_label): return 0.5
-    return 0.0
-
-scores = []
-for row in H:
-    hyp = row.hyp
-    seg = S[row.id]
-    for term in unique_ner_terms(seg):
-        concept = G.ground(term, context=seg.fr)
-        if concept is None: continue
-        renderings = [concept.name] + G.candidates(concept)
-        found = first_phrase_in(hyp, renderings)
-        scores.append(htm_span(found, concept.name,
-                              concept.level, G))
-return mean(scores) if scores else 0.0
-\end{lstlisting}
-\end{codealgobox}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{HRA --- \texttt{compute\_htm\_hyp\_vs\_ref}}
-\label{alg:hra}
-\begin{codealgobox}
-\begin{lstlisting}[
-  language=Python,
-  basicstyle=\scriptsize\ttfamily,
-  keywordstyle=\bfseries,
-  commentstyle=\color{gray}\itshape,
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=4pt,
-  xleftmargin=10pt,
-  frame=none,
-  showstringspaces=false,
-  breaklines=true,
-  columns=flexible
-]
-# Inputs: hypotheses H, segments S, graph G
-# Output: mean agreement in [0, 1] (HRA)
-
-agreements = []
-for row in H:
-    hyp, ref = row.hyp, seg.en_ref
-    seg = S[row.id]
-    for term in unique_ner_terms(seg):
-        concept = G.ground(term, context=seg.fr)
-        if concept is None: continue
-        renderings = [concept.name] + G.candidates(concept)
-        found_hyp = first_phrase_in(hyp, renderings)
-        found_ref = first_phrase_in(ref, renderings)
-        s_hyp = htm_span(found_hyp, concept.name,
-                         concept.level, G)
-        s_ref = htm_span(found_ref, concept.name,
-                         concept.level, G)
-        agreements.append(1.0 - abs(s_hyp - s_ref))
-return mean(agreements) if agreements else nan
-\end{lstlisting}
-\end{codealgobox}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{Soft Logit Boosting --- \texttt{PhraseLogitBoost}}
-\label{alg:logit-boost}
-\begin{codealgobox}
-\begin{lstlisting}[
-  language=Python,
-  basicstyle=\scriptsize\ttfamily,
-  keywordstyle=\bfseries,
-  commentstyle=\color{gray}\itshape,
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=4pt,
-  xleftmargin=10pt,
-  frame=none,
-  showstringspaces=false,
-  breaklines=true,
-  columns=flexible
-]
-# Inputs: tokenizer tok, locked phrases P, boost delta
-# Applied each decoding step to logits vector scores
-
-class PhraseLogitBoost(LogitsProcessor):
-    def __init__(self, tok, phrases, boost=1.75):
-        self.boost = boost
-        self.ids = set()
-        for p in phrases:
-            for tid in tok(p, add_special_tokens=False).input_ids:
-                self.ids.add(tid)
-
-    def __call__(self, input_ids, scores):
-        for tid in self.ids:
-            if 0 <= tid < scores.shape[-1]:
-                scores[:, tid] += self.boost
-        return scores
-# S5-NLLB: delta=1.75; S5-Mistral: delta=1.25
-\end{lstlisting}
-\end{codealgobox}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\caption{Hard Phrase Locking --- \texttt{force\_words\_ids} (NLLB S5/S6)}
-\label{alg:force-words}
-\begin{codealgobox}
-\begin{lstlisting}[
-  language=Python,
-  basicstyle=\scriptsize\ttfamily,
-  keywordstyle=\bfseries,
-  commentstyle=\color{gray}\itshape,
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=4pt,
-  xleftmargin=10pt,
-  frame=none,
-  showstringspaces=false,
-  breaklines=true,
-  columns=flexible
-]
-# Inputs: segment seg, lock map L, graph G
-# Output: constrained NLLB translation
-
-phrases = []
-for term in seg.terms:
-    concept = G.ground(term, context=seg.fr)
-    if concept is None: continue
-    en = L.get(term) or concept.name
-    phrases.append(en)
-
-phrase_ids = [tok(p, add_special_tokens=False).input_ids
-              for p in phrases if p]
-beams = min(10, 5 + len(phrases))
-try:
-    out = model.generate(
-        **encode(seg.fr),
-        logits_processor=[PhraseLogitBoost(tok, phrases)],
-        force_words_ids=phrase_ids,
-        num_beams=beams, max_new_tokens=256)
-except BeamSearchFailure:
-    # fallback: soft boost only (no hard lock)
-    out = model.generate(..., logits_processor=[boost])
-return decode(out)
-\end{lstlisting}
-\end{codealgobox}
-\end{algorithm}
 
 \noindent Fluency: corpus BLEU \citep{papineni2002bleu} and chrF\texttt{++}
 \citep{popovic2017chrf} via SacreBLEU; neural: COMET \citep{rei2020comet}.
@@ -747,21 +488,7 @@ HTM is computed only over spans the NER model successfully extracts; a stronger
 NER model exposes a larger and more challenging set of terminology spans,
 changing both the denominator and the matched set simultaneously. Scores across
 NER conditions are therefore not directly comparable and should be interpreted
-within each condition only. Fig.~\ref{fig:tradeoff} shows the chrF\texttt{++}/HTM
-scatter \emph{within} each NER condition (separate axes; do not compare HTM
-across panels).
-
-\begin{figure*}[!ht]
-\centering
-\includegraphics[width=0.47\textwidth]{comparison_tradeoff_chrF_vs_HTM_baseline.png}\hfill
-\includegraphics[width=0.47\textwidth]{comparison_tradeoff_chrF_vs_HTM_finetuned.png}
-\caption{chrF\texttt{++} vs.\ HTM trade-off by system.
-\textbf{Left:} baseline NER (\texttt{ner\_biollm}).
-\textbf{Right:} fine-tuned NER (\texttt{ner\_biollm\_ft}).
-HTM uses different grounded span sets in each panel; interpret fluency--terminology
-trade-offs only within a panel.}
-\label{fig:tradeoff}
-\end{figure*}
+within each condition only.
 
 \subsection{CCR is the Binding Constraint}
 \label{sec:ccr_bottleneck}
@@ -832,16 +559,71 @@ tokens (\textit{pembrolizumab}, grade annotations, numeric ranges) that NER
 extracted as candidate spans but that have no MedDRA equivalent -- confirming
 that the CCR ceiling is set by NER precision, not by graph coverage gaps.
 
-\subsection{Missing Terms, Flattening, and Consistency}
+\subsection{Missing Terms and Consistency}
 
 Under baseline NER, S5-Mistral achieves the lowest missing-term rate;
-S1-NLLB misses the majority of grounded terms. Zero concept flattening
-events are observed for grounded L5 source terms, partly an evaluation
-artefact that HTM-A addresses. Cross-document modal agreement is highest
-for graph-free systems under baseline NER (S1: 0.993, S2: 0.984, S3: 0.946);
-under fine-tuned NER the gap narrows (S3: 0.976) but S2 (0.985) remains
-the most consistent Mistral system, confirming that the consistency
-advantage of S1-NLLB is a vocabulary artefact rather than terminological reasoning.
+S1-NLLB misses the majority of grounded terms.
+Cross-document modal agreement is highest for graph-free systems (S1: 0.993,
+S2: 0.984); graph-augmented systems recover under fine-tuned NER but do not
+overtake S2 (0.985).
+
+\subsection{Inter-Annotator and Audit Agreement}
+\label{sec:interannotator}
+
+Nine Section~4.8 segments were double-annotated by two human raters (D, N)
+on register (binary), pattern acceptability (S1, S2, S5, S6), and
+\texttt{best\_system} choice.
+An LLM-assisted audit supplied reference labels for \emph{tie-breaking only},
+not as an equal third judge.
+Where raters tied between systems in free-text notes, adjudication followed
+documented rules: prefer the LLM label when it lies in the tied set; otherwise
+prefer N; if the LLM is \texttt{unknown}, use N
+(supplementary \texttt{adjudication\_decision\_table.csv}).
+
+\begin{table}[!t]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Comparison} & \textbf{Agree} & \textbf{\%} & $\boldsymbol{\kappa}$ \\
+\midrule
+\multicolumn{4}{l}{\textit{Best-system choice (9 segments)}} \\
+\quad D vs N (raw) & 4/9 & 44 & 0.00 \\
+\quad D vs N (adjudicated) & 6/9 & 67 & 0.18 \\
+\quad D vs LLM (adjudicated D) & 7/9 & 78 & 0.60 \\
+\quad N vs LLM & 4/9 & 44 & 0.00 \\
+\midrule
+\multicolumn{4}{l}{\textit{All fields pooled (54 binary labels)}} \\
+\quad D vs N & -- & 44 & 0.15 \\
+\quad D vs LLM & -- & 59 & 0.36 \\
+\quad N vs LLM & -- & 69 & 0.52 \\
+\bottomrule
+\end{tabular}
+\caption{Human--human and human--audit agreement.
+Raw best-system disagreement reflects genuine preference splits (N favours
+S2 in 7/9 segments); adjudication raised D--N best-system agreement from
+44\% to 67\%.
+$\kappa{=}0$ at 44\% best-system agreement means observed matches equal
+chance agreement given skewed marginals ($n{=}9$).}
+\label{tab:interannotator}
+\end{table}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{best_system_overall.png}
+\caption{Best-system agreement: raw vs.\ adjudicated bars.
+Segments~1, 5, 6, and 9 required adjudication; 2, 3, 4, 7, and 8 had
+consensus or single-reference resolution.}
+\label{fig:best-system-overall}
+\end{figure}
+
+Annotator N aligned more closely with the LLM audit on pooled pattern labels
+($\kappa{=}0.52$) than D ($\kappa{=}0.36$), while adjudicated D matched the
+LLM on best-system in 7/9 cases.
+Pattern fields showed the largest human--human splits (e.g.\ S2/S6 $\kappa<0$
+for D vs N), consistent with register and paraphrase disagreements documented
+in per-segment notes.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{The HTM--Practice Gap}
@@ -893,8 +675,7 @@ graph-augmented systems score consistently \emph{lower} on HRA than S2
 (Table~\ref{tab:biollm}: S3~=~0.601 vs.\ S2~=~0.743;
 Table~\ref{tab:finetuned}: S3~=~0.440 vs.\ S2~=~0.476): the graph pushes
 outputs toward MedDRA labels that professional translators avoid.
-The fluency--terminology trade-off is in Fig.~\ref{fig:tradeoff}; per-system
-inference times are in the project repository (\texttt{results/ner\_biollm/figures/}).
+Per-system inference times are in \texttt{results/ner\_biollm/figures/}.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Consistency Failure Analysis}
@@ -929,33 +710,12 @@ evaluation lens is \textbf{HRA}, which measures agreement with professional
 translation practice rather than raw ontology proximity.
 
 \paragraph{Unified expert evaluation.}
-To ground the system comparison empirically, we ran a unified expert
-evaluation across the same 30 segments as the register audit, covering
-all eight system variants (S1, S2, S3-base, S3-FT, S5-base, S5-FT, S6,
-human reference) using a GPT-4o senior EMA medical translator persona
-(seed~42; full results in \texttt{error\_analysis/unified\_eval.csv}).
-
-The human reference dominated with 20/30 best-output votes (67\%,
-average rank 1.50). Among MT systems, S2 (Mistral, full document context,
-no graph) achieved the highest average rank (3.27) and tied S3-FT for
-best-output votes (2/30 = 7\% each), confirming that fluent contextual
-prose without ontology enforcement remains the closest MT approximation
-to certified translation practice. S5 received zero best-output votes in
-both NER conditions -- consistent with the register mismatch finding that
-logit-boosted MedDRA label enforcement diverges from the clinical prose
-register EMA translators produce. The NER condition split was balanced
-(fine-tuned preferred in 10/30 segments, baseline in 10/30, tied in 10/30),
-indicating that NER quality determines performance within graph systems but
-does not override system architecture when all variants compete together.
-The evaluator flagged S1's hallucination of \textit{daxitinib} for
-\textit{axitinib} as a critical pharmacovigilance error, and S3-base's
-substitution of \textit{Hypercarotinaemia} for \textit{hypothyroidism}
-as a recurring contamination artefact from the baseline NER condition --
-both confirming that NER quality is a patient-safety concern, not merely
-a metric artefact. A pilot annotation (30 segments, 4 baseline systems)
-and a pilot expert evaluation (25 segments, 8 systems, different sample)
-motivated this design; the unified evaluation on the canonical 30-segment
-sample is the definitive result.
+A GPT-4o EMA-translator persona ranked eight outputs on 30 segments
+(\texttt{error\_analysis/unified\_eval.csv}).
+The human reference won 20/30 best-output votes (67\%); S2 ranked best among
+MT systems (mean rank 3.27); S5 received zero best-output votes.
+S1's \textit{daxitinib} for \textit{axitinib} substitution was flagged as a
+critical pharmacovigilance error.
 
 \paragraph{Mechanism.}
 \textit{Pneumopathie inflammatoire} maps to two distinct MedDRA concepts
@@ -968,15 +728,9 @@ terminological reasoning but through vocabulary rigidity. The fix is
 provisional lock for human review, consistent with CAT-tool workflows.
 
 \paragraph{Output contamination.}
-In the fine-tuned NER condition, 18/127 segments per system (14.2\%) contain
-prompt contamination: Mistral reproduced MedDRA metadata strings and
-instruction markers from its own system prompt. These rows were replaced
-with a null hypothesis for metric computation. Contamination biases raw
-scores in opposite directions--deflating BLEU (precision destroyed by
-injected strings) while inflating chrF (character overlap increased)--
-confirmed by S3 raw vs.\ filtered: BLEU 15.36$\to$19.58, chrF
-37.20$\to$35.33. S1 and S2 are unaffected as they receive no graph
-context in their prompts.
+In the fine-tuned NER condition, 18/127 segments (14.2\%) contain prompt
+contamination from graph-context Mistral runs; filtered scores are used
+throughout (S3 BLEU 15.36$\to$19.58 after filtering).
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section{Discussion and Limitations}
@@ -1042,16 +796,6 @@ the risk of deploying low-quality NER in pharmacovigilance contexts.
 Substantially higher CCR with cleaner NER span boundaries is the necessary
 condition for graph-augmented systems to surpass S2; quantifying that
 threshold is left to future work with broader French biomedical NER.
-
-\paragraph{Future work.}
-Graph-aware fine-tuning is the compelling next step: rather than prompting
-and inference-time logit boosting, fine-tuning the LLM directly on
-serialised Neo4j subgraphs may teach it to embed MedDRA concepts naturally
-in clinical prose, bridging the register mismatch gap without hard token
-forcing. Substantially higher CCR ($\approx$60--70\%) with cleaner NER
-boundaries is a likely necessary condition for graph-augmented systems to
-surpass S2; quantifying that threshold with broader French biomedical NER
-is the direct next empirical step.
 
 %% ═══════════════════════════════════════════════════════════════════════════
 \section*{Acknowledgements}

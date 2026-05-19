@@ -26,6 +26,7 @@ const matchLabels = {
   exact: "Exact",
   fuzzy: "Fuzzy",
   semantic: "Semantic",
+  substring: "Substring",
   context_llm: "In context",
   none: "No match",
 };
@@ -86,8 +87,9 @@ async function checkHealth() {
   try {
     const res = await fetch("/api/health");
     const data = await readJsonResponse(res);
-    if (data.status === "ok") {
-      healthDot.className = "health-dot ok";
+    if (data.status === "ok" || data.status === "degraded") {
+      healthDot.className =
+        data.status === "degraded" ? "health-dot warn" : "health-dot ok";
       const sem = data.semantic_ready || {};
       const semNote = data.semantic_disabled
         ? " · semantic off (low RAM)"
@@ -95,14 +97,18 @@ async function checkHealth() {
           ? " · semantic ready"
           : " · semantic loads on first use";
       const ctxNote = data.llm_configured
-        ? " · context routing on"
+        ? ` · LLM ${data.llm_model || "configured"}`
         : " · context routing off";
       const cacheNote = data.cache_ready === false ? " · index loads on first search" : "";
+      const graphNote =
+        data.graph_populated === false
+          ? " · graph empty — run build_graph.py"
+          : "";
       const labelsNote =
         data.labels_loaded != null
           ? `${Number(data.labels_loaded).toLocaleString()} labels`
           : "connected";
-      healthText.textContent = `Neo4j · ${labelsNote}${cacheNote}${semNote}${ctxNote}`;
+      healthText.textContent = `Neo4j · ${labelsNote}${graphNote}${cacheNote}${semNote}${ctxNote}`;
     } else {
       healthDot.className = "health-dot err";
       const hint = data.neo4j_target ? ` (${data.neo4j_target})` : "";
@@ -176,7 +182,48 @@ function pillLang(c, preferredLang) {
   return { term: c.name || c.en_label, lang: "en" };
 }
 
-function lookupTerm(term, searchLang) {
+async function showConceptLookup(data, searchLang) {
+  resultsEl.hidden = false;
+  setPipelineHighlight(data.match_type);
+  resultsEl.innerHTML = renderConceptCard(data);
+  wireNavigation(resultsEl, data.query_lang || searchLang || "en");
+}
+
+async function lookupConceptId(conceptId, searchLang) {
+  if (!conceptId) return;
+  modeTabs[0].click();
+  hideStatus();
+  resultsEl.hidden = true;
+  pipeSteps.forEach((el) => el.classList.remove("active"));
+  setLoading(true, "term");
+  showStatus("Loading concept…", false);
+  const ql = searchLang && searchLang !== "auto" ? searchLang : lang;
+  try {
+    const res = await fetch(
+      `/api/concept/${encodeURIComponent(conceptId)}?lang=${encodeURIComponent(ql)}`
+    );
+    const data = await readJsonResponse(res);
+    if (!res.ok) {
+      setPipelineHighlight("none");
+      showStatus(data.detail || "Concept lookup failed", true);
+      return;
+    }
+    hideStatus();
+    input.value = data.concept?.name || conceptId;
+    showConceptLookup(data, ql);
+  } catch (err) {
+    setPipelineHighlight("none");
+    showStatus(err.message || "Network error", true);
+  } finally {
+    setLoading(false, "term");
+  }
+}
+
+function lookupTerm(term, searchLang, conceptId) {
+  if (conceptId) {
+    lookupConceptId(conceptId, searchLang);
+    return;
+  }
   modeTabs[0].click();
   input.value = term;
   if (searchLang && searchLang !== "auto") setLang(searchLang);
@@ -192,7 +239,7 @@ function renderPills(items, preferredLang) {
       const { term, lang: pl } = pillLang(c, preferredLang);
       const sub = preferredLang === "fr" ? c.name : c.fr_label || "";
       return `
-    <button type="button" class="pill" data-term="${esc(term)}" data-lang="${pl}">
+    <button type="button" class="pill" data-concept-id="${esc(c.id)}" data-term="${esc(term)}" data-lang="${pl}">
       ${esc(preferredLang === "fr" ? c.fr_label || c.name : c.name)}
       <small>${esc(c.tier)}${sub ? ` · ${esc(sub)}` : ""}</small>
     </button>`;
@@ -210,7 +257,7 @@ function renderHierarchy(ancestors, queryLang) {
       const sep = i < ancestors.length - 1 ? '<span class="hier-sep">›</span>' : "";
       const attrs = isLast
         ? ""
-        : ` data-term="${esc(term)}" data-lang="${hl}" role="button" tabindex="0"`;
+        : ` data-concept-id="${esc(n.id)}" data-term="${esc(term)}" data-lang="${hl}" role="button" tabindex="0"`;
       return `<span class="${cls}"${attrs}>${esc(n.tier)}: ${esc(n.name)}</span>${sep}`;
     })
     .join("")}</div>`;
@@ -218,13 +265,17 @@ function renderHierarchy(ancestors, queryLang) {
 
 function wireNavigation(root, queryLang) {
   root.querySelectorAll(".pill[data-term], .hier-btn[data-term]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      lookupTerm(btn.dataset.term, btn.dataset.lang || queryLang);
-    });
+    const go = () =>
+      lookupTerm(
+        btn.dataset.term,
+        btn.dataset.lang || queryLang,
+        btn.dataset.conceptId || null
+      );
+    btn.addEventListener("click", go);
     btn.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        lookupTerm(btn.dataset.term, btn.dataset.lang || queryLang);
+        go();
       }
     });
   });
@@ -291,21 +342,18 @@ function renderConceptCard(data, { title = "Match", badgeExtra = "" } = {}) {
       <div class="cols">
         <div class="col">
           <h3>Parents (broader)</h3>
-          ${renderPills(data.parents, "en")}
+          ${renderPills(data.parents, ql)}
         </div>
         <div class="col">
           <h3>Children (narrower)</h3>
-          ${renderPills(data.children, "en")}
+          ${renderPills(data.children, ql)}
         </div>
       </div>
     </article>`;
 }
 
 function renderResults(data) {
-  resultsEl.hidden = false;
-  setPipelineHighlight(data.match_type);
-  resultsEl.innerHTML = renderConceptCard(data);
-  wireNavigation(resultsEl, data.query_lang || "fr");
+  showConceptLookup(data, data.query_lang || "fr");
 }
 
 function renderCandidateList(candidates, queryLang) {
@@ -335,7 +383,21 @@ function renderContextResults(payload) {
   const llm = payload.llm || {};
   let html = "";
 
-  if (llm.ok && !llm.abstain && llm.clinical_justification) {
+  if (!payload.candidates?.length) {
+    const isEmptyGraph = llm.error === "graph_empty";
+    html += `
+    <article class="card context-card muted-card">
+      <h2 class="concept-title">${isEmptyGraph ? "MedDRA graph not loaded" : "No graph candidates"}</h2>
+      <p>${esc(llm.message || "No graph candidates for this term.")}</p>
+      ${isEmptyGraph ? `<p class="concept-fr">docker compose up -d · PYTHONPATH=. python data/build_graph.py</p>` : ""}
+    </article>`;
+  } else if (llm.ok && !llm.abstain && llm.fallback) {
+    html += `
+    <article class="card context-card muted-card">
+      <h2 class="concept-title">Graph match (routing fallback)</h2>
+      <p>${esc(llm.clinical_justification || "Context routing was unavailable; the top graph candidate was used.")}</p>
+    </article>`;
+  } else if (llm.ok && !llm.abstain && llm.clinical_justification) {
     html += `
     <article class="card context-card">
       <div class="card-header">
@@ -416,7 +478,7 @@ form.addEventListener("submit", async (e) => {
       return;
     }
     hideStatus();
-    renderResults(data);
+    await showConceptLookup(data, lang);
   } catch (err) {
     setPipelineHighlight("none");
     showStatus(err.message || "Network error", true);

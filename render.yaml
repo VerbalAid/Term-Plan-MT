@@ -24,7 +24,7 @@ services:
       - key: LLM_API_BASE_URL
         value: https://openrouter.ai/api/v1
       - key: LLM_MODEL_NAME
-        value: mistralai/mistral-7b-instruct
+        value: openrouter/free
       - key: NEO4J_URI
         sync: false
       - key: NEO4J_USER

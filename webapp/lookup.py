@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from webapp.context_llm import llm_configured, llm_model, resolve_context
-from webapp.graph import MeddraGraph, norm_key
+from webapp.graph import GraphEmptyError, MeddraGraph, is_meddra_code, norm_key
 from webapp.neo4j_config import friendly_connection_error, safe_uri_hint, validate_neo4j_config
 
 log = logging.getLogger(__name__)
@@ -31,6 +31,37 @@ def detect_lang(term: str) -> Lang:
     if _FR_HINT.search(term):
         return "fr"
     return "en"
+
+
+_CONTEXT_WORD = re.compile(r"[\w'-]+", re.UNICODE)
+
+
+def _context_phrase_variants(
+    term: str, sentence: str, *, max_words: int = 6
+) -> list[str]:
+    """Longer phrases in the sentence that start with the target term (e.g. hormone → hormone replacement therapy)."""
+    t = (term or "").strip()
+    s = (sentence or "").strip()
+    if not t or not s:
+        return []
+    start = s.lower().find(t.lower())
+    if start < 0:
+        return []
+    tokens = _CONTEXT_WORD.findall(s[start:])
+    if not tokens:
+        return []
+    key = t.lower()
+    if not (tokens[0].lower().startswith(key) or key in tokens[0].lower()):
+        return []
+    out: list[str] = []
+    seen: set[str] = set()
+    for n in range(min(len(tokens), max_words), 0, -1):
+        phrase = " ".join(tokens[:n])
+        nk = norm_key(phrase)
+        if nk not in seen and len(phrase) >= len(t):
+            seen.add(nk)
+            out.append(phrase)
+    return out
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -137,6 +168,7 @@ class MeddraLookupService:
             os.environ.get("CONTEXT_FUZZY_CUTOFF", str(max(70.0, self._fuzzy_cutoff - 15)))
         )
         self._candidate_limit = int(os.environ.get("CONTEXT_CANDIDATE_LIMIT", "8"))
+        self._substring_min = float(os.environ.get("CONTEXT_SUBSTRING_MIN_SCORE", "45"))
         self._semantic: dict[str, _SemanticIndex] = {
             "fr": _SemanticIndex(self._embed_model_id, self._semantic_threshold),
             "en": _SemanticIndex(self._embed_model_id, self._semantic_threshold),
@@ -144,12 +176,28 @@ class MeddraLookupService:
         self._semantic_lock = threading.Lock()
         self._semantic_enabled = not _env_bool("DISABLE_SEMANTIC", False)
         self._prewarm = _env_bool("PREWARM_SEMANTIC", False)
+        self._prewarm_graph = _env_bool("PREWARM_GRAPH", True)
 
     def close(self) -> None:
         self._graph.close()
 
     def semantic_status(self) -> dict[str, bool]:
         return {lang: idx.ready for lang, idx in self._semantic.items()}
+
+    def prewarm_graph(self) -> None:
+        if not self._prewarm_graph:
+            return
+        try:
+            n = self._graph.prewarm()
+            if n == 0:
+                log.warning(
+                    "Neo4j is empty — run: docker compose up -d && "
+                    "PYTHONPATH=. python data/build_graph.py"
+                )
+            else:
+                log.info("Graph cache prewarmed (%d French labels)", n)
+        except Exception as exc:
+            log.warning("Graph prewarm skipped: %s", exc)
 
     def health(self) -> dict[str, Any]:
         try:
@@ -164,9 +212,11 @@ class MeddraLookupService:
                         labels = fut.result(timeout=8.0)
                     except FuturesTimeout:
                         log.warning("Neo4j label count timed out on health check")
+            graph_ok = bool(labels and labels > 0)
             return {
-                "status": "ok",
+                "status": "ok" if graph_ok else "degraded",
                 "neo4j": "connected",
+                "graph_populated": graph_ok,
                 "labels_loaded": labels,
                 "cache_ready": self._graph.cache_ready(),
                 "semantic_ready": self.semantic_status(),
@@ -196,8 +246,72 @@ class MeddraLookupService:
             except Exception as exc:
                 log.warning("Semantic prewarm (%s) skipped: %s", lang, exc)
 
+    def lookup_by_id(self, concept_id: str, *, lang: str = "auto") -> LookupResult:
+        """Resolve a MedDRA concept by numeric code and return full hierarchy navigation."""
+        raw = (concept_id or "").strip()
+        if not self._graph.graph_populated():
+            return LookupResult(
+                query=raw,
+                query_lang="en",
+                match_type="none",
+                score=None,
+                ambiguous=False,
+                concept=None,
+                message="MedDRA graph is empty in Neo4j.",
+                semantic_ready=self.semantic_status(),
+            )
+        if not is_meddra_code(raw):
+            return LookupResult(
+                query=raw,
+                query_lang="en",
+                match_type="none",
+                score=None,
+                ambiguous=False,
+                concept=None,
+                message="Not a MedDRA concept id.",
+                semantic_ready=self.semantic_status(),
+            )
+        concept = self._graph.concept_by_id(raw)
+        if not concept:
+            return LookupResult(
+                query=raw,
+                query_lang="en",
+                match_type="none",
+                score=None,
+                ambiguous=False,
+                concept=None,
+                message=f"No concept with id {raw}.",
+                semantic_ready=self.semantic_status(),
+            )
+        lang_norm = (lang or "auto").lower()
+        if lang_norm == "auto":
+            query_lang = detect_lang(str(concept.get("name") or ""))
+        elif lang_norm.startswith("en"):
+            query_lang = "en"
+        else:
+            query_lang = "fr"
+        result = self._result_from_concept(raw, query_lang, concept, "exact", 100.0)
+        result.semantic_ready = self.semantic_status()
+        return result
+
     def lookup(self, term: str, *, lang: str = "fr") -> LookupResult:
         raw = (term or "").strip()
+        if is_meddra_code(raw):
+            return self.lookup_by_id(raw, lang=lang)
+        if not self._graph.graph_populated():
+            return LookupResult(
+                query=raw,
+                query_lang="fr",
+                match_type="none",
+                score=None,
+                ambiguous=False,
+                concept=None,
+                message=(
+                    "MedDRA graph is empty in Neo4j. Run docker compose up -d, then "
+                    "PYTHONPATH=. python data/build_graph.py"
+                ),
+                semantic_ready=self.semantic_status(),
+            )
         if not raw:
             return LookupResult(
                 query=raw,
@@ -226,9 +340,16 @@ class MeddraLookupService:
         return result
 
     def collect_candidates(
-        self, term: str, *, lang: str = "auto", limit: int | None = None
+        self,
+        term: str,
+        *,
+        lang: str = "auto",
+        limit: int | None = None,
+        context_sentence: str | None = None,
     ) -> tuple[str, list[dict[str, Any]]]:
         """Hybrid graph retrieval: exact, ambiguous alts, fuzzy, semantic (deduped)."""
+        if not self._graph.graph_populated():
+            return "fr", []
         raw = (term or "").strip()
         cap = limit if limit is not None else self._candidate_limit
         lang_norm = (lang or "auto").lower()
@@ -249,32 +370,57 @@ class MeddraLookupService:
             if cid not in merged or (score or 0) > float(merged[cid].get("score") or 0):
                 merged[cid] = self._enrich_candidate(anchored, source, score)
 
-        if query_lang == "fr":
-            key = norm_key(raw)
-            if self._graph.is_ambiguous_fr(raw):
-                for row in self._graph.alternatives_fr(key):
-                    add(row, "ambiguous", 100.0)
-            exact = self._graph.exact_fr(raw)
-            if exact:
-                add(exact, "exact", 100.0)
-            if not exact or self._graph.is_ambiguous_fr(raw):
-                for concept, score in self._graph.fuzzy_fr_candidates(
-                    raw, self._candidate_fuzzy_cutoff, limit=5
-                ):
-                    add(concept, "fuzzy", score)
-                for concept, score in self._semantic_top_k(raw, "fr", k=5):
-                    add(concept, "semantic", round(score * 100, 1))
-        else:
-            exact = self._graph.exact_en(raw)
-            if exact:
-                add(exact, "exact", 100.0)
-            if not exact:
-                for concept, score in self._graph.fuzzy_en_candidates(
-                    raw, self._candidate_fuzzy_cutoff, limit=5
-                ):
-                    add(concept, "fuzzy", score)
-                for concept, score in self._semantic_top_k(raw, "en", k=5):
-                    add(concept, "semantic", round(score * 100, 1))
+        def collect_one(query: str) -> None:
+            q = (query or "").strip()
+            if not q:
+                return
+            if query_lang == "fr":
+                key = norm_key(q)
+                if self._graph.is_ambiguous_fr(q):
+                    for row in self._graph.alternatives_fr(key):
+                        add(row, "ambiguous", 100.0)
+                exact = self._graph.exact_fr(q)
+                if exact:
+                    add(exact, "exact", 100.0)
+                if not exact or self._graph.is_ambiguous_fr(q):
+                    for concept, score in self._graph.fuzzy_fr_candidates(
+                        q, self._candidate_fuzzy_cutoff, limit=5
+                    ):
+                        add(concept, "fuzzy", score)
+                    if self._semantic_enabled:
+                        for concept, score in self._semantic_top_k(q, "fr", k=5):
+                            add(concept, "semantic", round(score * 100, 1))
+            else:
+                exact = self._graph.exact_en(q)
+                if exact:
+                    add(exact, "exact", 100.0)
+                if not exact:
+                    for concept, score in self._graph.fuzzy_en_candidates(
+                        q, self._candidate_fuzzy_cutoff, limit=5
+                    ):
+                        add(concept, "fuzzy", score)
+                    if self._semantic_enabled:
+                        for concept, score in self._semantic_top_k(q, "en", k=5):
+                            add(concept, "semantic", round(score * 100, 1))
+
+        collect_one(raw)
+
+        if context_sentence:
+            for phrase in _context_phrase_variants(raw, context_sentence):
+                if norm_key(phrase) != norm_key(raw):
+                    collect_one(phrase)
+            # Substring/partial match only when the term alone and phrases found nothing.
+            if not merged:
+                if query_lang == "fr":
+                    for concept, score in self._graph.substring_fr_candidates(
+                        raw, min_score=self._substring_min, limit=cap
+                    ):
+                        add(concept, "substring", score)
+                else:
+                    for concept, score in self._graph.substring_en_candidates(
+                        raw, min_score=self._substring_min, limit=cap
+                    ):
+                        add(concept, "substring", score)
 
         ranked = sorted(
             merged.values(),
@@ -293,7 +439,9 @@ class MeddraLookupService:
         """In-context mode: graph candidates plus OpenRouter disambiguation."""
         ctx = (context_sentence or "").strip()
         term = (target_term or "").strip()
-        query_lang, candidates = self.collect_candidates(term, lang=lang)
+        query_lang, candidates = self.collect_candidates(
+            term, lang=lang, context_sentence=ctx
+        )
         baseline = self.lookup(term, lang=lang)
         baseline.semantic_ready = self.semantic_status()
 
@@ -303,11 +451,25 @@ class MeddraLookupService:
         }
         selected: LookupResult | None = None
 
-        if not candidates:
+        if not self._graph.graph_populated():
+            llm_out.update(
+                ok=False,
+                error="graph_empty",
+                message=(
+                    "MedDRA graph is empty in Neo4j. Run "
+                    "docker compose up -d then "
+                    "PYTHONPATH=. python data/build_graph.py "
+                    "(requires MedDRA licence files in data/meddra)."
+                ),
+            )
+        elif not candidates:
             llm_out.update(
                 ok=False,
                 error="no_candidates",
-                message="No graph candidates for this term.",
+                message=(
+                    "No graph candidates for this term. Try French spelling, "
+                    "a shorter substring, or check that the term exists in MedDRA."
+                ),
             )
         elif llm_configured():
             llm_out.update(resolve_context(ctx, term, candidates))

@@ -1,0 +1,10 @@
+segment,segment_id,d_best_raw,d_best_adjudicated,n_best,llm_best,adjudication_rule,agree_d_n_raw,agree_d_n_adj,agree_d_llm_raw,agree_d_llm_adj,agree_n_llm,agree_all_three_raw,agree_all_three_adj
+1,48_082,s2,s2,s2,s2,consensus,yes,yes,yes,yes,yes,yes,yes
+2,48_015,human,human,s2,human,llm_reference,no,no,yes,yes,no,no,no
+3,48_004,human,human,human,human,consensus,yes,yes,yes,yes,yes,yes,yes
+4,48_095,s2,s2,human,s2,llm_reference,no,no,yes,yes,no,no,no
+5,48_036,s2,s2,s2,s2,consensus,yes,yes,yes,yes,yes,yes,yes
+6,48_032,human,s2,s2,unknown,n_fallback,no,yes,no,no,no,no,no
+7,48_029,s5,s2,s2,s2,llm_reference,no,yes,no,yes,yes,no,yes
+8,48_018,human,human,s2,human,tie_break_llm,no,no,yes,yes,no,no,no
+9,48_124,s2,s2,s2,human,consensus,yes,yes,no,no,no,no,no

@@ -46,6 +46,45 @@ def load_level_file(path: Path) -> list[tuple[str, str]]:
     return rows
 
 
+def load_code_pair_file(path: Path) -> list[tuple[str, str]]:
+    """MedDRA relation files: ``parent_code$child_code$`` (e.g. hlt_pt, soc_hlgt)."""
+    rows: list[tuple[str, str]] = []
+    for line in read_meddra_asc(path).splitlines():
+        if not line.strip():
+            continue
+        parts = split_meddra_asc_line(line)
+        if len(parts) >= 2:
+            parent, child = parts[0].strip(), parts[1].strip()
+            if parent.isdigit() and child.isdigit():
+                rows.append((parent, child))
+    return rows
+
+
+def _add_edge(edges: set[tuple[str, str]], parent: str, child: str) -> None:
+    if parent and child and parent != child:
+        edges.add((parent, child))
+
+
+_TIER_RANK = {"SOC": 1, "HLGT": 2, "HLT": 3, "PT": 4, "LLT": 5}
+
+
+def _merge_concept(
+    concepts: dict[str, tuple[str, int, str]],
+    cid: str,
+    name: str,
+    level: int,
+    tier: str,
+) -> None:
+    """Keep the broadest tier when the same MedDRA code appears in multiple level files."""
+    if cid in concepts:
+        _name, old_level, old_tier = concepts[cid]
+        old_rank = _TIER_RANK.get(old_tier, old_level)
+        new_rank = _TIER_RANK.get(tier, level)
+        if new_rank >= old_rank:
+            return
+    concepts[cid] = (name, level, tier)
+
+
 def resolve_english_asc_dir(meddra: Path) -> Path | None:
     nested = meddra / "MedAscii" / "mdhier.asc"
     if nested.is_file():
@@ -148,20 +187,28 @@ def load_meddra_english(session, en_dir: Path) -> None:
         if (row.get("primary_soc_fg") or "Y").upper() != "Y":
             continue
         row = enrich_mdhier_row_pt(row, llt_pt, pt_names)
-        if not (row.get("pt_code") or "").strip():
-            row = dict(row)
-            row["pt_code"] = row["llt_code"]
-            row["pt_name"] = (row.get("pt_name") or row.get("llt_name") or "").strip()
-        concepts[row["soc_code"]] = (row["soc_name"], 1, "SOC")
-        concepts[row["hlgt_code"]] = (row["hlgt_name"], 2, "HLGT")
-        concepts[row["hlt_code"]] = (row["hlt_name"], 3, "HLT")
-        concepts[row["pt_code"]] = (row["pt_name"], 4, "PT")
-        concepts[row["llt_code"]] = (row["llt_name"], 5, "LLT")
+        pt_code = (row.get("pt_code") or "").strip()
+        if not pt_code:
+            continue
+        _merge_concept(concepts, row["soc_code"], row["soc_name"], 1, "SOC")
+        _merge_concept(concepts, row["hlgt_code"], row["hlgt_name"], 2, "HLGT")
+        _merge_concept(concepts, row["hlt_code"], row["hlt_name"], 3, "HLT")
+        _merge_concept(concepts, pt_code, row["pt_name"], 4, "PT")
+        _merge_concept(concepts, row["llt_code"], row["llt_name"], 5, "LLT")
 
-        edges.add((row["soc_code"], row["hlgt_code"]))
-        edges.add((row["hlgt_code"], row["hlt_code"]))
-        edges.add((row["hlt_code"], row["pt_code"]))
-        edges.add((row["pt_code"], row["llt_code"]))
+        _add_edge(edges, row["soc_code"], row["hlgt_code"])
+        _add_edge(edges, row["hlgt_code"], row["hlt_code"])
+        _add_edge(edges, row["hlt_code"], pt_code)
+        _add_edge(edges, pt_code, row["llt_code"])
+
+    for rel_file in ("soc_hlgt.asc", "hlgt_hlt.asc", "hlt_pt.asc"):
+        rel_path = en_dir / rel_file
+        if rel_path.is_file():
+            for parent, child in load_code_pair_file(rel_path):
+                _add_edge(edges, parent, child)
+
+    for llt_code, pt_code in llt_pt.items():
+        _add_edge(edges, pt_code, llt_code)
 
     for fname, level, tier in [
         ("soc.asc", 1, "SOC"),
@@ -174,7 +221,7 @@ def load_meddra_english(session, en_dir: Path) -> None:
         if not p.exists():
             continue
         for cid, cname in load_level_file(p):
-            concepts[cid] = (cname, level, tier)
+            _merge_concept(concepts, cid, cname, level, tier)
 
     session.run(
         """

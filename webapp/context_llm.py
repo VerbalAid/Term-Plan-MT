@@ -10,8 +10,15 @@ from typing import Any
 
 log = logging.getLogger(__name__)
 
-# Rolling production id — avoids pinned variants deprecated on OpenRouter (e.g. v0.1).
-DEFAULT_MODEL = "mistralai/mistral-7b-instruct"
+# Free-first on OpenRouter; set LLM_MODEL_NAME=openai/gpt-4o-mini in .env for paid routing.
+DEFAULT_MODEL = "openrouter/free"
+DEFAULT_FALLBACK_MODELS = (
+    "openrouter/free",
+    "meta-llama/llama-3.2-3b-instruct:free",
+    "google/gemma-3-4b-it:free",
+    "qwen/qwen-2.5-7b-instruct:free",
+    "openai/gpt-4o-mini",
+)
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
 _SYSTEM_PROMPT = """You are a medical translation and pharmacovigilance coding specialist \
@@ -48,6 +55,17 @@ def llm_model() -> str:
     return _env("LLM_MODEL_NAME", "OPENROUTER_MODEL") or DEFAULT_MODEL
 
 
+def llm_model_chain() -> list[str]:
+    """Primary model first, then env and built-in fallbacks (deduped)."""
+    chain: list[str] = []
+    extra = _env("LLM_MODEL_FALLBACKS")
+    for mid in (llm_model(), *extra.split(","), *DEFAULT_FALLBACK_MODELS):
+        m = mid.strip()
+        if m and m not in chain:
+            chain.append(m)
+    return chain or [DEFAULT_MODEL]
+
+
 def llm_base_url() -> str:
     return _env("LLM_API_BASE_URL") or DEFAULT_BASE_URL
 
@@ -74,6 +92,9 @@ def _parse_json_payload(raw: str) -> dict[str, Any]:
     text = (raw or "").strip()
     if not text:
         return {}
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```\s*$", "", text)
     try:
         return json.loads(text)
     except json.JSONDecodeError:
@@ -103,6 +124,62 @@ def _format_candidates(candidates: list[dict[str, Any]]) -> str:
 
 def _valid_ids(candidates: list[dict[str, Any]]) -> set[str]:
     return {str(c["id"]) for c in candidates if _JSON_ID_RE.match(str(c.get("id", "")))}
+
+
+def _is_model_unavailable(exc: BaseException) -> bool:
+    text = str(exc).lower()
+    return (
+        "404" in text
+        or "no endpoints found" in text
+        or "model not found" in text
+        or "does not exist" in text
+    )
+
+
+def _chat_completion(
+    client: Any,
+    base_kwargs: dict[str, Any],
+    model: str,
+) -> Any:
+    """Call one model; retry without response_format if the gateway rejects it."""
+    kwargs = {**base_kwargs, "model": model}
+    try:
+        kwargs["response_format"] = {"type": "json_object"}
+        return client.chat.completions.create(**kwargs)
+    except Exception as exc:
+        if _is_model_unavailable(exc):
+            raise
+        kwargs.pop("response_format", None)
+        return client.chat.completions.create(**kwargs)
+
+
+def _complete_json(
+    client: Any,
+    base_kwargs: dict[str, Any],
+    models: list[str],
+) -> tuple[dict[str, Any], str]:
+    """Try each model until JSON parses; skip models that 404 or return garbage."""
+    last_json_err: json.JSONDecodeError | None = None
+    last_exc: BaseException | None = None
+    for model in models:
+        try:
+            response = _chat_completion(client, base_kwargs, model)
+            raw = response.choices[0].message.content or "{}"
+            return _parse_json_payload(raw), model
+        except json.JSONDecodeError as exc:
+            log.warning("Model %s returned invalid JSON: %s", model, exc)
+            last_json_err = exc
+            continue
+        except Exception as exc:
+            if _is_model_unavailable(exc):
+                log.warning("OpenRouter model unavailable (%s): %s", model, exc)
+                last_exc = exc
+                continue
+            raise
+    if last_json_err is not None:
+        raise last_json_err
+    assert last_exc is not None
+    raise last_exc
 
 
 def _fallback_result(
@@ -145,7 +222,7 @@ def resolve_context(
         }
 
     valid = _valid_ids(candidates)
-    model = llm_model()
+    models = llm_model_chain()
     user_prompt = f"""Context sentence:
 "{context_sentence.strip()}"
 
@@ -157,44 +234,39 @@ Grounded MedDRA graph candidates:
 
 Return JSON with exactly these keys:
 - "selected_concept_id": string, one of: {", ".join(sorted(valid))}
-- "clinical_justification": string, 2–4 sentences, British English
-- "stylistic_analysis": string, 2–4 sentences on register (MedDRA vs translator prose)
+- "clinical_justification": string, 1–2 sentences, British English
+- "stylistic_analysis": string, 1–2 sentences on register (MedDRA vs translator prose)
 - "abstain": boolean, true only if no candidate is defensible
 - "confidence": "high", "medium", or "low"
 """
 
+    model = models[0]
     try:
         client = _client()
-        kwargs: dict[str, Any] = {
-            "model": model,
+        base_kwargs: dict[str, Any] = {
             "messages": [
                 {"role": "system", "content": _SYSTEM_PROMPT},
                 {"role": "user", "content": user_prompt},
             ],
             "temperature": 0.1,
+            "max_tokens": 1024,
         }
-        try:
-            kwargs["response_format"] = {"type": "json_object"}
-            response = client.chat.completions.create(**kwargs)
-        except Exception:
-            kwargs.pop("response_format", None)
-            response = client.chat.completions.create(**kwargs)
-
-        raw = response.choices[0].message.content or "{}"
-        parsed = _parse_json_payload(raw)
-    except json.JSONDecodeError as exc:
-        log.warning("Model returned invalid JSON: %s", exc)
+        parsed, model = _complete_json(client, base_kwargs, models)
+    except json.JSONDecodeError:
         return _fallback_result(
             candidates,
             model=model,
-            reason=f"Invalid JSON from model; defaulted to top graph candidate. ({exc})",
+            reason="Context routing returned invalid JSON; the top graph match was used instead.",
         )
-    except Exception as exc:
+    except Exception:
         log.exception("OpenRouter context resolve failed")
         return _fallback_result(
             candidates,
             model=model,
-            reason=f"OpenRouter routing unavailable; defaulted to top graph candidate. ({exc})",
+            reason=(
+                "Context routing could not reach any configured OpenRouter model "
+                f"({', '.join(models[:2])}). The top graph match was used instead."
+            ),
         )
 
     selected = str(parsed.get("selected_concept_id", "")).strip()

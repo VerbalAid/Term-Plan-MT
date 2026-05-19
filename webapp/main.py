@@ -17,8 +17,9 @@ from pydantic import BaseModel, Field
 
 WEBAPP_DIR = Path(__file__).resolve().parent
 REPO_ROOT = WEBAPP_DIR.parent
-load_dotenv(WEBAPP_DIR / ".env")
+# Repo defaults first; webapp/.env wins (overrides shell exports for local dev).
 load_dotenv(REPO_ROOT / ".env")
+load_dotenv(WEBAPP_DIR / ".env", override=True)
 
 from webapp.auth import (
     AccessGateMiddleware,
@@ -40,7 +41,14 @@ async def lifespan(_app: FastAPI):
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     warn_if_public()
     validate_neo4j_config()
+    from webapp.context_llm import llm_configured, llm_model
+
+    if llm_configured():
+        log.info("Context LLM: %s", llm_model())
+    else:
+        log.warning("Context LLM disabled (set LLM_API_KEY in webapp/.env)")
     svc = get_lookup_service()
+    svc.prewarm_graph()
     if os.environ.get("PREWARM_SEMANTIC", "").lower() in ("1", "true", "yes"):
         svc.prewarm_semantic()
     yield
@@ -101,6 +109,7 @@ def api_health():
             "semantic_disabled": data.get("semantic_disabled"),
             "semantic_ready": data.get("semantic_ready"),
             "llm_configured": data.get("llm_configured"),
+            "llm_model": data.get("llm_model"),
         }
     return data
 
@@ -133,6 +142,21 @@ def api_debug_neighborhood(
             }
         ),
     }
+
+
+@app.get("/api/concept/{concept_id}")
+async def api_concept_by_id(
+    concept_id: str,
+    lang: str = Query("auto"),
+):
+    """Hierarchy navigation: fetch one concept with parents, children, and ancestor chain."""
+    try:
+        return await run_in_threadpool(
+            lambda: get_lookup_service().lookup_by_id(concept_id, lang=lang).to_dict()
+        )
+    except Exception as exc:
+        log.exception("concept lookup failed")
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.post("/api/lookup")

@@ -13,6 +13,11 @@ from typing import Any
 
 log = logging.getLogger(__name__)
 
+
+class GraphEmptyError(RuntimeError):
+    """Neo4j is reachable but contains no loadable MedDRA concepts."""
+
+
 from neo4j import Driver, GraphDatabase
 from rapidfuzz import fuzz, process
 
@@ -49,6 +54,7 @@ class MeddraGraph:
         self._en_fuzzy_keys: list[str] = []
         self._en_fuzzy_vals: list[dict] = []
         self._ambiguous: set[str] = set()
+        self._ambiguous_buckets: dict[str, list[dict]] = {}
         self._ambiguous_counts: dict[str, int] = {}
         self._label_count = 0
         self._load_lock = threading.Lock()
@@ -102,6 +108,25 @@ class MeddraGraph:
     def cache_ready(self) -> bool:
         return self._fr_cache is not None and bool(self._en_fuzzy_keys)
 
+    def graph_populated(self) -> bool:
+        """True when at least one MedDRA-coded concept with a French label exists."""
+        if self._fr_cache is not None:
+            return self._label_count > 0
+        return self.quick_label_count() > 0
+
+    def ensure_populated(self) -> None:
+        if not self.graph_populated():
+            raise GraphEmptyError(
+                "Neo4j has no MedDRA concepts. Start Neo4j (docker compose up -d) "
+                "and load the graph: PYTHONPATH=. python data/build_graph.py"
+            )
+
+    def prewarm(self) -> int:
+        """Load in-memory indexes; return French label count."""
+        self._load_fr()
+        self._load_en()
+        return self._label_count
+
     def _load_fr(self) -> None:
         if self._fr_cache is not None:
             return
@@ -122,11 +147,13 @@ class MeddraGraph:
                     buckets[k].append(self._row_to_concept(r))
 
             cache: dict[str, dict] = {}
+            self._ambiguous_buckets = {}
             for k, items in buckets.items():
                 ids = {str(p["id"]) for p in items}
                 self._ambiguous_counts[k] = len(ids)
                 if len(ids) > 1:
                     self._ambiguous.add(k)
+                    self._ambiguous_buckets[k] = [dict(p) for p in items]
                 cache[k] = items[0]
 
             self._fr_fuzzy_keys = []
@@ -190,23 +217,52 @@ class MeddraGraph:
         self, fr_term: str, cutoff: float, *, limit: int = 5
     ) -> list[tuple[dict, float]]:
         self._load_fr()
-        hits = process.extract(
-            norm_key(fr_term),
-            self._fr_fuzzy_keys,
-            scorer=fuzz.ratio,
-            score_cutoff=cutoff,
-            limit=limit,
-        )
+        if self._fr_fuzzy_keys:
+            hits = process.extract(
+                norm_key(fr_term),
+                self._fr_fuzzy_keys,
+                scorer=fuzz.ratio,
+                score_cutoff=cutoff,
+                limit=limit,
+            )
+            out: list[tuple[dict, float]] = []
+            seen: set[str] = set()
+            for _label, score, idx in hits:
+                concept = dict(self._fr_fuzzy_vals[idx])
+                cid = str(concept.get("id", ""))
+                if cid in seen:
+                    continue
+                seen.add(cid)
+                out.append((concept, float(score)))
+            if out:
+                return out
+        return self._fuzzy_fr_via_cypher(fr_term, cutoff=cutoff, limit=limit)
+
+    def _fuzzy_fr_via_cypher(
+        self, fr_term: str, *, cutoff: float, limit: int = 5
+    ) -> list[tuple[dict, float]]:
+        """Cypher fallback when the in-memory French index is empty or has no hits."""
+        needle = (fr_term or "").strip()
+        if not needle:
+            return []
+        q = """
+        MATCH (c:Concept)
+        WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
+          AND c.tier IN ['PT', 'LLT'] AND c.id =~ '^[0-9]+$'
+          AND toLower(trim(c.fr_label)) CONTAINS toLower($n)
+        RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
+        LIMIT $lim
+        """
+        nk = norm_key(needle)
         out: list[tuple[dict, float]] = []
-        seen: set[str] = set()
-        for _label, score, idx in hits:
-            concept = dict(self._fr_fuzzy_vals[idx])
-            cid = str(concept.get("id", ""))
-            if cid in seen:
-                continue
-            seen.add(cid)
-            out.append((concept, float(score)))
-        return out
+        with self._driver.session() as s:
+            for rec in s.run(q, n=needle, lim=limit * 4):
+                concept = self._row_to_concept(rec)
+                fr = str(rec.get("fr_label") or "")
+                score = float(fuzz.ratio(nk, norm_key(fr)))
+                out.append((concept, score))
+        out.sort(key=lambda x: x[1], reverse=True)
+        return [(c, s) for c, s in out if s >= cutoff][:limit]
 
     def exact_en(self, en_term: str) -> dict | None:
         q = """
@@ -248,6 +304,59 @@ class MeddraGraph:
         out.sort(key=lambda x: x[1], reverse=True)
         return out[:limit]
 
+    def substring_en_candidates(
+        self,
+        en_term: str,
+        *,
+        min_score: float = 45.0,
+        limit: int = 8,
+    ) -> list[tuple[dict, float]]:
+        """CONTAINS + partial_ratio — for short terms (e.g. ``hormone``) that fail ratio fuzzy."""
+        needle = (en_term or "").strip()
+        if len(needle) < 2:
+            return []
+        nk = norm_key(needle)
+        hits = self._fuzzy_en_via_cypher(needle, limit=limit * 3)
+        out: list[tuple[dict, float]] = []
+        seen: set[str] = set()
+        for concept, _ratio_score in hits:
+            cid = str(concept.get("id", ""))
+            if cid in seen:
+                continue
+            name = str(concept.get("name") or "")
+            score = float(fuzz.partial_ratio(nk, norm_key(name)))
+            if score >= min_score:
+                seen.add(cid)
+                out.append((concept, score))
+        out.sort(key=lambda x: x[1], reverse=True)
+        return out[:limit]
+
+    def substring_fr_candidates(
+        self,
+        fr_term: str,
+        *,
+        min_score: float = 45.0,
+        limit: int = 8,
+    ) -> list[tuple[dict, float]]:
+        needle = (fr_term or "").strip()
+        if len(needle) < 2:
+            return []
+        nk = norm_key(needle)
+        hits = self._fuzzy_fr_via_cypher(needle, cutoff=0, limit=limit * 3)
+        out: list[tuple[dict, float]] = []
+        seen: set[str] = set()
+        for concept, _ratio_score in hits:
+            cid = str(concept.get("id", ""))
+            if cid in seen:
+                continue
+            fr = str(concept.get("fr_label") or "")
+            score = float(fuzz.partial_ratio(nk, norm_key(fr)))
+            if score >= min_score:
+                seen.add(cid)
+                out.append((concept, score))
+        out.sort(key=lambda x: x[1], reverse=True)
+        return out[:limit]
+
     def fuzzy_en_candidates(
         self, en_term: str, cutoff: float, *, limit: int = 5
     ) -> list[tuple[dict, float]]:
@@ -274,15 +383,20 @@ class MeddraGraph:
         return out
 
     def alternatives_fr(self, key: str) -> list[dict]:
+        nk = norm_key(key)
+        self._load_fr()
+        if nk in self._ambiguous_buckets:
+            return [dict(c) for c in self._ambiguous_buckets[nk]]
         q = """
         MATCH (c:Concept)
-        WHERE c.fr_label IS NOT NULL AND toLower(trim(c.fr_label)) = $key
+        WHERE c.fr_label IS NOT NULL AND trim(c.fr_label) <> ''
           AND c.id =~ '^[0-9]+$'
         RETURN c.id AS id, c.name AS name, c.level AS level, c.tier AS tier, c.fr_label AS fr_label
         ORDER BY c.level
         """
         with self._driver.session() as s:
-            return [self._row_to_concept(r) for r in s.run(q, key=key)]
+            rows = [self._row_to_concept(r) for r in s.run(q)]
+        return [r for r in rows if norm_key(str(r.get("fr_label") or "")) == nk]
 
     def resolve_concept(self, concept: dict) -> dict:
         """Re-anchor to a canonical MedDRA-coded node with hierarchy edges when possible."""
@@ -356,8 +470,9 @@ class MeddraGraph:
         q = """
         MATCH (c:Concept {id: $cid})
         MATCH (p:Concept)-[:BROADER_THAN]->(c)
+        WHERE p.id <> c.id
         RETURN p.id AS id, p.name AS name, p.level AS level, p.tier AS tier, p.fr_label AS fr_label
-        ORDER BY p.level ASC
+        ORDER BY p.level ASC, p.name
         """
         with self._driver.session() as s:
             return [self._row_to_concept(r) for r in s.run(q, cid=cid)]
@@ -368,18 +483,20 @@ class MeddraGraph:
         q = """
         MATCH (c:Concept {id: $cid})
         MATCH (c)-[:BROADER_THAN]->(ch:Concept)
+        WHERE ch.id <> c.id
         RETURN ch.id AS id, ch.name AS name, ch.level AS level, ch.tier AS tier, ch.fr_label AS fr_label
-        ORDER BY ch.level ASC
+        ORDER BY ch.level ASC, ch.name
         """
         with self._driver.session() as s:
             return [self._row_to_concept(r) for r in s.run(q, cid=cid)]
 
     def ancestor_chain(self, concept: dict) -> list[dict]:
-        """SOC → … → concept (broadest first). Up to four hops covers SOC…LLT."""
+        """SOC → … → concept (broadest first). Up to six hops covers SOC…LLT."""
         cid = self._anchor_id(concept)
         q = """
         MATCH (c:Concept {id: $cid})
-        OPTIONAL MATCH (ancestor:Concept)-[:BROADER_THAN*1..4]->(c)
+        OPTIONAL MATCH (ancestor:Concept)-[:BROADER_THAN*1..6]->(c)
+        WHERE ancestor.id <> c.id
         WITH c, [a IN collect(DISTINCT ancestor) WHERE a IS NOT NULL] AS ancestors
         RETURN ancestors, c
         """
